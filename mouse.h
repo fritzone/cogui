@@ -5,6 +5,14 @@
 class mouse
 {
 public:
+
+    enum class state
+    {
+	left_down,
+	right_down,
+	left_and_right_down
+    };
+
     static mouse& get();
 
     int x() const;

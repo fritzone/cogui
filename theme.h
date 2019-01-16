@@ -37,6 +37,26 @@ public:
     std::wstring WND_TITLE_DELIM_LEFT = L"\x2563 ";
     std::wstring WND_TITLE_DELIM_RIGHT = L" \x2560";
 
+    /* resize graphics down */
+
+    // the line characters when moving/resizing the window
+    std::wstring UL_CORNER_RESIZE = L"\x250F";
+    std::wstring UR_CORNER_RESIZE = L"\x2513";
+    std::wstring LL_CORNER_RESIZE = L"\x2517";
+    std::wstring LR_CORNER_RESIZE = L"\x251B";
+    std::wstring HORZ_LINE_RESIZE = L"\x2501";
+    std::wstring VERT_LINE_RESIZE = L"\x2503";
+
+    // the system menu, resize mode
+    std::wstring WND_SYSMENU_RESIZE =  L"\x252B\x25bf\x2523";
+
+    // the delimiters of the title
+    std::wstring WND_TITLE_DELIM_LEFT_RESIZE = L"\x252B ";
+    std::wstring WND_TITLE_DELIM_RIGHT_RESIZE = L" \x2523";
+
+    // the close button of the theme
+    std::wstring WND_CLOSE_RESIZE = L"\x252B\x2613\x2523";
+    std::wstring WND_MAXIMIZE_RESIZE = L"\x252B\x25ab\x2523";
 };
 }
 

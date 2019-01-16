@@ -158,6 +158,8 @@ void cogui::graphics::handle_mouse_movement()
         prev_char = char_at;
 
         wmove(stdscr, 0, 0);
+        attron(COLOR_PAIR(2));
+
         refresh();
     }
 }

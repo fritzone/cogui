@@ -10,6 +10,7 @@ enum class event
     mouse_move,
     mouse_left_click,
     mouse_right_click,
+    mouse_left_press,
     unknown
 };
 

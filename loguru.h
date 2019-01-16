@@ -1,3 +1,5 @@
+#define LOGURU_WITH_STREAMS 1
+
 /*
 Loguru logging library for C++, by Emil Ernerfeldt.
 www.github.com/emilk/loguru

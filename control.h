@@ -8,6 +8,7 @@ class control
 {
 public:
     control(int x, int y, int width, int height);
+    virtual ~control() = default;
 
     int x() const;
     void setX(int x);
@@ -20,6 +21,10 @@ public:
 
     int height() const;
     void setHeight(int height);
+
+    bool inside(int x, int y) const;
+
+    virtual void draw() const = 0;
 
 private:
 

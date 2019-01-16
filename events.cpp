@@ -12,6 +12,11 @@ cogui::event cogui::to_event(int c)
         {
             mouse::get().setX(event.x);
             mouse::get().setY(event.y);
+
+            if(event.bstate & BUTTON1_PRESSED)
+            {
+                return cogui::event::mouse_left_press;
+            }
             if(event.bstate & BUTTON1_CLICKED)
             {
                 return cogui::event::mouse_left_click;

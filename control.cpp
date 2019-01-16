@@ -14,6 +14,11 @@ void cogui::control::setHeight(int h)
     m_h = h;
 }
 
+bool cogui::control::inside(int x, int y) const
+{
+    return x >= m_x && x < m_x + m_w && y >= m_y && y < m_y + m_h;
+}
+
 int cogui::control::width() const
 {
     return m_w;
