@@ -21,6 +21,14 @@ bool desktop::set_chars(int x, int y, const std::wstring &s)
     return m_graphics->set_chars(x, y, s);
 }
 
+void desktop::handle_mouse_move(int x, int y)
+{
+    if(m_captured_window)
+    {
+        m_captured_window->mouse_move(x, y);
+    }
+}
+
 void desktop::handle_mouse_left_click(int x, int y)
 {
     for(auto w : m_windows)
@@ -28,7 +36,7 @@ void desktop::handle_mouse_left_click(int x, int y)
         if(w->inside(x, y))
         {
             LOG_S(INFO) << "inside";
-            w->click( x - w->x(), y - w->y() );
+            w->click( x, y);
         }
     }
 }
@@ -39,11 +47,26 @@ void desktop::handle_mouse_left_down(int x, int y)
     {
         if(w->inside(x, y))
         {
-            LOG_S(INFO) << "inside";
-            w->left_mouse_down( x - w->x(), y - w->y() );
+            info() << "captured a window";
+
+            w->left_mouse_down(x, y);
+            if(w->getDrawState() != window::draw_state::normal)
+            {
+                info() << "captured a window";
+                m_captured_window = w;
+                return;
+            }
         }
     }
+}
 
+void desktop::handle_mouse_left_up(int x, int y)
+{
+    if(m_captured_window)
+    {
+        m_captured_window->left_mouse_up(x, y);
+        m_captured_window = nullptr;
+    }
 }
 
 std::shared_ptr<cogui::theme> desktop::theme() const

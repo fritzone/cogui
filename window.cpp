@@ -25,14 +25,88 @@ void cogui::window::click(int x, int y)
     LOG_S(INFO) << "window click: x=" << x << " y=" << y;
 }
 
+void cogui::window::mouse_move(int x, int y)
+{
+
+    info() << "x=" << x << " w=" << width() << " x()=" << this->x();
+    info() << "y=" << y << " h=" << height()<< " y()=" << this->y();
+    if(m_draw_state == draw_state::moving)
+    {
+        if(x - m_mouse_down_x >= 0 && y - m_mouse_down_y >= 0)
+        {
+            clear(); // clear is usually followed by a draw that why there is no refresh
+            setX(x - m_mouse_down_x);
+            setY(y - m_mouse_down_y);
+            draw();
+        }
+    }
+
+    if(m_draw_state == draw_state::resizing)
+    {
+        int dx = x - m_mouse_down_x - this->x();
+        int dy = y - m_mouse_down_y - this->y();
+        info() << "dx=" << dx << " dy=" << dy;
+        if(width() +  dx >=5 && height() + dy>= 5)
+        {
+            clear(); // clear is usually followed by a draw that why there is no refresh
+            info() << "w = " << width() << " nw=" << width() + dx;
+            setWidth( m_prev_w + dx);
+            setHeight( m_prev_h + dy);
+            draw();
+        }
+    }
+}
+
+bool cogui::window::inside(int x, int y) const
+{
+
+    info() << "I x=" << x << " w=" << width() << " x()=" << this->x();
+    info() << "I y=" << y << " h=" << height()<< " y()=" << this->y();
+
+    return x >= this->x()
+            && x <= this->x() + width() + 1
+            && y >= this->y()
+            && y <= this->y() + height()
+            ;
+}
+
+
 void cogui::window::left_mouse_down(int x, int y)
 {
-    if( y == 0)
+    info() << "D x=" << x << " w=" << width() << " x()=" << this->x();
+    info() << "D y=" << y << " h=" << height()<< " y()=" << this->y();
+    if( y == this->y())
     {
         // see: outside of sysmenu, maximize, close
-        m_draw_state = draw_state::resizing;
+        m_draw_state = draw_state::moving;
+        m_mouse_down_x = x - this->x();
+        m_mouse_down_y = y - this->y();
         draw();
+        return;
     }
+
+    info() << "R x=" << x << " w=" << width();
+    info() << "R y=" << y << " h=" << height();
+    if(x == width() + 1 + this->x() && y == height() + this->y())
+    {
+        info() << "resize starts";
+        m_draw_state = draw_state::resizing;
+        m_mouse_down_x = x - this->x();
+        m_mouse_down_y = y - this->y();
+        m_prev_w = width();
+        m_prev_h = height();
+
+        draw();
+        return;
+
+    }
+}
+
+void cogui::window::left_mouse_up(int x, int y)
+{
+    info() << "UP: " << x << " " << y;
+    m_draw_state = draw_state::normal;
+    draw();
 }
 
 bool cogui::window::hasSysmenuButton() const

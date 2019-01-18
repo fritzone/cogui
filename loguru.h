@@ -1,5 +1,7 @@
 #define LOGURU_WITH_STREAMS 1
 
+#define info() LOG_S(INFO)
+
 /*
 Loguru logging library for C++, by Emil Ernerfeldt.
 www.github.com/emilk/loguru
@@ -1083,7 +1085,7 @@ namespace loguru
 	class LOGURU_EXPORT StreamLogger
 	{
 	public:
-		StreamLogger(Verbosity verbosity, const char* file, unsigned line) : _verbosity(verbosity), _file(file), _line(line) {}
+        StreamLogger(Verbosity verbosity, const char* file, unsigned line, const char* func) : _verbosity(verbosity), _file(file), _line(line), _func(func) {}
 		~StreamLogger() noexcept(false);
 
 		template<typename T>
@@ -1104,7 +1106,8 @@ namespace loguru
 		Verbosity   _verbosity;
 		const char* _file;
 		unsigned    _line;
-		std::ostringstream _ss;
+        const char* _func;
+        std::ostringstream _ss;
 	};
 
 	class LOGURU_EXPORT AbortLogger
@@ -1192,7 +1195,7 @@ namespace loguru
 #define VLOG_IF_S(verbosity, cond)                                                                 \
 	((verbosity) > loguru::current_verbosity_cutoff() || (cond) == false)                          \
 		? (void)0                                                                                  \
-		: loguru::Voidify() & loguru::StreamLogger(verbosity, __FILE__, __LINE__)
+        : loguru::Voidify() & loguru::StreamLogger(verbosity, __FILE__, __LINE__, __FUNCTION__)
 #define LOG_IF_S(verbosity_name, cond) VLOG_IF_S(loguru::Verbosity_ ## verbosity_name, cond)
 #define VLOG_S(verbosity)              VLOG_IF_S(verbosity, true)
 #define LOG_S(verbosity_name)          VLOG_S(loguru::Verbosity_ ## verbosity_name)

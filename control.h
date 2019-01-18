@@ -22,9 +22,11 @@ public:
     int height() const;
     void setHeight(int height);
 
-    bool inside(int x, int y) const;
+    virtual bool inside(int x, int y) const;
 
     virtual void draw() const = 0;
+
+    void clear() const;
 
 private:
 

@@ -11,6 +11,9 @@ enum class event
     mouse_left_click,
     mouse_right_click,
     mouse_left_press,
+    mouse_left_release,
+    mouse_right_press,
+    mouse_right_release,
     unknown
 };
 

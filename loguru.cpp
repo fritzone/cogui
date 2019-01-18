@@ -1448,7 +1448,7 @@ namespace loguru
     StreamLogger::~StreamLogger() noexcept(false)
     {
         auto message = _ss.str();
-        log(_verbosity, _file, _line, "%s", message.c_str());
+        log(_verbosity, _file, _line, "(%s) %s", _func, message.c_str());
     }
 
     AbortLogger::~AbortLogger() noexcept(false)

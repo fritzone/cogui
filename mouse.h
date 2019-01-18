@@ -6,11 +6,12 @@ class mouse
 {
 public:
 
-    enum class state
+    enum class button
     {
-	left_down,
-	right_down,
-	left_and_right_down
+        left,
+        right,
+        left_and_right,
+        none
     };
 
     static mouse& get();
@@ -21,12 +22,16 @@ public:
     int y() const;
     void setY(int y);
 
+    button buttons() const;
+    void set_button(button b);
+    void clear_button(button b);
+
 private:
+    mouse();
 
     int m_x;
     int m_y;
-
-    mouse();
+    button m_button = button::none;
 };
 
 #endif // MOUSE_H

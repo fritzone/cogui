@@ -8,23 +8,25 @@ namespace cogui
 {
 
 class window;
+class control;
 
 class theme
 {
 public:
 
+    void clear(const control& c);
     void draw_window(const window& w);
 
-    // the line characters
-    std::wstring UL_CORNER = L"\x2554";
-    std::wstring UR_CORNER = L"\x2557";
-    std::wstring LL_CORNER = L"\x255A";
-    std::wstring LR_CORNER = L"\x255D";
-    std::wstring HORZ_LINE = L"\x2550";
-    std::wstring VERT_LINE = L"\x2551";
+    // the line characters of the window
+    std::wstring WND_UL_CORNER = L"\x2554";
+    std::wstring WND_UR_CORNER = L"\x2557";
+    std::wstring WND_LL_CORNER = L"\x255A";
+    std::wstring WND_LR_CORNER = L"\x255D";
+    std::wstring WND_HORZ_LINE = L"\x2550";
+    std::wstring WND_VERT_LINE = L"\x2551";
 
     // if the window is resizeable this is the corner of it
-    std::wstring LR_RESIZE = L"\x251B";
+    std::wstring WND_LR_RESIZE = L"\x251B";
 
     // the close button of the theme
     std::wstring WND_CLOSE = L"\x2561\x2613\x255e";
@@ -37,7 +39,7 @@ public:
     std::wstring WND_TITLE_DELIM_LEFT = L"\x2563 ";
     std::wstring WND_TITLE_DELIM_RIGHT = L" \x2560";
 
-    /* resize graphics down */
+    /* resize graphics for windows down */
 
     // the line characters when moving/resizing the window
     std::wstring UL_CORNER_RESIZE = L"\x250F";

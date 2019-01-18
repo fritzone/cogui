@@ -2,6 +2,7 @@
 #include "desktop.h"
 #include "graphics.h"
 #include "window.h"
+#include "control.h"
 
 #include "loguru.h"
 
@@ -63,26 +64,36 @@ void draw<int,const wchar_t*>(int x, int y, const wchar_t* s)
 }
 }
 
+void cogui::theme::clear(const control &c)
+{
+    int top = c.y();
+    for(int y = top; y <= top + c.height(); y++)
+    {
+        cogui::draw(c.x(), y, cogui::line(c.width() + 2, L" "));
+    }
+}
+
 void cogui::theme::draw_window(const cogui::window &w)
 {
-    // top line
     bool rs = w.getDrawState() == window::draw_state::normal;
-    auto line_char = rs ? HORZ_LINE : HORZ_LINE_RESIZE;
-    auto vert_line_char = rs ? VERT_LINE : VERT_LINE_RESIZE;
-    auto ul_corner_char = rs ? UL_CORNER : UL_CORNER_RESIZE;
-    auto ur_corner_char = rs ? UR_CORNER : UR_CORNER_RESIZE;
-    auto ll_corner_char = rs ? LL_CORNER : LL_CORNER_RESIZE;
-    auto lr_corner_char = rs ? LR_CORNER : LR_CORNER_RESIZE;
+
+    auto line_char = rs ? WND_HORZ_LINE : HORZ_LINE_RESIZE;
+    auto vert_line_char = rs ? WND_VERT_LINE : VERT_LINE_RESIZE;
+    auto ul_corner_char = rs ? WND_UL_CORNER : UL_CORNER_RESIZE;
+    auto ur_corner_char = rs ? WND_UR_CORNER : UR_CORNER_RESIZE;
+    auto ll_corner_char = rs ? WND_LL_CORNER : LL_CORNER_RESIZE;
+    auto lr_corner_char = rs ? WND_LR_CORNER : LR_CORNER_RESIZE;
     auto sysmenu_char = rs ? WND_SYSMENU : WND_SYSMENU_RESIZE;
     auto title_delim_left_char = rs ? WND_TITLE_DELIM_LEFT : WND_TITLE_DELIM_LEFT_RESIZE;
     auto title_delim_right_char = rs ? WND_TITLE_DELIM_RIGHT : WND_TITLE_DELIM_RIGHT_RESIZE;
     auto close_char = rs ? WND_CLOSE : WND_CLOSE_RESIZE;
     auto maximize_char = rs ? WND_MAXIMIZE : WND_MAXIMIZE_RESIZE;
 
+    // top line
     cogui::draw(w.x(), w.y(), ul_corner_char + cogui::line(w.width(), line_char) + ur_corner_char);
     // bottom line
     cogui::draw(w.x(), w.y() + w.height(), ll_corner_char + cogui::line(w.width(), line_char) +
-        (w.resizeable() ? LR_RESIZE : lr_corner_char) );
+        (w.resizeable() ? WND_LR_RESIZE : lr_corner_char) );
 
     // side lines
     for(int i=1; i< w.height(); i++)

@@ -1,6 +1,8 @@
 #define _XOPEN_SOURCE_EXTENDED
 #define _XOPEN_SOURCE 600
 
+#define MAX_DESKTOP_SIZE 4096
+
 #include "graphics.h"
 #include "events.h"
 #include "mouse.h"
@@ -31,10 +33,10 @@ bool cogui::graphics::initialize()
         return false;
     }
 
-    for(int i=0; i< 4096; i++)
+    for(int i=0; i< MAX_DESKTOP_SIZE; i++)
     {
         std::vector<wchar_t> row;
-        for(int j=0; j< 4096; j++)
+        for(int j=0; j< MAX_DESKTOP_SIZE; j++)
         {
             row.push_back(L' ');
         }
@@ -43,11 +45,9 @@ bool cogui::graphics::initialize()
 
     start_color();
 
-
     setlocale(LC_ALL, "");
-    init_pair(1, COLOR_BLACK, COLOR_RED);
-    init_pair(2, COLOR_WHITE, COLOR_BLACK);
-
+    init_pair(1, COLOR_BLACK, COLOR_RED);   // the text mouse cursor
+    init_pair(2, COLOR_WHITE, COLOR_BLACK); // the normal text
 
     keypad(stdscr, TRUE);
     noecho();
@@ -79,7 +79,10 @@ bool cogui::graphics::set_chars(int x, int y, const std::wstring &s)
     int l = static_cast<int>(s.length());
     for(int i=x; i<x+l; i++)
     {
-        chars[y][i] = s[i-x];
+        if(y > 0 && i > 0 && i < MAX_DESKTOP_SIZE && y < MAX_DESKTOP_SIZE)
+        {
+            chars[y][i] = s[i-x];
+        }
     }
     return true;
 }
@@ -103,6 +106,16 @@ void cogui::graphics::draw(int x, int y, const wchar_t *s)
         return;
     }
 
+    if(x < 0)
+    {
+        info() << "x=" << x << " ax=" << std::abs(x) + 1;
+
+        std::wstring sw(s);
+        std::wstring subs = sw.substr(std::abs(x) + 1);
+        mvwaddwstr(stdscr, y, 0, subs.c_str());
+        return;
+    }
+
     mvwaddwstr(stdscr, y, x, s);
 
 }
@@ -120,7 +133,7 @@ cogui::event cogui::graphics::get_next_event()
 
 void cogui::graphics::handle_mouse_movement()
 {
-    {
+   /* {
         static int prev_x = -1;
         static int prev_y = -1;
         static wchar_t prev_char = 0;
@@ -135,7 +148,7 @@ void cogui::graphics::handle_mouse_movement()
         attron(COLOR_PAIR(2));
         std::wstringstream ws;
         ws << "x:" << mx << " y:" << my << " c:" << cc << "  ";
-        mvaddwstr(22, 0, ws.str().c_str());
+        //mvaddwstr(22, 0, ws.str().c_str());
 
 
         if(prev_char)
@@ -161,5 +174,5 @@ void cogui::graphics::handle_mouse_movement()
         attron(COLOR_PAIR(2));
 
         refresh();
-    }
+    }*/
 }
