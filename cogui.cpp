@@ -61,6 +61,7 @@ int main( int argc, char* argv[] )
     signal(SIGWINCH, do_resize);
     signal(SIGSEGV, handler);   // install our handler
 
+    setenv("TERM", "linux", 1);
     cogui::desktop::get();
 
 
