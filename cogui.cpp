@@ -24,10 +24,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "loguru.h"
+#include "cogui.h"
+
+using namespace cogui;
 
 void do_resize(int dummy)
 {
-     exit(66);
+     info() << "Resize window";
 }
 
 
@@ -45,30 +48,22 @@ void handler(int sig) {
   exit(1);
 }
 
-int main( int argc, char* argv[] )
+void init_log(int argc, char* argv[])
 {
-    // Optional, but useful to time-stamp the start of the log.
-    // Will also detect verbosity level on command line as -v.
     loguru::init(argc, argv);
-
     LOG_SCOPE_FUNCTION(INFO);
-
-    // Put every log message in "everything.log":
     loguru::add_file("everything.log", loguru::Append, loguru::Verbosity_MAX);
-
     loguru::g_stderr_verbosity = loguru::Verbosity_OFF;
+}
+
+void cogui::init(int argc, char* argv[])
+{
+    init_log(argc, argv);
 
     signal(SIGWINCH, do_resize);
-    signal(SIGSEGV, handler);   // install our handler
+    signal(SIGSEGV, handler);
 
-    setenv("TERM", "linux", 1);
     cogui::desktop::get();
-
-
-    cogui::window a(5,5,70,15);
-    a.draw();
-
-    cogui::application app;
-    app.run();
-
 }
+
+

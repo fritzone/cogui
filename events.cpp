@@ -1,13 +1,50 @@
 #include "events.h"
 #include "curses.h"
 #include "mouse.h"
+#include "loguru.h"
+
+void log_event(MEVENT event)
+{
+    std::stringstream ss;
+    ss << "E@ " << event.x << ", " << event.y ;
+    if(event.bstate & BUTTON1_PRESSED)
+    {
+        ss << " LP ";
+    }
+    if(event.bstate & BUTTON2_PRESSED)
+    {
+        ss << " RP ";
+    }
+    if(event.bstate & BUTTON1_RELEASED)
+    {
+        ss << " LR ";
+    }
+    if(event.bstate & BUTTON2_RELEASED)
+    {
+        ss << " RR ";
+    }
+    if(event.bstate & BUTTON1_CLICKED)
+    {
+        ss << " LC ";
+    }
+    if(event.bstate & BUTTON2_CLICKED)
+    {
+        ss << " RC ";
+    }
+
+    ss << " V:" << (static_cast<int>(event.bstate));
+
+    info() << ss.str();
+
+}
 
 cogui::event cogui::to_event(int c)
 {
+    info() << "Event:" << c;
     switch (c) {
     case KEY_MOUSE:
     {
-        MEVENT event;
+        MEVENT event = {0};
 
         int prev_x = mouse::get().x();
         int prev_y = mouse::get().y();
@@ -15,6 +52,8 @@ cogui::event cogui::to_event(int c)
 
         if(getmouse(&event) == OK)
         {
+
+            log_event(event);
 
             if(prev_x != event.x || prev_y != event.y)
             {
@@ -55,10 +94,14 @@ cogui::event cogui::to_event(int c)
                 return cogui::event::mouse_move;
             }
         }
+        else {
+            info() << "Could not get mouse event";
+        }
         break;
     }
 
     case 27: return cogui::event::press_escape;
+    case 9: return cogui::event::press_tab;
     default: return cogui::event::unknown;
     }
     return cogui::event::unknown;

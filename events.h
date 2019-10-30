@@ -7,6 +7,7 @@ namespace cogui
 enum class event
 {
     press_escape,
+    press_tab,
     mouse_move,
     mouse_left_click,
     mouse_right_click,
@@ -14,6 +15,7 @@ enum class event
     mouse_left_release,
     mouse_right_press,
     mouse_right_release,
+    no_event,
     unknown
 };
 

@@ -1,8 +1,12 @@
 #ifndef MOUSE_H
 #define MOUSE_H
 
+#include <string>
 
-class mouse
+namespace cogui
+{
+
+class mouse final
 {
 public:
 
@@ -15,6 +19,8 @@ public:
     };
 
     static mouse& get();
+
+    static std::string buttonName(button);
 
     int x() const;
     void setX(int x);
@@ -33,5 +39,7 @@ private:
     int m_y;
     button m_button = button::none;
 };
+
+}
 
 #endif // MOUSE_H

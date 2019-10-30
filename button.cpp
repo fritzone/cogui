@@ -1,0 +1,20 @@
+#include "button.h"
+#include "desktop.h"
+#include "theme.h"
+
+cogui::button::OnClick::argument cogui::button::on_click;
+
+cogui::button::button(int x, int y, int width, int height, const std::wstring &title) : control(x, y, width, height, title)
+{
+}
+
+void cogui::button::draw() const
+{
+    cogui::desktop::get().getTheme()->draw_button(*this);
+}
+
+void cogui::button::click()
+{
+    debug() << "Emitting a click signal";
+    emit sig_on_click(this);
+}

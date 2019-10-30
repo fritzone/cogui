@@ -3,6 +3,7 @@
 #include "graphics.h"
 #include "window.h"
 #include "control.h"
+#include "button.h"
 
 #include "loguru.h"
 
@@ -53,23 +54,23 @@ template<typename T, typename S>
 void draw(T x, T y, S s)
 {
     desktop::get().set_chars(x, y, s);
-    desktop::get().graphics()->draw(x, y, s.c_str());
+    desktop::get().getGraphics()->draw(x, y, s.c_str());
 }
 
 template<>
 void draw<int,const wchar_t*>(int x, int y, const wchar_t* s)
 {
     desktop::get().set_chars(x, y, s);
-    desktop::get().graphics()->draw(x, y, s);
+    desktop::get().getGraphics()->draw(x, y, s);
 }
-}
+} // namespace
 
 void cogui::theme::clear(const control &c)
 {
-    int top = c.y();
-    for(int y = top; y <= top + c.height(); y++)
+    int top = c.getY();
+    for(int y = top; y <= top + c.getHeight(); y++)
     {
-        cogui::draw(c.x(), y, cogui::line(c.width() + 2, L" "));
+        cogui::draw(c.getX(), y, cogui::line(c.getWidth() + 2, L" "));
     }
 }
 
@@ -90,37 +91,39 @@ void cogui::theme::draw_window(const cogui::window &w)
     auto maximize_char = rs ? WND_MAXIMIZE : WND_MAXIMIZE_RESIZE;
 
     // top line
-    cogui::draw(w.x(), w.y(), ul_corner_char + cogui::line(w.width(), line_char) + ur_corner_char);
+    cogui::draw(w.getX(), w.getY(), ul_corner_char + cogui::line(w.getWidth(), line_char) + ur_corner_char);
     // bottom line
-    cogui::draw(w.x(), w.y() + w.height(), ll_corner_char + cogui::line(w.width(), line_char) +
+    cogui::draw(w.getX(), w.getY() + w.getHeight(), ll_corner_char + cogui::line(w.getWidth(), line_char) +
         (w.resizeable() ? WND_LR_RESIZE : lr_corner_char) );
 
     // side lines
-    for(int i=1; i< w.height(); i++)
+    for(int i=1; i< w.getHeight(); i++)
     {
-        cogui::draw(w.x(), w.y() + i, vert_line_char);
-        cogui::draw(w.x() + w.width() + 1, w.y() + i, vert_line_char);
+        cogui::draw(w.getX(), w.getY() + i, vert_line_char);
+        cogui::draw(w.getX() + w.getWidth() + 1, w.getY() + i, vert_line_char);
     }
 
-    int available_width = w.width(); // -3 because of the begin and end chars for title separator
+    int available_width = w.getWidth(); // -3 because of the begin and end chars for title separator
     // buttons
     if(w.hasCloseButton())
     {
         available_width -= close_char.length();
-        LOG_S(INFO) << "wdth:" << w.width() << " avail:" << available_width;
+        //info() << "wdth:" << w.width() << " avail:" << available_width;
 
-        cogui::draw(w.x() + available_width, w.y(), close_char);
+        cogui::draw(w.getX() + available_width, w.getY(), close_char);
+
+        w.update_close_btn_pos(w.getX() + available_width + 1);
     }
     if(w.hasMaximizeButton())
     {
         available_width -= maximize_char.length() - 1;
-        LOG_S(INFO) << "wdth:" << w.width() << " avail:" << available_width;
+        // info() << "wdth:" << w.width() << " avail:" << available_width;
 
-        cogui::draw(w.x() + available_width , w.y(), maximize_char);
+        cogui::draw(w.getX() + available_width , w.getY(), maximize_char);
         if(w.hasCloseButton()) // remove ugly close and end buttons from window titlebar
         {
-            int newx = w.x() + available_width + maximize_char.length() - 1;
-            cogui::draw(newx, w.y(), L" ");
+            int newx = w.getX() + available_width + maximize_char.length() - 1;
+            cogui::draw(newx, w.getY(), L" ");
         }
     }
 
@@ -128,21 +131,76 @@ void cogui::theme::draw_window(const cogui::window &w)
     if(w.hasSysmenuButton())
     {
         available_width -= sysmenu_char.length();
-        cogui::draw(w.x() + 1, w.y(), sysmenu_char);
+        cogui::draw(w.getX() + 1, w.getY(), sysmenu_char);
     }
 
     // title
-    if(!w.title().empty())
+    if(!w.getTitle().empty())
     {
         available_width -= title_delim_left_char.length() + title_delim_right_char.length(); // two title delimiters
-        int lefts = w.x() + available_width / 2 - w.title().length() / 2;
-        int right = w.x() + available_width / 2 + w.title().length() / 2 + title_delim_left_char.length() + w.title().length() % 2;
-        cogui::draw(lefts, w.y(), title_delim_left_char);
+        int lefts = w.getX() + available_width / 2 - w.getTitle().length() / 2;
+        int right = w.getX() + available_width / 2 + w.getTitle().length() / 2 + title_delim_left_char.length() + w.getTitle().length() % 2;
+        cogui::draw(lefts, w.getY(), title_delim_left_char);
         int title_left = lefts + title_delim_left_char.length();
-        cogui::draw(title_left, w.y(), w.title());
-        cogui::draw(right, w.y(), title_delim_right_char);
+        cogui::draw(title_left, w.getY(), w.getTitle());
+        cogui::draw(right, w.getY(), title_delim_right_char);
+    }
+}
+
+void cogui::theme::draw_button(const cogui::button &b)
+{
+    auto ul_char = BTN_UL_CORNER_STATE_UP ;
+    auto ll_char = BTN_LL_CORNER_STATE_UP ;
+    auto ur_char = BTN_UR_CORNER_STATE_UP ;
+    auto lr_char = BTN_LR_CORNER_STATE_UP ;
+    auto top_char = BTN_TOP_BORDER_UP ;
+    auto bottom_char = BTN_BOTTOM_BORDER_UP ;
+    auto left_border = BTN_LEFT_UP ;
+    auto right_border = BTN_RIGHT_UP ;
+
+    if(b.getFocusState() == cogui::control::focus_state::focused)
+    {
+        ul_char = BTN_UL_CORNER_STATE_FOCUSED;
+        ll_char = BTN_LL_CORNER_STATE_FOCUSED;
+        ur_char = BTN_UR_CORNER_STATE_FOCUSED;
+        lr_char = BTN_LR_CORNER_STATE_FOCUSED;
+        top_char = BTN_TOP_BORDER_FOCUSED;
+        bottom_char = BTN_BOTTOM_BORDER_FOCUSED;
+        left_border = BTN_LEFT_FOCUSED;
+        right_border = BTN_RIGHT_FOCUSED;
     }
 
-    cogui::desktop::get().graphics()->refresh_screen();
+    if(b.state() == control::press_state::pressed)
+    {
+        ul_char = BTN_UL_CORNER_STATE_PRESSED;
+        ll_char = BTN_LL_CORNER_STATE_PRESSED;
+        ur_char = BTN_UR_CORNER_STATE_PRESSED;
+        lr_char = BTN_LR_CORNER_STATE_PRESSED;
+        top_char = BTN_TOP_BORDER_PRESSED;
+        bottom_char = BTN_BOTTOM_BORDER_PRESSED;
+        left_border = BTN_LEFT_PRESSED;
+        right_border = BTN_RIGHT_PRESSED;
+    }
+
+    // upper left corner
+    cogui::draw(b.getX(), b.getY(), ul_char);
+    cogui::draw(b.getX(), b.getY() + b.getHeight(), ll_char);
+    cogui::draw(b.getX() + b.getWidth(), b.getY(), ur_char);
+    cogui::draw(b.getX() + b.getWidth(), b.getY() + b.getHeight(), lr_char);
+
+    // top border of button
+    cogui::draw(b.getX() + 1, b.getY(), cogui::line(b.getWidth() - 1, top_char ) );
+    cogui::draw(b.getX() + 1, b.getY() + b.getHeight(), cogui::line(b.getWidth() - 1, bottom_char) );
+
+    // side lines
+    for(int i=1; i< b.getHeight(); i++)
+    {
+        cogui::draw(b.getX(), b.getY() + i, left_border);
+        cogui::draw(b.getX() + b.getWidth(), b.getY() + i, right_border);
+    }
+
+    // button text
+    cogui::draw((int)(b.getX() + b.getWidth() / 2 - b.getTitle().length() / 2), b.getY() + b.getHeight() / 2, b.getTitle());
+
 
 }

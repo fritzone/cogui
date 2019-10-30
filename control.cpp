@@ -1,44 +1,123 @@
 #include "control.h"
+#include "loguru.h"
 #include "desktop.h"
 #include "theme.h"
 
-cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_w(w), m_h(h)
+#include <locale>
+#include <codecvt>
+#include <string>
+
+cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_width(w), m_height(h)
 {
+    info() << "Created a control at:" << x << ", " << y;
 }
 
-int cogui::control::height() const
+cogui::control::control(int x, int y, int width, int height, const std::wstring &title):
+    cogui::control::control(x, y, width, height)
 {
-    return m_h;
+    m_title = title;
+}
+
+cogui::control::control(int x, int y, int width, int height, const std::string &title) :
+    cogui::control::control(x, y, width, height)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    m_title = converter.from_bytes(title);
+}
+
+int cogui::control::getHeight() const
+{
+    return m_height;
 }
 
 void cogui::control::setHeight(int h)
 {
-    m_h = h;
+    m_height = h;
 }
 
 bool cogui::control::inside(int x, int y) const
 {
-    return x >= m_x && x < m_x + m_w && y >= m_y && y < m_y + m_h;
+    return x >= this->getX() && x < this->getX() + m_width && y >= this->getY() && y < this->getY() + m_height;
 }
 
 void cogui::control::clear() const
 {
-    cogui::desktop::get().theme()->clear(*this);
+    cogui::desktop::get().getTheme()->clear(*this);
 }
 
-int cogui::control::width() const
+cogui::control *cogui::control::getParent() const
 {
-    return m_w;
+    return m_parent;
+}
+
+void cogui::control::setParent(cogui::control *value)
+{
+    m_parent = value;
+}
+
+void cogui::control::focus()
+{
+    m_focus_state = focus_state::focused;
+}
+
+void cogui::control::unfocus()
+{
+    m_focus_state = focus_state::not_focused;
+}
+
+cogui::control::focus_state cogui::control::getFocusState() const
+{
+    return m_focus_state;
+}
+
+bool cogui::control::hasFocus() const
+{
+    return m_focus_state == focus_state::focused;
+}
+
+void cogui::control::control::setFocusState(const cogui::control::focus_state &focus_state)
+{
+    m_focus_state = focus_state;
+}
+
+void cogui::control::press()
+{
+    m_state = press_state::pressed;
+}
+
+void cogui::control::release()
+{
+    m_state = press_state::released;
+}
+
+bool cogui::control::isPressed() const
+{
+    return m_state == press_state::pressed;
+}
+
+cogui::control::press_state cogui::control::state() const
+{
+    return m_state;
+}
+
+void cogui::control::setState(cogui::control::press_state s)
+{
+    m_state = s;
+}
+
+int cogui::control::getWidth() const
+{
+    return m_width;
 }
 
 void cogui::control::setWidth(int w)
 {
-    m_w = w;
+    m_width = w;
 }
 
-int cogui::control::y() const
+int cogui::control::getY() const
 {
-    return m_y;
+    return m_parent ? m_parent->getY() + m_y : m_y;
 }
 
 void cogui::control::setY(int y)
@@ -46,12 +125,22 @@ void cogui::control::setY(int y)
     m_y = y;
 }
 
-int cogui::control::x() const
+int cogui::control::getX() const
 {
-    return m_x;
+    return m_parent ? m_parent->getX() + m_x : m_x;
 }
 
 void cogui::control::setX(int x)
 {
     m_x = x;
+}
+
+std::wstring cogui::control::getTitle() const
+{
+    return m_title;
+}
+
+void cogui::control::setTitle(const std::wstring &title)
+{
+    m_title = title;
 }

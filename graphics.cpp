@@ -6,6 +6,7 @@
 #include "graphics.h"
 #include "events.h"
 #include "mouse.h"
+#include "input.h"
 
 #include <wchar.h>
 
@@ -16,7 +17,6 @@
 
 cogui::graphics::graphics()
 {
-
 }
 
 cogui::graphics::~graphics()
@@ -26,6 +26,8 @@ cogui::graphics::~graphics()
 
 bool cogui::graphics::initialize()
 {
+    setenv("TERM", "linux", 1);
+    setlocale(LC_ALL, "");
     stdscr = initscr();
 
     if(stdscr == nullptr)
@@ -43,32 +45,19 @@ bool cogui::graphics::initialize()
         chars.push_back(row);
     }
 
-    start_color();
+    if(has_colors())
+    {
+        start_color();
+        m_colours = true;
+    }
 
-    setlocale(LC_ALL, "");
     init_pair(1, COLOR_BLACK, COLOR_RED);   // the text mouse cursor
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // the normal text
 
-    keypad(stdscr, TRUE);
-    noecho();
-
-    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, nullptr);
-
-    // Makes the terminal report mouse movement events
-    printf("\033[?1003h\n");
-
-    //Hide the cursor
-    printf("\033[?25l\n");
-    printf("\033[?25h\n");
-
     fflush(stdout) ;
-
-    curs_set(0);
 
     // screen size
     getmaxyx(stdscr, m_height, m_width);
-
-    refresh();
 
     return true;
 }
@@ -125,15 +114,9 @@ void cogui::graphics::refresh_screen()
     refresh();
 }
 
-cogui::event cogui::graphics::get_next_event()
-{
-    int c = wgetch(stdscr);
-    return cogui::to_event(c);
-}
-
 void cogui::graphics::handle_mouse_movement()
 {
-   /* {
+    /*{
         static int prev_x = -1;
         static int prev_y = -1;
         static wchar_t prev_char = 0;
@@ -174,5 +157,5 @@ void cogui::graphics::handle_mouse_movement()
         attron(COLOR_PAIR(2));
 
         refresh();
-    }*/
+    } */
 }

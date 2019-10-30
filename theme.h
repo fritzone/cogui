@@ -7,6 +7,7 @@
 namespace cogui
 {
 
+class button;
 class window;
 class control;
 
@@ -16,6 +17,11 @@ public:
 
     void clear(const control& c);
     void draw_window(const window& w);
+    void draw_button(const button& b);
+
+    /******************************************************************************************************************/
+    /*                                                      WINDOW                                                    */
+    /******************************************************************************************************************/
 
     // the line characters of the window
     std::wstring WND_UL_CORNER = L"\x2554";
@@ -59,6 +65,46 @@ public:
     // the close button of the theme
     std::wstring WND_CLOSE_RESIZE = L"\x252B\x2613\x2523";
     std::wstring WND_MAXIMIZE_RESIZE = L"\x252B\x25ab\x2523";
+
+    /******************************************************************************************************************/
+    /*                                                      BUTTON                                                    */
+    /******************************************************************************************************************/
+
+    // Normal state, button is just drawn  as it is
+
+    std::wstring BTN_UL_CORNER_STATE_UP = L"\x250C";    // Upper left corner
+    std::wstring BTN_UR_CORNER_STATE_UP = L"\x2512";    // Upper right corner
+    std::wstring BTN_LL_CORNER_STATE_UP = L"\x2515";    // Lower left corner
+    std::wstring BTN_LR_CORNER_STATE_UP = L"\x251B";    // Lower right corner
+
+    std::wstring BTN_TOP_BORDER_UP = L"\x2500";    // Top border for line
+    std::wstring BTN_BOTTOM_BORDER_UP = L"\x2501";    // Bottom border for line, thicker than top
+    std::wstring BTN_LEFT_UP = L"\x2502";    // Left border for line
+    std::wstring BTN_RIGHT_UP = L"\x2503";    // Right border for line, thicker than left
+
+    // Pressed state, button is drawn with thicker border
+
+    std::wstring BTN_UL_CORNER_STATE_PRESSED = L"\x250F";    // PRESSED upper left corner
+    std::wstring BTN_UR_CORNER_STATE_PRESSED = L"\x2511";    // PRESSED upper right corner
+    std::wstring BTN_LL_CORNER_STATE_PRESSED = L"\x2516";    // PRESSED Lower left corner
+    std::wstring BTN_LR_CORNER_STATE_PRESSED = L"\x2518";    // PRESSED Lower right corner
+
+    std::wstring BTN_TOP_BORDER_PRESSED = L"\x2501";    // PRESSED Top border for line
+    std::wstring BTN_BOTTOM_BORDER_PRESSED = L"\x2500";    // PRESSED Bottom border for line
+    std::wstring BTN_LEFT_PRESSED = L"\x2503";    // PRESSED Left border for line
+    std::wstring BTN_RIGHT_PRESSED = L"\x2502";    // PRESSED Right border for line
+
+    // Focused state, buttons' border is dotted
+    std::wstring BTN_UL_CORNER_STATE_FOCUSED = L"\x250C";    // FOCUSED upper left corner
+    std::wstring BTN_UR_CORNER_STATE_FOCUSED = L"\x2512";    // FOCUSED upper right corner
+    std::wstring BTN_LL_CORNER_STATE_FOCUSED = L"\x2515";    // FOCUSED Lower left corner
+    std::wstring BTN_LR_CORNER_STATE_FOCUSED = L"\x251B";    // FOCUSED Lower right corner
+
+    std::wstring BTN_TOP_BORDER_FOCUSED = L"\x2504";    // FOCUSED Top border for line
+    std::wstring BTN_BOTTOM_BORDER_FOCUSED = L"\x2505";    // FOCUSED Bottom border for line
+    std::wstring BTN_LEFT_FOCUSED = L"\x250A";    // FOCUSED Left border for line
+    std::wstring BTN_RIGHT_FOCUSED = L"\x250B";    // FOCUSED Right border for line, thicker
+
 };
 }
 

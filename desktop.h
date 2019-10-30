@@ -10,6 +10,7 @@ namespace cogui {
 class graphics;
 class theme;
 class window;
+class input;
 
 class desktop
 {
@@ -22,14 +23,22 @@ public:
     void handle_mouse_left_down(int x, int y);
     void handle_mouse_left_up(int x, int y);
 
-    std::shared_ptr<cogui::theme> theme() const;
-    std::shared_ptr<cogui::graphics> graphics() const;
+    void handle_tab();
+
+    std::shared_ptr<theme> getTheme() const;
+    std::shared_ptr<graphics> getGraphics() const;
+    std::shared_ptr<input> getInput() const;
+
     void add_window(window* w);
     void remove_window(window* w);
+
+    void refresh();
 
 public:
 
     static desktop& get();
+
+    std::vector<window *> windows() const;
 
 private:
 
@@ -38,9 +47,11 @@ private:
 
     std::shared_ptr<cogui::theme> m_theme;
     std::shared_ptr<cogui::graphics> m_graphics;
+    std::shared_ptr<cogui::input> m_input;
 
     std::vector<window*> m_windows;
     window* m_captured_window = nullptr;
+    bool m_initialized = false;
 };
 
 }

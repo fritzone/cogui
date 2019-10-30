@@ -1,9 +1,22 @@
 #include "mouse.h"
 
+using namespace cogui;
+
 mouse &mouse::get()
 {
     static mouse instance;
     return instance;
+}
+
+std::string mouse::buttonName(mouse::button b)
+{
+    switch (b)
+    {
+        case button::left: return "left";
+        case button::right: return "right";
+        case button::left_and_right: return "left and right";
+        case button::none: return "none";
+    }
 }
 
 int mouse::x() const

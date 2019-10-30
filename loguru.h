@@ -1,6 +1,9 @@
 #define LOGURU_WITH_STREAMS 1
 
+
 #define info() LOG_S(INFO)
+#define warning() LOG_S(WARNING)
+#define debug() LOG_S(INFO)
 
 /*
 Loguru logging library for C++, by Emil Ernerfeldt.
