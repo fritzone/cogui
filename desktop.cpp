@@ -39,11 +39,6 @@ std::vector<window *> desktop::windows() const
     return m_windows;
 }
 
-bool desktop::set_chars(int x, int y, const std::wstring &s)
-{
-    return m_graphics->set_chars(x, y, s);
-}
-
 void desktop::handle_mouse_move(int x, int y)
 {
     if(m_captured_window)
@@ -97,6 +92,28 @@ void desktop::handle_mouse_left_up(int x, int y)
     }
 }
 
+void desktop::handle_mouse_right_down(int x, int y)
+{
+    for(const auto& w : m_windows)
+    {
+        if(w->inside(x, y))
+        {
+            w->right_mouse_down(x, y);
+        }
+    }
+}
+
+void desktop::handle_mouse_right_up(int x, int y)
+{
+    if(m_captured_window)
+    {
+        if(m_captured_window->inside(x, y))
+        {
+            m_captured_window->right_mouse_up(x, y);
+        }
+    }
+}
+
 void desktop::handle_tab()
 {
     if(m_captured_window)
@@ -142,12 +159,29 @@ void desktop::refresh()
 
 }
 
+void desktop::shutdown()
+{
+    m_graphics->shutdown();
+    m_input->shutdown();
+}
+
+void desktop::resize()
+{
+    m_graphics->shutdown();
+    m_graphics->initialize();
+    m_graphics->refresh_screen();
+}
+
+int desktop::getWidth() const {return m_graphics->getWidth();}
+
+int desktop::getHeight() const {return m_graphics->getHeight();}
+
 desktop &desktop::get()
 {
-    static desktop a;
-    static bool desk_init = a.initialize();
-    a.m_initialized = desk_init;
-    return a;
+    static desktop d;
+    static bool desk_init = d.initialize();
+    d.m_initialized = desk_init;
+    return d;
 }
 
 desktop::desktop() : m_theme(new theme), m_graphics(new graphics), m_input(new gpm_input)

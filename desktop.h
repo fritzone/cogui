@@ -15,13 +15,15 @@ class input;
 class desktop
 {
 public:
-    bool set_chars(int x, int y, const std::wstring &s);
-
     void handle_mouse_move(int x, int y);
 
     void handle_mouse_left_click(int x, int y);
     void handle_mouse_left_down(int x, int y);
     void handle_mouse_left_up(int x, int y);
+
+    void handle_mouse_right_down(int x, int y);
+    void handle_mouse_right_up(int x, int y);
+
 
     void handle_tab();
 
@@ -33,6 +35,10 @@ public:
     void remove_window(window* w);
 
     void refresh();
+    void shutdown();
+    void resize();
+    int getWidth() const;
+    int getHeight() const;
 
 public:
 

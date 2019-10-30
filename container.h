@@ -48,6 +48,8 @@ public:
 protected:
 
     void update_container();
+    /*will just release a control that was pressed, helper function */
+    void release_control(std::shared_ptr<control>);
 private:
 
     /**

@@ -37,7 +37,7 @@ void cogui::window::draw() const
 
 void cogui::window::click(int x, int y)
 {
-   info() << "window click: x=" << x << " y=" << y;
+   // info() << "window click: x=" << x << " y=" << y;
    if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
    {
        m_draw_state = draw_state::normal;
@@ -47,7 +47,7 @@ void cogui::window::click(int x, int y)
    if(y == this->getY() && x == m_close_btn_pos)
    {
        // close click:
-       debug() << "click on close button";
+       // debug() << "click on close button";
        emit sig_on_close(this);
        return;
    }
@@ -56,8 +56,10 @@ void cogui::window::click(int x, int y)
    std::shared_ptr<control> under = element_under(x, y);
    if(under)
    {
-       debug() << "found under ontrol";
+       release_control(under);
+       // debug() << "found under ontrol";
        under->click();
+
    }
 }
 
@@ -65,13 +67,17 @@ void cogui::window::mouse_move(int x, int y)
 {
     if(m_draw_state == draw_state::moving)
     {
-        debug() << "mouse moving at" <<x<<", "<<y;
-        if(x - m_mouse_down_x >= 0 && y - m_mouse_down_y >= 0)
+        // debug() << "mouse moving at" <<x<<", "<<y;
+
+        int new_x = x - m_mouse_down_x;
+        int new_y = y - m_mouse_down_y;
+
+        if(new_x >= 0 && new_y >= 0 && new_x + this->getWidth() < desktop::get().getWidth() - 1 && new_y + this->getHeight() < desktop::get().getHeight())
         {
-            debug() << "window moving at" <<x<<", "<<y;
+            // debug() << "window moving at" <<x<<", "<<y;
             clear(); // clear is usually followed by a draw that why there is no refresh
-            setX(x - m_mouse_down_x);
-            setY(y - m_mouse_down_y);
+            setX(new_x);
+            setY(new_y);
 
             update_container();
 
@@ -79,7 +85,7 @@ void cogui::window::mouse_move(int x, int y)
         }
         else
         {
-            debug() << "window not moving at all at " <<x<<", "<<y;
+            // debug() << "window not moving at all at " <<x<<", "<<y;
         }
     }
     else
@@ -90,7 +96,7 @@ void cogui::window::mouse_move(int x, int y)
         if(getWidth() +  dx >=5 && getHeight() + dy>= 5)
         {
             clear(); // clear is usually followed by a draw that why there is no refresh
-            info() << "w = " << getWidth() << " nw=" << getWidth() + dx;
+            // info() << "w = " << getWidth() << " nw=" << getWidth() + dx;
             setWidth( m_prev_w + dx);
             setHeight( m_prev_h + dy);
 
@@ -141,6 +147,13 @@ void cogui::window::mouse_move(int x, int y)
             return draw();
         }
     }
+
+    // now if there was a control we have focused on, unfocus it since we moved outside of it
+    if(m_focused != m_tab_order.end())
+    {
+        (*m_focused)->unfocus();
+        return draw();
+    }
 }
 
 bool cogui::window::inside(int x, int y) const
@@ -160,13 +173,13 @@ void cogui::window::click()
 void cogui::window::update_close_btn_pos(int nx) const
 {
     m_close_btn_pos = nx;
-    debug() << "Close at:" << m_close_btn_pos;
+    // debug() << "Close at:" << m_close_btn_pos;
 }
 
 
 void cogui::window::left_mouse_down(int x, int y)
 {
-    info() << "y=" << y << " topy=" << this->getY();
+    // info() << "y=" << y << " topy=" << this->getY();
     if( y == this->getY()) // down on the top line, usually this means move the window
     {
         // see: outside of sysmenu, maximize, close
@@ -196,8 +209,15 @@ void cogui::window::left_mouse_down(int x, int y)
         return draw();
     }
 
-    // noone else captured this event, emit as a generic signal
+    // now if there was a control we have pressed the button on, release it since we clicked outside of it
+    if(m_prev_pressed != m_tab_order.end() || m_pressed != m_tab_order.end() )
+    {
+        auto to_unpress_it = m_prev_pressed != m_tab_order.end() ? m_prev_pressed : m_pressed;
+        release_control(*to_unpress_it);
+        return draw();
+    }
 
+    // noone else captured this event, emit as a generic signal
     emit sig_on_mouse_down(this, cogui::mouse::button::left, x - this->getX(), y - this->getY());
     draw();
 }
@@ -215,17 +235,9 @@ void cogui::window::left_mouse_up(int x, int y)
         // see if the release has happened on the same control that was pressed on
         if(*m_prev_pressed == under)
         {
-            // means, this is a click
-            under->release();
-            under->unfocus();
-
+            release_control(under);
             // call the click
             under->click();
-
-            // reset the controls
-            m_prev_pressed = m_tab_order.end();
-            m_pressed = m_tab_order.end();
-            m_focused = m_tab_order.end();
         }
         return draw();
     }
@@ -234,17 +246,7 @@ void cogui::window::left_mouse_up(int x, int y)
     if(m_prev_pressed != m_tab_order.end() || m_pressed != m_tab_order.end() )
     {
         auto to_unpress_it = m_prev_pressed != m_tab_order.end() ? m_prev_pressed : m_pressed;
-
-        (*to_unpress_it)->release();
-
-        // and remove the focus from it
-        (*to_unpress_it)->unfocus();
-
-        // reset the controls
-        m_prev_pressed = m_tab_order.end();
-        m_pressed = m_tab_order.end();
-        m_focused = m_tab_order.end();
-
+        release_control(*to_unpress_it);
         return draw();
     }
 
@@ -252,6 +254,16 @@ void cogui::window::left_mouse_up(int x, int y)
     emit sig_on_mouse_up(this, cogui::mouse::button::left, x - this->getX(), y - this->getY());
     draw();
 
+}
+
+void cogui::window::right_mouse_down(int x, int y)
+{
+    emit sig_on_mouse_down(this, cogui::mouse::button::right, x - this->getX(), y - this->getY());
+}
+
+void cogui::window::right_mouse_up(int x, int y)
+{
+    emit sig_on_mouse_up(this, cogui::mouse::button::right, x - this->getX(), y - this->getY());
 }
 
 bool cogui::window::hasSysmenuButton() const

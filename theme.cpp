@@ -53,14 +53,12 @@ std::wstring line(int l, std::wstring chr)
 template<typename T, typename S>
 void draw(T x, T y, S s)
 {
-    desktop::get().set_chars(x, y, s);
     desktop::get().getGraphics()->draw(x, y, s.c_str());
 }
 
 template<>
 void draw<int,const wchar_t*>(int x, int y, const wchar_t* s)
 {
-    desktop::get().set_chars(x, y, s);
     desktop::get().getGraphics()->draw(x, y, s);
 }
 } // namespace

@@ -6,15 +6,18 @@
 #include <ncursesw/ncurses.h>
 #include <linux/keyboard.h>
 #include <string.h>
-
+#include <chrono>
 #include "loguru.h"
 
 static cogui::mouse::button last_button = cogui::mouse::button::none;
+static auto t_start = std::chrono::high_resolution_clock::now();
+// the work...
+
+
 
 int my_handler(Gpm_Event *event, void *data)
 {
-    info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y <<
-              " buttons:" << (int)event->buttons;
+    // info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
 
     cogui::mouse::get().setX(event->x - 1);
     cogui::mouse::get().setY(event->y - 1);
@@ -22,18 +25,42 @@ int my_handler(Gpm_Event *event, void *data)
     if(event->type == GPM_DOWN && event->buttons == GPM_B_LEFT) //
     {
         info() << "Event Type: LEFT DOWN at " <<  event->x << "," << event->y;
+        t_start = std::chrono::high_resolution_clock::now();
         last_button = cogui::mouse::button::left;
         cogui::desktop::get().handle_mouse_left_down(event->x - 1, event->y - 1);
     }
 
+    if(event->type == GPM_DOWN && event->buttons == GPM_B_RIGHT) //
+    {
+        info() << "Event Type: RIGHT DOWN at " <<  event->x << "," << event->y;
+        last_button = cogui::mouse::button::right;
+        cogui::desktop::get().handle_mouse_right_down(event->x - 1, event->y - 1);
+    }
+
     if(event->type & GPM_UP) //
     {
+
         if(last_button == cogui::mouse::button::left)
         {
-            info() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
-            cogui::desktop::get().handle_mouse_left_up(event->x - 1, event->y - 1);
-        }
+            auto t_end = std::chrono::high_resolution_clock::now();
 
+            double elapsed_time_ms = std::chrono::duration<double, std::milli>(t_end-t_start).count();
+            if(elapsed_time_ms < 200) // this was a fast exchange handle it as a click
+            {
+                info() << "Event Type: LEFT CLICK at " <<  event->x << "," << event->y;
+                cogui::desktop::get().handle_mouse_left_click(event->x - 1, event->y - 1);
+            }
+            else
+            {
+                info() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
+                cogui::desktop::get().handle_mouse_left_up(event->x - 1, event->y - 1);
+            }
+        }
+        if(last_button == cogui::mouse::button::right)
+        {
+            info() << "Event Type: RIGHT UP at " <<  event->x << "," << event->y;
+            cogui::desktop::get().handle_mouse_right_up(event->x - 1, event->y - 1);
+        }
         last_button = cogui::mouse::button::none;
     }
 
@@ -51,7 +78,7 @@ cogui::gpm_input::gpm_input()
 
 cogui::gpm_input::~gpm_input()
 {
-    Gpm_Close();
+    shutdown();
 }
 
 bool cogui::gpm_input::init()
@@ -88,7 +115,7 @@ bool cogui::gpm_input::init()
 
 bool cogui::gpm_input::shutdown()
 {
-
+    Gpm_Close();
 }
 
 std::vector<cogui::event> cogui::gpm_input::get_next_event()

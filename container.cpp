@@ -32,6 +32,18 @@ void cogui::container::update_container()
     }
 }
 
+void cogui::container::release_control(std::shared_ptr<cogui::control> c)
+{
+    // means, this is a click
+    c->release();
+    c->unfocus();
+
+    // reset the controls
+    m_prev_pressed = m_tab_order.end();
+    m_pressed = m_tab_order.end();
+    m_focused = m_tab_order.end();
+}
+
 std::vector<std::shared_ptr<cogui::control>>::iterator& cogui::container::focused()
 {
     return m_focused;

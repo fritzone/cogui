@@ -18,18 +18,17 @@ public:
     virtual ~graphics();
 
     bool initialize();
-    bool set_chars(int x, int y, const std::wstring &s);
     void draw(int x, int y, const wchar_t* s);
     void refresh_screen();
     void handle_mouse_movement();
-
+    void shutdown();
+    int getWidth() const {return m_width;}
+    int getHeight() const {return m_height;}
 private:
     WINDOW *stdscr = nullptr;
     int m_width = -1;
     int m_height = -1;
     bool m_colours = false;
-
-    std::vector< std::vector<wchar_t>> chars;
 };
 
 }

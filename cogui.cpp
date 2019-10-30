@@ -23,6 +23,8 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+
 #include "loguru.h"
 #include "cogui.h"
 
@@ -31,11 +33,16 @@ using namespace cogui;
 void do_resize(int dummy)
 {
      info() << "Resize window";
+
+     desktop::get().resize();
 }
 
 
 
-void handler(int sig) {
+void handler(int sig)
+{
+    desktop::get().shutdown();
+
   void *array[10];
   size_t size;
 
@@ -43,7 +50,7 @@ void handler(int sig) {
   size = backtrace(array, 10);
 
   // print out all the frames to stderr
-  LOG_S(INFO) << "Error: signal %d:\n" << sig;
+  LOG_S(FATAL) << "Error: signal: " << strsignal(sig);
   backtrace_symbols_fd(array, size, STDERR_FILENO);
   exit(1);
 }
@@ -62,6 +69,7 @@ void cogui::init(int argc, char* argv[])
 
     signal(SIGWINCH, do_resize);
     signal(SIGSEGV, handler);
+    signal(SIGINT, handler);
 
     cogui::desktop::get();
 }

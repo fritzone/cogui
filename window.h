@@ -69,6 +69,8 @@ public:
     void mouse_move(int x, int y);
     void left_mouse_down(int x, int y);
     void left_mouse_up(int x, int y);
+    void right_mouse_down(int x, int y);
+    void right_mouse_up(int x, int y);
 
     bool resizeable() const;
     void setResizeable(bool resizeable);

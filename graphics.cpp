@@ -21,7 +21,7 @@ cogui::graphics::graphics()
 
 cogui::graphics::~graphics()
 {
-    endwin();
+    shutdown();
 }
 
 bool cogui::graphics::initialize()
@@ -33,16 +33,6 @@ bool cogui::graphics::initialize()
     if(stdscr == nullptr)
     {
         return false;
-    }
-
-    for(int i=0; i< MAX_DESKTOP_SIZE; i++)
-    {
-        std::vector<wchar_t> row;
-        for(int j=0; j< MAX_DESKTOP_SIZE; j++)
-        {
-            row.push_back(L' ');
-        }
-        chars.push_back(row);
     }
 
     if(has_colors())
@@ -62,19 +52,6 @@ bool cogui::graphics::initialize()
     return true;
 }
 
-bool cogui::graphics::set_chars(int x, int y, const std::wstring &s)
-{
-
-    int l = static_cast<int>(s.length());
-    for(int i=x; i<x+l; i++)
-    {
-        if(y > 0 && i > 0 && i < MAX_DESKTOP_SIZE && y < MAX_DESKTOP_SIZE)
-        {
-            chars[y][i] = s[i-x];
-        }
-    }
-    return true;
-}
 void cogui::graphics::draw(int x, int y, const wchar_t *s)
 {
     auto sl = wcslen(s);
@@ -158,4 +135,9 @@ void cogui::graphics::handle_mouse_movement()
 
         refresh();
     } */
+}
+
+void cogui::graphics::shutdown()
+{
+    endwin();
 }
