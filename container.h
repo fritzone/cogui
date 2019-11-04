@@ -3,6 +3,7 @@
 
 #include "control.h"
 #include "button.h"
+#include "layout.h"
 
 #include <vector>
 #include <iterator>
@@ -14,14 +15,14 @@ namespace cogui {
 class container : public control
 {
 public:
-    container(int getX, int getY, int getWidth, int getHeight);
+    container(int x, int y, int width, int height);
 
     template<typename ... Args>
     container(Args... args) : control (std::forward<Args>(args)...)
     {
     }
 
-    button& add_button(int getX, int getY, int getWidth, int getHeight, const std::wstring& getTitle);
+    button& add_button(int x, int y, int width, int height, const std::wstring& title);
 
 
     template<typename ... Args>
@@ -35,13 +36,26 @@ public:
     void focus_element(std::shared_ptr<control> c);
     void press_element(std::shared_ptr<control> c);
 
+    template<typename T, typename ... Args> T& setLayout(Args... args)
+    {
+        static_assert(std::is_base_of<cogui::layout::abstract, T>::value, "need a cogui::layout::abstract derived class");
+
+        m_layout = std::make_shared<T>(std::forward<Args>(args)...);
+        m_layout->setContainer(this);
+        reLayout();
+
+        return *(dynamic_cast<T*>(m_layout.get()));
+    }
+
+    void reLayout();
+
     /**
      * @brief element_under Will return the control which is under the X,Y pair
      * @param x - the X coordinate
      * @param y - the Y coordinate
      * @return the control to be found under the given coordinates, nullptr if nothing
      */
-    std::shared_ptr<control> element_under(int getX, int getY);
+    std::shared_ptr<control> element_under(int x, int y);
 
     std::vector<std::shared_ptr<control>>::iterator& focused();
 
@@ -65,7 +79,7 @@ private:
         }
 
         virtual void draw() const = 0;
-        virtual std::shared_ptr<control> element_under(int getX, int getY) = 0;
+        virtual std::shared_ptr<control> element_under(int x, int y) = 0;
 
     protected:
 
@@ -80,6 +94,7 @@ private:
     {
         store(container*c) : basic_store(c) {}
 
+        // this contains the controls of this container
         std::vector<std::shared_ptr<C>> m_controls;
 
         void draw() const override
@@ -154,11 +169,12 @@ protected:
     CIT m_pressed = m_tab_order.end();   // the currently pressed element
     CIT m_prev_pressed = m_tab_order.end(); // the previously pressed element. Activated when the user pressed the button on a control and moved his mouse out of it
 
-    std::vector<std::shared_ptr<control>> m_tab_order;    // the order for the focusable elements
+    std::vector<std::shared_ptr<control>> m_tab_order;    // the order for the focusable elements for this container only
 
 private:
 
     static std::map<const container*, std::vector<basic_store*>> m_container_stores;
+    std::shared_ptr<cogui::layout::abstract> m_layout;
 };
 
 }

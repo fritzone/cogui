@@ -34,6 +34,9 @@ public:
     void draw() const override;
     void click() override;
 
+    int minimumDrawableWidth() const override;
+
+
     using OnClick = fluent::NamedType<std::function<void(button*)>, struct OnClickHelper>;
     static OnClick::argument on_click;
 

@@ -7,9 +7,18 @@
 #include <codecvt>
 #include <string>
 
+void cogui::control::initInitialPosition()
+{
+    m_initial_x = m_x;
+    m_initial_y = m_y;
+    m_initial_width = m_width;
+    m_initial_height = m_height;
+}
+
 cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_width(w), m_height(h)
 {
     info() << "Created a control at:" << x << ", " << y;
+    initInitialPosition();
 }
 
 cogui::control::control(int x, int y, int width, int height, const std::wstring &title):
@@ -75,6 +84,21 @@ bool cogui::control::hasFocus() const
     return m_focus_state == focus_state::focused;
 }
 
+void cogui::control::show()
+{
+    m_visible = true;
+}
+
+void cogui::control::hide()
+{
+    m_visible = false;
+}
+
+bool cogui::control::isVisible() const
+{
+    return m_visible ;
+}
+
 void cogui::control::control::setFocusState(const cogui::control::focus_state &focus_state)
 {
     m_focus_state = focus_state;
@@ -103,6 +127,12 @@ cogui::control::press_state cogui::control::state() const
 void cogui::control::setState(cogui::control::press_state s)
 {
     m_state = s;
+}
+
+void cogui::control::redraw()
+{
+    clear();
+    draw();
 }
 
 int cogui::control::getWidth() const

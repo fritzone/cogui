@@ -18,3 +18,8 @@ void cogui::button::click()
     debug() << "Emitting a click signal";
     emit sig_on_click(this);
 }
+
+int cogui::button::minimumDrawableWidth() const
+{
+    return desktop::get().getTheme()->recommended_button_width(*this);
+}

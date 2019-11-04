@@ -100,6 +100,14 @@ void cogui::container::press_element(std::shared_ptr<cogui::control> c)
     m_prev_pressed = m_pressed;
 }
 
+void cogui::container::reLayout()
+{
+    if(m_layout)
+    {
+        m_layout->arrange_controls(m_tab_order, this);
+    }
+}
+
 std::shared_ptr<cogui::control> cogui::container::element_under(int x, int y)
 {
     const auto& cvs = m_container_stores[this];

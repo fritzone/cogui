@@ -66,14 +66,22 @@ void draw<int,const wchar_t*>(int x, int y, const wchar_t* s)
 void cogui::theme::clear(const control &c)
 {
     int top = c.getY();
-    for(int y = top; y <= top + c.getHeight(); y++)
+    int h = c.getHeight();
+    int x = c.getX();
+    int w = c.getWidth();
+    for(int y = top; y <= top + h; y++)
     {
-        cogui::draw(c.getX(), y, cogui::line(c.getWidth() + 2, L" "));
+        cogui::draw(x, y, cogui::line(w + 2, L" "));
     }
 }
 
 void cogui::theme::draw_window(const cogui::window &w)
 {
+    if(!w.isVisible())
+    {
+        return;
+    }
+
     bool rs = w.getDrawState() == window::draw_state::normal;
 
     auto line_char = rs ? WND_HORZ_LINE : HORZ_LINE_RESIZE;
@@ -147,6 +155,11 @@ void cogui::theme::draw_window(const cogui::window &w)
 
 void cogui::theme::draw_button(const cogui::button &b)
 {
+    if(!b.isVisible())
+    {
+        return;
+    }
+
     auto ul_char = BTN_UL_CORNER_STATE_UP ;
     auto ll_char = BTN_LL_CORNER_STATE_UP ;
     auto ur_char = BTN_UR_CORNER_STATE_UP ;
@@ -198,7 +211,34 @@ void cogui::theme::draw_button(const cogui::button &b)
     }
 
     // button text
-    cogui::draw((int)(b.getX() + b.getWidth() / 2 - b.getTitle().length() / 2), b.getY() + b.getHeight() / 2, b.getTitle());
+    int title_x = (int)(b.getX() + b.getWidth() / 2 - b.getTitle().length() / 2);
+    std::wstring title_to_draw = b.getTitle();
+    if(title_x <= b.getX())
+    {
+        title_x = b.getX() + 1;
+    }
 
+    if(title_to_draw.length() >= b.getWidth())
+    {
+        title_to_draw = title_to_draw.substr(0, b.getWidth() - 4) + L"...";
+    }
 
+    if(b.getHeight() >= 2)
+    {
+        cogui::draw(title_x, b.getY() + b.getHeight() / 2, title_to_draw);
+    }
+}
+
+int cogui::theme::recommended_button_width(const cogui::button &b)
+{
+    return b.getTitle().length() + 2; // +2 for the beginning and ending lines
+}
+
+int cogui::theme::recommended_window_width(const cogui::window &w)
+{
+    return w.getTitle().length() +
+            (w.hasSysmenuButton() ? WND_SYSMENU.length() : 0) +
+            (w.hasMaximizeButton()? WND_MAXIMIZE.length() : 0) +
+            (w.hasCloseButton() ? WND_CLOSE.length() : 0)
+    ;
 }

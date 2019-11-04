@@ -118,6 +118,10 @@ public:
     void unfocus();
     bool hasFocus() const;
 
+    void show();
+    void hide();
+    bool isVisible() const;
+
     focus_state getFocusState() const;
     void setFocusState(const focus_state &focus_state);
 
@@ -126,6 +130,13 @@ public:
     bool isPressed() const;
     press_state state() const;
     void setState(press_state s);
+
+    virtual int minimumDrawableWidth() const = 0;
+
+    /**
+     * @brief redraw Re-draws the control
+     */
+    void redraw();
 
     virtual void click() = 0;
     virtual void draw() const = 0;
@@ -143,6 +154,18 @@ protected:
     focus_state m_focus_state = focus_state::not_focused;
     press_state m_state = press_state::released;
 
+    // the location where the control is placed initially, when there was no layout applied to it
+    int m_initial_x = -1, m_initial_y = -1, m_initial_width = -1, m_initial_height = -1;
+
+    int m_minimumWidth = -1;
+    int m_minimumHeight = -1;
+    int m_maximumWidth = -1;
+    int m_maximumHeight = -1;
+
+    bool m_visible = true;
+
+private:
+    void initInitialPosition();
 };
 
 }

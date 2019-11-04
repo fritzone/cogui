@@ -100,6 +100,9 @@ void cogui::window::mouse_move(int x, int y)
             setWidth( m_prev_w + dx);
             setHeight( m_prev_h + dy);
 
+            // if there is a layout attached
+            reLayout();
+
             emit sig_on_resize(this, m_prev_w + dx, m_prev_h + dy);
 
             return draw();
@@ -168,6 +171,11 @@ bool cogui::window::inside(int x, int y) const
 void cogui::window::click()
 {
     info() << "This window was clicked:" << this;
+}
+
+int cogui::window::minimumDrawableWidth() const
+{
+    return desktop::get().getTheme()->recommended_window_width(*this);
 }
 
 void cogui::window::update_close_btn_pos(int nx) const

@@ -18,6 +18,8 @@ public:
     void clear(const control& c);
     void draw_window(const window& w);
     void draw_button(const button& b);
+    int recommended_button_width(const button& b);
+    int recommended_window_width(const window& w);
 
     /******************************************************************************************************************/
     /*                                                      WINDOW                                                    */

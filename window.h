@@ -88,6 +88,7 @@ public:
 
     bool inside(int x, int y) const override;
     void click() override;
+    int minimumDrawableWidth() const override;
 
     void update_close_btn_pos(int nx) const;
 
