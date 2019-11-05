@@ -51,16 +51,52 @@ std::wstring line(int l, std::wstring chr)
 }
 
 template<typename T, typename S>
-void draw(T x, T y, S s)
+void draw(T x, T y, S s, cogui::textflags flags = cogui::textflags::normal)
 {
-    desktop::get().getGraphics()->draw(x, y, s.c_str());
+    desktop::get().getGraphics()->draw(x, y, s.c_str(), flags);
 }
 
 template<>
-void draw<int,const wchar_t*>(int x, int y, const wchar_t* s)
+void draw<int,const wchar_t*>(int x, int y, const wchar_t* s, cogui::textflags flags)
 {
-    desktop::get().getGraphics()->draw(x, y, s);
+    desktop::get().getGraphics()->draw(x, y, s, flags);
 }
+
+void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal)
+{
+    std::wstring final_title;
+    wchar_t highlight_char = L'\0';
+    int highlight_pos = -1;
+    bool first_taken = false;
+    for(std::size_t i=0; i<s.length(); i++)
+    {
+        if(s[i] == L'&')
+        {
+            i++;
+            if( i< s.length() )
+            {
+                if( s[i] != L'&' && !first_taken)
+                {
+                    highlight_char = s[i];
+                    highlight_pos = i - 1;
+                    first_taken = true;
+                }
+                final_title += s[i];
+            }
+        }
+        else
+        {
+            final_title += s[i];
+        }
+    }
+    desktop::get().getGraphics()->draw(x, y, final_title.c_str(), flags);
+    if(highlight_char != L'\0')
+    {
+        desktop::get().getGraphics()->draw(x + highlight_pos, y, highlight_char,
+                                           cogui::textflags::underline & cogui::textflags::bold);
+    }
+}
+
 } // namespace
 
 void cogui::theme::clear(const control &c)
@@ -225,7 +261,16 @@ void cogui::theme::draw_button(const cogui::button &b)
 
     if(b.getHeight() >= 2)
     {
-        cogui::draw(title_x, b.getY() + b.getHeight() / 2, title_to_draw);
+        if(b.getFocusState() == cogui::control::focus_state::focused)
+        {
+            info()<<"focused, drawing underlined";
+            cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw, cogui::textflags::underline);
+        }
+        else
+        {
+            cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw);
+        }
+
     }
 }
 

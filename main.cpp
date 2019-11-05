@@ -7,27 +7,27 @@ int main( int argc, char* argv[] )
 
     using namespace cogui;
 
-    auto a = cogui::window(5, 5, 70, 15, L"A window with title",
+    auto a = cogui::window(5, 5, 70, 15, L"A window with title:⻣",
                            window::on_resize = [](window* win, int w,int h){info() << "(lambda slot) new size:" << w << "x" << h;},
                            window::on_close  = [](window* w){info() << "Closing this window"; },
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
                            window::on_mouse_up = [](window* w, cogui::mouse::button b, int x, int y){info() << "Mouse (" << mouse::get().buttonName(b) << ") up:" << x << ", " << y; }
     );
 
-    auto& b = a.add_button(5,5, 10, 2, L"Vertical layout",
+    auto& b = a.add_button(5,5, 10, 2, L"&Vertical layout",
                            button::on_click = [&a](button*){info() << "Thanks";
                                 a.setLayout<cogui::layout::vertical>();
                                 a.redraw();
                            }
     );
 
-    auto& c = a.add_button(35,5, 20, 2, L"Horizontal layout",
+    auto& c = a.add_button(35,5, 20, 2, L"&Horizontal layout",
                            button::on_click = [&a](button*){info() << "Thanks";
                                 a.setLayout<cogui::layout::horizontal>().expand(1);
                                 a.redraw();
                            }
     );
-    auto& d = a.add_button(35,5, 5, 2, L"Grid layout",
+    auto& d = a.add_button(35,5, 5, 2, L"G&rid layout",
                            button::on_click = [&a](button*){info() << "Thanks";
                                 a.setLayout<cogui::layout::grid>(2, 2);
                                 a.redraw();

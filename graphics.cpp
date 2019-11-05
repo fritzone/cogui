@@ -7,6 +7,7 @@
 #include "events.h"
 #include "mouse.h"
 #include "input.h"
+#include "cogui.h"
 
 #include <wchar.h>
 
@@ -52,7 +53,7 @@ bool cogui::graphics::initialize()
     return true;
 }
 
-void cogui::graphics::draw(int x, int y, const wchar_t *s)
+void cogui::graphics::draw(int x, int y, const wchar_t *s, int flags)
 {
     auto sl = wcslen(s);
 
@@ -65,10 +66,10 @@ void cogui::graphics::draw(int x, int y, const wchar_t *s)
     {
         for(auto sc = 0; sc + x < m_width ; sc++)
         {
-            wchar_t c[2] = {0};
-            c[0] = s[sc];
+            wchar_t c[2] = {s[sc] | flags, 0};
             mvwaddwstr(stdscr, y, sc + x, c);
         }
+
         return;
     }
 
@@ -78,12 +79,29 @@ void cogui::graphics::draw(int x, int y, const wchar_t *s)
 
         std::wstring sw(s);
         std::wstring subs = sw.substr(std::abs(x) + 1);
-        mvwaddwstr(stdscr, y, 0, subs.c_str());
+        for(int i=0; i<subs.length(); i++)
+        {
+            wchar_t c[2]  = {subs[i] | flags, 0};
+            mvwaddwstr(stdscr, y, i, c);
+        }
         return;
     }
 
-    mvwaddwstr(stdscr, y, x, s);
+    std::wstring sw(s);
 
+    for(int i=0; i<sw.length(); i++)
+    {
+        wchar_t c[2] = {sw[i], 0};
+        mvwaddwstr(stdscr, y, i + x, c);
+    }
+
+    //mvwaddwstr(stdscr, y, x, s);
+
+}
+
+void cogui::graphics::draw(int x, int y, wchar_t c, int flags)
+{
+    mvwaddch(stdscr, y, x, c | flags);
 }
 
 void cogui::graphics::refresh_screen()

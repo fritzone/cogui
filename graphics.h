@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 
+#include "cogui.h"
+
 // hmm, maybe we should include the cursed headers
 typedef struct _win_st WINDOW;
 
@@ -18,12 +20,13 @@ public:
     virtual ~graphics();
 
     bool initialize();
-    void draw(int x, int y, const wchar_t* s);
+    void draw(int x, int y, const wchar_t* s, int flags);
     void refresh_screen();
     void handle_mouse_movement();
     void shutdown();
     int getWidth() const {return m_width;}
     int getHeight() const {return m_height;}
+    void draw(int x, int y, wchar_t c, int flags);
 private:
     WINDOW *stdscr = nullptr;
     int m_width = -1;

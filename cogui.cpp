@@ -30,6 +30,10 @@
 
 using namespace cogui;
 
+cogui::textflags cogui::textflags::normal(textflags::v_normal);
+cogui::textflags cogui::textflags::bold(textflags::v_bold);
+cogui::textflags cogui::textflags::underline(textflags::v_underline);
+
 void do_resize(int dummy)
 {
      info() << "Resize window";
@@ -75,3 +79,22 @@ void cogui::init(int argc, char* argv[])
 }
 
 
+#include "ncurses.h"
+
+cogui::textflags::operator int() const
+{
+    switch(m_value)
+    {
+    case v_normal: return A_NORMAL;
+    case v_underline: return A_UNDERLINE;
+    case v_bold: return A_BOLD;
+    }
+}
+
+int textflags::operator &(const textflags &o) const
+{
+    int a = this->operator int();
+    int b = static_cast<int>(o);
+
+    return (a | b);
+}
