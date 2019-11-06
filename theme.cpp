@@ -134,6 +134,8 @@ void cogui::theme::draw_window(const cogui::window &w)
 
     // top line
     cogui::draw(w.getX(), w.getY(), ul_corner_char + cogui::line(w.getWidth(), line_char) + ur_corner_char);
+
+
     // bottom line
     cogui::draw(w.getX(), w.getY() + w.getHeight(), ll_corner_char + cogui::line(w.getWidth(), line_char) +
         (w.resizeable() ? WND_LR_RESIZE : lr_corner_char) );
@@ -147,14 +149,18 @@ void cogui::theme::draw_window(const cogui::window &w)
 
     int available_width = w.getWidth(); // -3 because of the begin and end chars for title separator
     // buttons
+
+    int close_pos = -1;
+    int sysmenu_pos = -1;
+
     if(w.hasCloseButton())
     {
         available_width -= close_char.length();
         //info() << "wdth:" << w.width() << " avail:" << available_width;
 
         cogui::draw(w.getX() + available_width, w.getY(), close_char);
+        close_pos = w.getX() + available_width + 1;
 
-        w.update_close_btn_pos(w.getX() + available_width + 1);
     }
     if(w.hasMaximizeButton())
     {
@@ -174,19 +180,23 @@ void cogui::theme::draw_window(const cogui::window &w)
     {
         available_width -= sysmenu_char.length();
         cogui::draw(w.getX() + 1, w.getY(), sysmenu_char);
+        sysmenu_pos = w.getX() + 1 + 1 ;
     }
 
     // title
     if(!w.getTitle().empty())
     {
+        std::wstring wtitle = w.getTitle();
         available_width -= title_delim_left_char.length() + title_delim_right_char.length(); // two title delimiters
-        int lefts = w.getX() + available_width / 2 - w.getTitle().length() / 2;
-        int right = w.getX() + available_width / 2 + w.getTitle().length() / 2 + title_delim_left_char.length() + w.getTitle().length() % 2;
-        cogui::draw(lefts, w.getY(), title_delim_left_char);
-        int title_left = lefts + title_delim_left_char.length();
-        cogui::draw(title_left, w.getY(), w.getTitle());
-        cogui::draw(right, w.getY(), title_delim_right_char);
+        int lefts = w.getX() + available_width / 2 - (wtitle.length() +1) / 2;
+
+        std::wstring t = title_delim_left_char + wtitle + title_delim_right_char;
+
+        cogui::draw(lefts, w.getY(), t);
     }
+
+    w.update_titlebar_btn_positions(close_pos, sysmenu_pos);
+
 }
 
 void cogui::theme::draw_button(const cogui::button &b)
@@ -270,20 +280,57 @@ void cogui::theme::draw_button(const cogui::button &b)
         {
             cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw);
         }
-
     }
 }
 
-int cogui::theme::recommended_button_width(const cogui::button &b)
+void cogui::theme::draw_menu(const cogui::menu &w)
+{
+    int top = w.getY();
+    int h = w.getHeight();
+    int x = w.getX();
+    int wi = w.getWidth();
+    for(int y = top; y <= top + h; y++)
+    {
+        cogui::draw(x, y, cogui::line(wi + 2, L" "));
+    }
+
+    cogui::draw(w.getX(), w.getY(), MNU_UL_CORNER);
+    cogui::draw(w.getX(), w.getY() + w.getHeight(), MNU_LL_CORNER);
+    cogui::draw(w.getX() + w.getWidth(), w.getY(), MNU_UR_CORNER);
+    cogui::draw(w.getX() + w.getWidth(), w.getY() + w.getHeight(), MNU_LR_CORNER);
+
+    cogui::draw(w.getX() + 1, w.getY(), cogui::line(w.getWidth() - 1, MNU_HORIZONTAL));
+    cogui::draw(w.getX() + 1, w.getY() + w.getHeight(), cogui::line(w.getWidth() - 1, MNU_HORIZONTAL));
+
+    int mc = 0;
+    for(int y = top+1; y < top + h; y++)
+    {
+        cogui::draw(x, y, MNU_VERTICAL);
+        cogui::draw(x + wi, y, MNU_VERTICAL);
+        cogui::draw(x + 1, y, w[mc++].getTitle());
+    }
+}
+
+int cogui::theme::minimum_button_width(const cogui::button &b)
 {
     return b.getTitle().length() + 2; // +2 for the beginning and ending lines
 }
 
-int cogui::theme::recommended_window_width(const cogui::window &w)
+int cogui::theme::minimum_button_height(const cogui::button&)
 {
-    return w.getTitle().length() +
+    return 2; // topline = 0 + text = 1 + bottomline = 2
+}
+
+int cogui::theme::minimum_window_width(const cogui::window &w)
+{
+    return w.getTitle().length() + (w.getTitle().length() > 0? WND_TITLE_DELIM_LEFT.length() + WND_TITLE_DELIM_RIGHT.length() : 0) +
             (w.hasSysmenuButton() ? WND_SYSMENU.length() : 0) +
             (w.hasMaximizeButton()? WND_MAXIMIZE.length() : 0) +
             (w.hasCloseButton() ? WND_CLOSE.length() : 0)
-    ;
+            ;
+}
+
+int cogui::theme::minimum_window_height(const cogui::window &)
+{
+    return 3; // top line + content line + bottomline
 }

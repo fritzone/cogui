@@ -13,6 +13,10 @@
 namespace cogui
 {
 
+desktop::desktop() : m_theme(new theme), m_graphics(new graphics), m_input(new gpm_input)
+{
+}
+
 bool desktop::initialize()
 {
     bool b = true;
@@ -156,7 +160,6 @@ void desktop::remove_window(window *w)
 void desktop::refresh()
 {
     getGraphics()->refresh_screen();
-
 }
 
 void desktop::shutdown()
@@ -182,10 +185,6 @@ desktop &desktop::get()
     static bool desk_init = d.initialize();
     d.m_initialized = desk_init;
     return d;
-}
-
-desktop::desktop() : m_theme(new theme), m_graphics(new graphics), m_input(new gpm_input)
-{
 }
 
 }

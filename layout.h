@@ -42,7 +42,7 @@ public:
 
 private:
 
-    int m_expanded_cell = -1;
+    int m_expanded_column = -1;
 
 };
 
@@ -57,6 +57,15 @@ public:
      */
     void arrange_controls(std::vector<std::shared_ptr<cogui::control>>&, container*) override ;
 
+    /**
+     * @brief expand expands the given row. All the controls before will be aligned to the top
+     * and all the controls after will be aligned to the bottom
+     */
+    void expand(int);
+
+private:
+
+    int m_expanded_row = -1;
 };
 
 class grid : public abstract

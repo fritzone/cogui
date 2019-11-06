@@ -17,8 +17,8 @@ namespace fluent
 template<typename T>
 using IsNotReference = typename std::enable_if<!std::is_reference<T>::value, void>::type;
 
-template <typename T, typename Parameter, template<typename> class... Skills>
-class FLUENT_EBCO NamedType : public Skills<NamedType<T, Parameter, Skills...>>...
+template <typename T, typename Parameter>
+class FLUENT_EBCO NamedType
 {
 public:
     using UnderlyingType = T;
@@ -31,13 +31,6 @@ public:
     // get
     constexpr T& get() { return value_; }
     constexpr std::remove_reference_t<T> const& get() const {return value_; }
-
-    // conversions
-    using ref = NamedType<T&, Parameter, Skills...>;
-    operator ref ()
-    {
-	return ref(value_);
-    }
 
     struct argument
     {

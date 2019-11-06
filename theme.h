@@ -10,16 +10,22 @@ namespace cogui
 class button;
 class window;
 class control;
+class menu;
 
 class theme
 {
 public:
 
     void clear(const control& c);
+
     void draw_window(const window& w);
     void draw_button(const button& b);
-    int recommended_button_width(const button& b);
-    int recommended_window_width(const window& w);
+    void draw_menu(const menu &w);
+
+    int minimum_button_width(const button& b);
+    int minimum_button_height(const button& b);
+    int minimum_window_width(const window& w);
+    int minimum_window_height(const window& w);
 
     /******************************************************************************************************************/
     /*                                                      WINDOW                                                    */
@@ -72,7 +78,7 @@ public:
     /*                                                      BUTTON                                                    */
     /******************************************************************************************************************/
 
-    // Normal state, button is just drawn  as it is
+    // Normal state, button is just drawn  as it is, thin line
 
     std::wstring BTN_UL_CORNER_STATE_UP = L"\x250C";    // Upper left corner
     std::wstring BTN_UR_CORNER_STATE_UP = L"\x2512";    // Upper right corner
@@ -107,6 +113,16 @@ public:
     std::wstring BTN_LEFT_FOCUSED = L"\x250A";    // FOCUSED Left border for line
     std::wstring BTN_RIGHT_FOCUSED = L"\x250B";    // FOCUSED Right border for line, thicker
 
+    /******************************************************************************************************************/
+    /*                                                      MENU                                                      */
+    /******************************************************************************************************************/
+
+    std::wstring MNU_UL_CORNER = L"\x250C";    // Upper left corner
+    std::wstring MNU_UR_CORNER = L"\x2510";    // Upper right corner
+    std::wstring MNU_LL_CORNER = L"\x2514";    // Lower left corner
+    std::wstring MNU_LR_CORNER = L"\x2518";    // Lower right corner
+    std::wstring MNU_HORIZONTAL = L"\x2500";
+    std::wstring MNU_VERTICAL = L"\x2502";
 };
 }
 

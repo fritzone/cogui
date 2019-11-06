@@ -131,16 +131,15 @@ public:
     press_state state() const;
     void setState(press_state s);
 
-    virtual int minimumDrawableWidth() const = 0;
-
     /**
      * @brief redraw Re-draws the control
      */
     void redraw();
 
+    virtual int minimumDrawableWidth() const = 0;
+    virtual int minimumDrawableHeight() const = 0;
     virtual void click() = 0;
     virtual void draw() const = 0;
-
     virtual bool inside(int x, int y) const;
 
 protected:

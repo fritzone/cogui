@@ -10,6 +10,7 @@ cogui::window::OnResize::argument cogui::window::on_resize;
 cogui::window::OnClose::argument cogui::window::on_close;
 cogui::window::OnMouseDown::argument cogui::window::on_mouse_down;
 cogui::window::OnMouseUp::argument cogui::window::on_mouse_up;
+cogui::window::SystemMenu::argument cogui::window::sysmenu;
 
 cogui::window::window(int x, int y, int width, int height, const std::wstring &title):
     container(x, y, width, height, title)
@@ -32,16 +33,19 @@ void cogui::window::draw() const
 {
     cogui::desktop::get().getTheme()->draw_window(*this);
     draw_content();
+    if(m_current_menu)
+    {
+        cogui::desktop::get().getTheme()->draw_menu(*m_current_menu);
+    }
     desktop::get().refresh();
 }
 
 void cogui::window::click(int x, int y)
 {
-   // info() << "window click: x=" << x << " y=" << y;
+   info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
    if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
    {
        m_draw_state = draw_state::normal;
-       return draw();
    }
 
    if(y == this->getY() && x == m_close_btn_pos)
@@ -50,6 +54,14 @@ void cogui::window::click(int x, int y)
        // debug() << "click on close button";
        emit sig_on_close(this);
        return;
+   }
+
+   if(y == this->getY() && x == m_sysmenu_btn_pos)
+   {
+        info() << "click on sysmenu";
+        m_current_menu = &m_sysmenu;
+        m_current_menu->open(x - 1, y + 1);
+        return;
    }
 
    // did we click on a control by any chance?
@@ -93,6 +105,13 @@ void cogui::window::mouse_move(int x, int y)
     {
         int dx = x - m_mouse_down_x - this->getX();
         int dy = y - m_mouse_down_y - this->getY();
+
+        int attempted_new_width = m_prev_w + dx;
+        if(attempted_new_width <= minimumDrawableWidth())
+        {
+            return;
+        }
+
         if(getWidth() +  dx >=5 && getHeight() + dy>= 5)
         {
             clear(); // clear is usually followed by a draw that why there is no refresh
@@ -175,20 +194,24 @@ void cogui::window::click()
 
 int cogui::window::minimumDrawableWidth() const
 {
-    return desktop::get().getTheme()->recommended_window_width(*this);
+    return desktop::get().getTheme()->minimum_window_width(*this);
 }
 
-void cogui::window::update_close_btn_pos(int nx) const
+int cogui::window::minimumDrawableHeight() const
 {
-    m_close_btn_pos = nx;
-    // debug() << "Close at:" << m_close_btn_pos;
+    return desktop::get().getTheme()->minimum_window_height(*this);
 }
 
+void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos) const
+{
+    m_close_btn_pos = close_pos;
+    m_sysmenu_btn_pos = sysmenu_pos;
+}
 
 void cogui::window::left_mouse_down(int x, int y)
 {
     // info() << "y=" << y << " topy=" << this->getY();
-    if( y == this->getY()) // down on the top line, usually this means move the window
+    if( y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
         // see: outside of sysmenu, maximize, close
         m_draw_state = draw_state::moving;

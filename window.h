@@ -5,6 +5,7 @@
 #include "miso.h"
 #include "desktop.h"
 #include "mouse.h"
+#include "menu.h"
 
 #include "named_type.h"
 #include "tuple_iterator.h"
@@ -38,16 +39,29 @@ public:
      */
     template<typename ... Args>
     window(int x, int y, int width, int height, const std::wstring& title, Args... args):
-        container(x, y, width, height)
+        container(x, y, width, height, title)
     {
-        setTitle(title);
         desktop::get().add_window(this);
+        resolve_named_parameters(std::forward<Args>(args)...);
+    }
 
+    template<typename ... Args>
+    window(int x, int y, int width, int height, const std::string& title, Args... args):
+        container(x, y, width, height, title)
+    {
+        desktop::get().add_window(this);
+        resolve_named_parameters(std::forward<Args>(args)...);
+    }
+
+    template<typename ... Args>
+    void resolve_named_parameters(Args... args)
+    {
         auto connector = overload_unref(
             [&,this](OnResize r) { miso::connect(this, sig_on_resize, r.get()); },
             [&,this](OnClose c) { miso::connect(this, sig_on_close, c.get()); },
             [&,this](OnMouseDown m) { miso::connect(this, sig_on_mouse_down, m.get()); },
-            [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); }
+            [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
+            [&,this](SystemMenu m) {m_sysmenu = m.get();}
         );
 
 
@@ -57,8 +71,8 @@ public:
         {
             std::visit(connector, elem);
         }
-
     }
+
 
     ~window() override;
 
@@ -89,8 +103,9 @@ public:
     bool inside(int x, int y) const override;
     void click() override;
     int minimumDrawableWidth() const override;
+    int minimumDrawableHeight() const override;
 
-    void update_close_btn_pos(int nx) const;
+    void update_titlebar_btn_positions(int close_pos, int sysmenu_pos) const;
 
     // signals
 
@@ -109,8 +124,13 @@ public:
     miso::signal<window*,mouse::button,int,int> sig_on_mouse_down {"mouse_down"};
     miso::signal<window*,mouse::button,int,int> sig_on_mouse_up {"mouse_up"};
 
+    // system menu
+    using SystemMenu = fluent::NamedType<menu, struct SystemMenuHelper>;
+    static SystemMenu::argument sysmenu;
+
 private:
 
+    menu m_sysmenu;
 
     bool m_resizeable = true;
     bool m_hasCloseButton = true;
@@ -122,6 +142,10 @@ private:
     int m_prev_w = -1;
     int m_prev_h = -1;
     mutable int m_close_btn_pos = -1;
+    mutable int m_sysmenu_btn_pos = -1;
+
+    // this is the current menu that is shown on the screen
+    menu* m_current_menu = nullptr;
 };
 
 }

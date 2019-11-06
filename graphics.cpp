@@ -79,24 +79,11 @@ void cogui::graphics::draw(int x, int y, const wchar_t *s, int flags)
 
         std::wstring sw(s);
         std::wstring subs = sw.substr(std::abs(x) + 1);
-        for(int i=0; i<subs.length(); i++)
-        {
-            wchar_t c[2]  = {subs[i] | flags, 0};
-            mvwaddwstr(stdscr, y, i, c);
-        }
+        mvwaddwstr(stdscr, y, 0, subs.c_str());
         return;
     }
 
-    std::wstring sw(s);
-
-    for(int i=0; i<sw.length(); i++)
-    {
-        wchar_t c[2] = {sw[i], 0};
-        mvwaddwstr(stdscr, y, i + x, c);
-    }
-
-    //mvwaddwstr(stdscr, y, x, s);
-
+    mvwaddwstr(stdscr, y, x, s);
 }
 
 void cogui::graphics::draw(int x, int y, wchar_t c, int flags)

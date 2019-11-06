@@ -3,7 +3,8 @@
 
 #include "application.h"
 #include "window.h"
-
+#include "button.h"
+#include "menu.h"
 
 
 namespace cogui {

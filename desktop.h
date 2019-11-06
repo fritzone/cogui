@@ -11,6 +11,7 @@ class graphics;
 class theme;
 class window;
 class input;
+class menu;
 
 class desktop
 {

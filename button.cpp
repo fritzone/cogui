@@ -21,5 +21,10 @@ void cogui::button::click()
 
 int cogui::button::minimumDrawableWidth() const
 {
-    return desktop::get().getTheme()->recommended_button_width(*this);
+    return desktop::get().getTheme()->minimum_button_width(*this);
+}
+
+int cogui::button::minimumDrawableHeight() const
+{
+    return desktop::get().getTheme()->minimum_button_height(*this);
 }
