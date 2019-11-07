@@ -35,13 +35,12 @@ struct common_slot_base {
 };
 
 template<class T, class FT, class SHT>
-void connect_i(void* sig_addr, void* obj, T &&f, std::vector<common_slot_base *> &sholders, bool active = true) {
+void connect_i(void* sig_addr, void* obj, T &&f, std::vector<common_slot_base *> &sholders, bool active = true, bool really_remove = false) {
     static SHT sh;
     func_and_bool<FT> fb{std::make_shared<FT>(std::forward<T>(f)), active, reinterpret_cast<void *>(&f), obj, sig_addr};
     bool already_in = false;
 
     info() << "looking for in:" << &f << " for obj:" << obj;
-
     std::for_each(sh.slots.begin(), sh.slots.end(),
                   [&](func_and_bool<FT> &s)
                     {
@@ -52,8 +51,24 @@ void connect_i(void* sig_addr, void* obj, T &&f, std::vector<common_slot_base *>
                     }
     );
 
-    if (!already_in) sh.slots.emplace_back(fb);
-    if (std::find(sholders.begin(), sholders.end(), static_cast<common_slot_base *>(&sh)) == sholders.end()) {
+    if (!already_in && active && !really_remove)
+    {
+        sh.slots.emplace_back(fb);
+    }
+
+    if(already_in && really_remove)
+    {
+        sh.slots.erase(std::remove_if(sh.slots.begin(), sh.slots.end(),
+                              [&](func_and_bool<FT> &s)
+                                 {
+                                     return (s.addr == fb.addr && s.obj == fb.obj && s.sig_addr == fb.sig_addr);
+                                 }
+        ), sh.slots.end());
+
+    }
+
+    if (std::find(sholders.begin(), sholders.end(), static_cast<common_slot_base *>(&sh)) == sholders.end())
+    {
         sholders.push_back(&sh);
     }
 }
@@ -111,6 +126,7 @@ class signal final
         void run_slots(void* sig_addr, void*sender_obj, Args... args) override {
             std::for_each(slots.begin(), slots.end(), [&](internal::func_and_bool<FT>& s)
             {
+                info() << "trying: (s.obj) " << s.obj << "==" << sender_obj << " (sender_obj) and (s.sig_addr)" << s.sig_addr << "==" << sig_addr << " (sig_addr)";
                 if (s.active && s.obj == sender_obj && s.sig_addr == sig_addr) (*(s.ft.get()))(args...);
             }
             );
@@ -147,15 +163,15 @@ public:
     ~signal() noexcept = default;
 
     template<class T, class S>
-    void connect(T* obj, S&& f, bool active = true) {
-        info() << "Connecting " << signal_name  << " living at " << this << " from object " << obj << " to " << &f ;
+    void connect(T* obj, S&& f, bool active = true, bool remove_too = false) {
+        info() << (active ? "Connecting " : "Disconnecting ") << (remove_too ? "and removing " : "") << signal_name  << " living at " << this << " from object " << obj << " to " << &f ;
         internal::connect_i<S, typename slot_holder<S>::FT,
-                slot_holder<S>> (this, obj, std::forward<S>(f), slot_holders, active);
+                slot_holder<S>> (this, obj, std::forward<S>(f), slot_holders, active, remove_too);
     }
 
-    template<class T>
-    void disconnect(T&& f) {
-        connect<T>(std::forward<T>(f), false);
+    template<class T, class S>
+    void disconnect(T*obj, S&& f, bool remove_too = false) {
+        connect<T, S>(obj, std::forward<S>(f), false, remove_too);
     }
 
     signal<Args...>& operator()(Args... args) {
@@ -170,7 +186,7 @@ template<class T, class Si, class So>
 void connect(T* obj, Si &&sig, So &&slo) {
     static_assert(!std::is_same<So, std::nullptr_t>::value, "cannot use nullptr as slot");
 
-    debug() << "Connecting " << &sig << " to " << &slo << " living in obj:" << obj;
+    debug() << "Connecting " << &sig << " ("<< sig.name()  << ")"<< " to " << &slo << " living in obj:" << obj ;
 
     std::forward<Si>(sig).connect(obj, std::forward<So>(slo));
 }

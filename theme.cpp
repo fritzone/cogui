@@ -307,7 +307,23 @@ void cogui::theme::draw_menu(const cogui::menu &w)
     {
         cogui::draw(x, y, MNU_VERTICAL);
         cogui::draw(x + wi, y, MNU_VERTICAL);
-        cogui::draw(x + 1, y, w[mc++].getTitle());
+        info() << "LASTSEL:" << w.getLastSelectedIndex() << " mc=" << mc;
+
+        std::wstring titleToDraw = w[mc].getTitle();
+        while(titleToDraw.length() < w.getWidth() - 1) titleToDraw += L" ";
+
+        if(mc == w.getLastSelectedIndex())
+        {
+            desktop::get().getGraphics()->setColors(graphics::color::black, graphics::color::white);
+            cogui::draw_title(x + 1, y, titleToDraw);
+            desktop::get().getGraphics()->setColors(graphics::color::white, graphics::color::black);
+        }
+        else
+        {
+            cogui::draw_title(x + 1, y, titleToDraw);
+        }
+
+        mc ++;
     }
 }
 

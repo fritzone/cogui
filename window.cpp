@@ -43,6 +43,26 @@ void cogui::window::draw() const
 void cogui::window::click(int x, int y)
 {
    info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
+
+   //firstly: see if there is an open menu
+   if(m_current_menu)
+   {
+       if(m_current_menu->inside(x, y))
+       {
+           auto tempm = m_current_menu;
+           m_current_menu = nullptr;
+           redraw();
+           tempm->click(x, y);
+       }
+       else
+       {
+           // clicked outside the menu, close it
+           m_current_menu = nullptr;
+           redraw();
+       }
+       return draw();
+   }
+
    if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
    {
        m_draw_state = draw_state::normal;
@@ -61,7 +81,7 @@ void cogui::window::click(int x, int y)
         info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
         m_current_menu->open(x - 1, y + 1);
-        return;
+        return draw();
    }
 
    // did we click on a control by any chance?
@@ -129,14 +149,26 @@ void cogui::window::mouse_move(int x, int y)
     }
     else
     {
+        // do we have an opened menu? That takes priority over controls
+        if(m_current_menu)
+        {
+            if(m_current_menu->inside(x, y))
+            {
+                if(m_current_menu->mouse_move(x, y))
+                {
+                    return draw();
+                }
+            }
+            return;
+        }
         // now go to the controls, see if the mouse is over of one of them or not
         std::shared_ptr<control> under = element_under(x, y);
         if(under)
         {
 
-            info()<< "got under element" << under;
+            //debug ()<< "got under element " << under;
 
-            if(m_prev_pressed != m_tab_order.end())
+            if(m_prev_pressed != m_tab_order.end() && !m_tab_order.empty())
             {
                 if(under == *m_prev_pressed)
                 {
@@ -156,7 +188,7 @@ void cogui::window::mouse_move(int x, int y)
 
         // here we do not have an element under the cursor, however if we had one
         // make sure to un-press it
-        if(m_pressed != m_tab_order.end())
+        if(m_pressed != m_tab_order.end() && !m_tab_order.empty())
         {
             m_prev_pressed = m_pressed;
 
@@ -171,7 +203,7 @@ void cogui::window::mouse_move(int x, int y)
     }
 
     // now if there was a control we have focused on, unfocus it since we moved outside of it
-    if(m_focused != m_tab_order.end())
+    if(m_focused != m_tab_order.end() && !m_tab_order.empty())
     {
         (*m_focused)->unfocus();
         return draw();
@@ -241,7 +273,7 @@ void cogui::window::left_mouse_down(int x, int y)
     }
 
     // now if there was a control we have pressed the button on, release it since we clicked outside of it
-    if(m_prev_pressed != m_tab_order.end() || m_pressed != m_tab_order.end() )
+    if(!m_tab_order.empty() && (m_prev_pressed != m_tab_order.end() || m_pressed != m_tab_order.end()) )
     {
         auto to_unpress_it = m_prev_pressed != m_tab_order.end() ? m_prev_pressed : m_pressed;
         release_control(*to_unpress_it);
@@ -274,7 +306,7 @@ void cogui::window::left_mouse_up(int x, int y)
     }
 
     // now if there was a control we have pressed the button on, release it
-    if(m_prev_pressed != m_tab_order.end() || m_pressed != m_tab_order.end() )
+    if( !m_tab_order.empty() && (m_prev_pressed != m_tab_order.end() || m_pressed != m_tab_order.end()) )
     {
         auto to_unpress_it = m_prev_pressed != m_tab_order.end() ? m_prev_pressed : m_pressed;
         release_control(*to_unpress_it);
