@@ -13,6 +13,8 @@ namespace cogui
 {
     class action
     {
+        using Selectable = bool;
+
     public:
 
         action() = default;
@@ -24,8 +26,19 @@ namespace cogui
         template<typename ... Args>
         action(const std::wstring& title, Args... args) : m_title(title)
         {
+            resolve_named_parameters(std::forward<Args>(args)...);
+        }
+        template<typename ... Args>
+        action(const std::wstring& title, Selectable s, Args... args) : m_title(title), m_selectable(true)
+        {
+            resolve_named_parameters(std::forward<Args>(args)...);
+        }
+
+        template<typename ... Args>
+        void resolve_named_parameters(Args... args)
+        {
             auto connector = overload_unref(
-                [&,this](OnTrigger c) { conn = c; miso::connect(this, sig_on_trigger, c.get()); }
+                [&,this](OnTrigger c) { m_conn = c; miso::connect(this, sig_on_trigger, c.get()); }
             );
 
             auto tup = std::make_tuple(std::forward<Args>(args)...);
@@ -45,10 +58,16 @@ namespace cogui
         static OnTrigger::argument on_trigger;
         miso::signal<action*> sig_on_trigger {"on_trigger"};
 
+        // whether it is selectable or not
+        static Selectable selectable;
+
+        bool isSelectable() const;
+
     private:
         std::wstring m_title;
-        OnTrigger conn;
-
+        OnTrigger m_conn;
+        bool m_selectable = false;
+        bool m_selected = false;
     };
 
     class menu

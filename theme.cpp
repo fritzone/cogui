@@ -68,6 +68,7 @@ void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = co
     wchar_t highlight_char = L'\0';
     int highlight_pos = -1;
     bool first_taken = false;
+
     for(std::size_t i=0; i<s.length(); i++)
     {
         if(s[i] == L'&')
@@ -94,6 +95,9 @@ void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = co
     {
         desktop::get().getGraphics()->draw(x + highlight_pos, y, highlight_char,
                                            cogui::textflags::underline & cogui::textflags::bold);
+
+        // draw an extra space at the end, because we took away an & sign
+        desktop::get().getGraphics()->draw(x + final_title.length(), y, L' ', flags);
     }
 }
 
@@ -334,7 +338,7 @@ int cogui::theme::minimum_button_width(const cogui::button &b)
 
 int cogui::theme::minimum_button_height(const cogui::button&)
 {
-    return 2; // topline = 0 + text = 1 + bottomline = 2
+    return 3; // topline = 0 + text = 1 + bottomline = 2
 }
 
 int cogui::theme::minimum_window_width(const cogui::window &w)

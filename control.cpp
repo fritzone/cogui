@@ -152,6 +152,7 @@ int cogui::control::getY() const
 
 void cogui::control::setY(int y)
 {
+    debug() << "set y=" << y << " to" << (char*)m_title.c_str();
     m_y = y;
 }
 

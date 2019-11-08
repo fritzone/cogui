@@ -20,12 +20,12 @@ int main( int argc, char* argv[] )
                            //window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
                            //window::on_mouse_up = [](window* w, cogui::mouse::button b, int x, int y){info() << "Mouse (" << mouse::get().buttonName(b) << ") up:" << x << ", " << y; },
                            window::sysmenu = menu{
-                               {L"&Select", action::on_trigger = [](action*){info() << "Clicked Select";}},
+                               {L"&Select", action::selectable, action::on_trigger = [](action*){info() << "Clicked Select";}},
                                {L"No select", action::on_trigger = [](action*){info() << "Clicked No select";}}
                            }
     );
 
-    /*auto& b = a.add_button(5,5, 10, 2, L"&Vertical layout",
+    auto& b = a.add_button(5,5, 10, 2, L"&Vertical layout",
                            button::on_click = [&a](button*){info() << "Thanks";
                                 a.setLayout<cogui::layout::vertical>().expand(2);
                                 a.redraw();
@@ -53,7 +53,7 @@ int main( int argc, char* argv[] )
     miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){info() << "(slot) new size:" << w << "x" << h;});
     miso::connect(&c, c.sig_on_click, [](button*){ info() << "You clicked me...:" ;});
 
-    a.setLayout<cogui::layout::grid>(3, 3);*/
+    a.setLayout<cogui::layout::grid>(3, 3);
 
     cogui::application app;
     app.run();

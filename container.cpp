@@ -100,11 +100,14 @@ void cogui::container::press_element(std::shared_ptr<cogui::control> c)
     m_prev_pressed = m_pressed;
 }
 
-void cogui::container::reLayout()
+void cogui::container::reLayout(int temptative_width, int temptative_height, bool force)
 {
     if(m_layout)
     {
-        m_layout->arrange_controls(m_tab_order, this);
+        if(m_layout->accept_new_size(m_tab_order, temptative_width, temptative_height) || force)
+        {
+            m_layout->arrange_controls(m_tab_order, this);
+        }
     }
 }
 

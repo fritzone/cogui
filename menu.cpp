@@ -1,7 +1,7 @@
 #include "menu.h"
 
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
-
+cogui::action::Selectable cogui::action::selectable;
 
 cogui::menu::menu(std::initializer_list<cogui::action> l) : m_actions(l)
 {
@@ -22,14 +22,26 @@ void cogui::menu::open(int x, int y)
     m_x = x;
     m_y = y;
     int max_len = 0;
+    bool any_selectable = false;
     for(int i=0; i<m_actions.size(); i++)
     {
         if(max_len < m_actions[i].getTitle().length())
         {
             max_len = m_actions[i].getTitle().length();
         }
+        if(m_actions[i].isSelectable())
+        {
+            any_selectable = true;
+        }
     }
+
+
     m_width = max_len + 2;
+    if(any_selectable)
+    {
+        m_width += 2;
+    }
+
     m_height = m_actions.size() + 1;
 
     // now gather a list of all the windows that need to be repainted when this menu disappears
@@ -101,23 +113,25 @@ int cogui::menu::getWidth() const
 
 cogui::action::~action()
 {
-    sig_on_trigger.disconnect(this, conn.get(), true);
+    sig_on_trigger.disconnect(this, m_conn.get(), true);
 }
 
 cogui::action::action(const cogui::action &o)
 {
     m_title = o.m_title;
-    conn = o.conn;
-    miso::connect(this, sig_on_trigger, conn.get());
+    m_conn = o.m_conn;
+    miso::connect(this, sig_on_trigger, m_conn.get());
 }
 
 cogui::action &cogui::action::operator=(const cogui::action &o)
 {
     m_title = o.m_title;
-    sig_on_trigger.disconnect(this, conn.get());
+    sig_on_trigger.disconnect(this, m_conn.get());
     sig_on_trigger = o.sig_on_trigger;
-    conn = o.conn;
-    miso::connect(this, sig_on_trigger, conn.get());
+    m_conn = o.m_conn;
+    miso::connect(this, sig_on_trigger, m_conn.get());
+
+    return *this;
 }
 
 void cogui::action::trigger()
@@ -133,4 +147,9 @@ std::wstring cogui::action::getTitle() const
 void cogui::action::setTitle(const std::wstring &title)
 {
     m_title = title;
+}
+
+bool cogui::action::isSelectable() const
+{
+    return m_selectable;
 }

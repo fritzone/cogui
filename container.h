@@ -42,12 +42,17 @@ public:
 
         m_layout = std::make_shared<T>(std::forward<Args>(args)...);
         m_layout->setContainer(this);
-        reLayout();
+        reLayout(getWidth(), getHeight(), false);
 
         return *(dynamic_cast<T*>(m_layout.get()));
     }
 
-    void reLayout();
+    /**
+     * @brief reLayout Layouts the window in the current layout for the new width and height
+     * @param temptative_width
+     * @param temptative_height
+     */
+    void reLayout(int temptative_width, int temptative_height, bool force);
 
     /**
      * @brief element_under Will return the control which is under the X,Y pair
@@ -170,11 +175,11 @@ protected:
     CIT m_prev_pressed = m_tab_order.end(); // the previously pressed element. Activated when the user pressed the button on a control and moved his mouse out of it
 
     std::vector<std::shared_ptr<control>> m_tab_order;    // the order for the focusable elements for this container only
+    std::shared_ptr<cogui::layout::abstract> m_layout;
 
 private:
 
     static std::map<const container*, std::vector<basic_store*>> m_container_stores;
-    std::shared_ptr<cogui::layout::abstract> m_layout;
 };
 
 }

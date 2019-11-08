@@ -132,15 +132,31 @@ void cogui::window::mouse_move(int x, int y)
             return;
         }
 
-        if(getWidth() +  dx >=5 && getHeight() + dy>= 5)
+        if(getWidth() +  dx >= 5 && getHeight() + dy >= 5)
         {
             clear(); // clear is usually followed by a draw that why there is no refresh
             // info() << "w = " << getWidth() << " nw=" << getWidth() + dx;
+
+            int temptative_width = m_prev_w + dx;
+            int temptative_height = m_prev_h + dy;
+
+            if(m_layout)
+            {
+                if(!m_layout->accept_new_size(m_tab_order, temptative_width, temptative_height))
+                {
+                    // return only if the new layout size is smaller than the current size
+                    if(temptative_width < getWidth() && temptative_height < getHeight())
+                    {
+                        return draw();
+                    }
+                }
+            }
+
             setWidth( m_prev_w + dx);
             setHeight( m_prev_h + dy);
 
             // if there is a layout attached
-            reLayout();
+            reLayout(getWidth(), getHeight(), true);
 
             emit sig_on_resize(this, m_prev_w + dx, m_prev_h + dy);
 
@@ -245,6 +261,12 @@ void cogui::window::left_mouse_down(int x, int y)
     // info() << "y=" << y << " topy=" << this->getY();
     if( y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
+        if(m_current_menu)
+        {
+            m_current_menu = nullptr;
+            redraw();
+        }
+
         // see: outside of sysmenu, maximize, close
         m_draw_state = draw_state::moving;
         m_mouse_down_x = x - this->getX();
@@ -254,6 +276,12 @@ void cogui::window::left_mouse_down(int x, int y)
 
     if(x == getWidth() + 1 + this->getX() && y == getHeight() + this->getY()) // in the lower right corner
     {
+        if(m_current_menu)
+        {
+            m_current_menu = nullptr;
+            redraw();
+        }
+
         m_draw_state = draw_state::resizing;
         m_mouse_down_x = x - this->getX();
         m_mouse_down_y = y - this->getY();
