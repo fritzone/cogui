@@ -5,7 +5,7 @@
 #include "window.h"
 #include "button.h"
 #include "menu.h"
-
+#include "arguments.h"
 
 namespace cogui {
 
@@ -37,8 +37,6 @@ private:
 
 
 };
-
-void init(int argc, char* argv[]);
 
 }
 

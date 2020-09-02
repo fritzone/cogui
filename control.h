@@ -1,7 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "loguru.h"
+#include "log.h"
 #include "miso.h"
 
 #include "named_type.h"

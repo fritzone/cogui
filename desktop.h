@@ -34,8 +34,10 @@ public:
 
     void add_window(window* w);
     void remove_window(window* w);
+    void maximize_window(window* w);
 
     void refresh();
+    void clear();
     void shutdown();
     void resize();
     int getWidth() const;

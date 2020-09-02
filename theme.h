@@ -123,6 +123,8 @@ public:
     std::wstring MNU_LR_CORNER = L"\x2518";    // Lower right corner
     std::wstring MNU_HORIZONTAL = L"\x2500";
     std::wstring MNU_VERTICAL = L"\x2502";
+    std::wstring MNU_SYSMENU_TOP =  L"\x2502 \x2514";
+
 };
 }
 

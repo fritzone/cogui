@@ -5,7 +5,7 @@
 #include "control.h"
 #include "button.h"
 
-#include "loguru.h"
+#include "log.h"
 
 namespace cogui
 {
@@ -93,11 +93,13 @@ void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = co
     desktop::get().getGraphics()->draw(x, y, final_title.c_str(), flags);
     if(highlight_char != L'\0')
     {
+        // draw an extra space at the end, because we took away an & sign
+        desktop::get().getGraphics()->draw(x + final_title.length(), y, L' ', cogui::textflags::normal);
+
         desktop::get().getGraphics()->draw(x + highlight_pos, y, highlight_char,
                                            cogui::textflags::underline & cogui::textflags::bold);
 
-        // draw an extra space at the end, because we took away an & sign
-        desktop::get().getGraphics()->draw(x + final_title.length(), y, L' ', flags);
+
     }
 }
 
@@ -156,11 +158,12 @@ void cogui::theme::draw_window(const cogui::window &w)
 
     int close_pos = -1;
     int sysmenu_pos = -1;
+    int maximize_pos = -1;
 
     if(w.hasCloseButton())
     {
         available_width -= close_char.length();
-        //info() << "wdth:" << w.width() << " avail:" << available_width;
+        //log_info() << "wdth:" << w.width() << " avail:" << available_width;
 
         cogui::draw(w.getX() + available_width, w.getY(), close_char);
         close_pos = w.getX() + available_width + 1;
@@ -169,9 +172,10 @@ void cogui::theme::draw_window(const cogui::window &w)
     if(w.hasMaximizeButton())
     {
         available_width -= maximize_char.length() - 1;
-        // info() << "wdth:" << w.width() << " avail:" << available_width;
+        // log_info() << "wdth:" << w.width() << " avail:" << available_width;
 
         cogui::draw(w.getX() + available_width , w.getY(), maximize_char);
+        maximize_pos = w.getX() + available_width + 1;
         if(w.hasCloseButton()) // remove ugly close and end buttons from window titlebar
         {
             int newx = w.getX() + available_width + maximize_char.length() - 1;
@@ -199,7 +203,7 @@ void cogui::theme::draw_window(const cogui::window &w)
         cogui::draw(lefts, w.getY(), t);
     }
 
-    w.update_titlebar_btn_positions(close_pos, sysmenu_pos);
+    w.update_titlebar_btn_positions(close_pos, sysmenu_pos, maximize_pos);
 
 }
 
@@ -277,7 +281,7 @@ void cogui::theme::draw_button(const cogui::button &b)
     {
         if(b.getFocusState() == cogui::control::focus_state::focused)
         {
-            info()<<"focused, drawing underlined";
+            log_info()<<"focused, drawing underlined";
             cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw, cogui::textflags::underline);
         }
         else
@@ -306,12 +310,17 @@ void cogui::theme::draw_menu(const cogui::menu &w)
     cogui::draw(w.getX() + 1, w.getY(), cogui::line(w.getWidth() - 1, MNU_HORIZONTAL));
     cogui::draw(w.getX() + 1, w.getY() + w.getHeight(), cogui::line(w.getWidth() - 1, MNU_HORIZONTAL));
 
+    if(w.isSysmenu())
+    {
+        cogui::draw(w.getX(), w.getY(), MNU_SYSMENU_TOP);
+    }
+
     int mc = 0;
     for(int y = top+1; y < top + h; y++)
     {
         cogui::draw(x, y, MNU_VERTICAL);
         cogui::draw(x + wi, y, MNU_VERTICAL);
-        info() << "LASTSEL:" << w.getLastSelectedIndex() << " mc=" << mc;
+        log_info() << "LASTSEL:" << w.getLastSelectedIndex() << " mc=" << mc;
 
         std::wstring titleToDraw = w[mc].getTitle();
         while(titleToDraw.length() < w.getWidth() - 1) titleToDraw += L" ";

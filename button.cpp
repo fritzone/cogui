@@ -15,7 +15,7 @@ void cogui::button::draw() const
 
 void cogui::button::click()
 {
-    debug() << "Emitting a click signal";
+    log_debug() << "Emitting a click signal";
     emit sig_on_click(this);
 }
 

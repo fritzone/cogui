@@ -8,7 +8,7 @@
 #include <algorithm>
 #define LOGURU_WITH_STREAMS 1
 
-#include "loguru.h"
+#include "log.h"
 
 namespace cogui
 {
@@ -36,6 +36,7 @@ bool desktop::initialize()
     {
         m_graphics->refresh_screen();
     }
+    return b;
 }
 
 std::vector<window *> desktop::windows() const
@@ -60,7 +61,6 @@ void desktop::handle_mouse_left_click(int x, int y)
     {
         if(w->inside(x, y))
         {
-            LOG_S(INFO) << "inside";
             w->click( x, y);
         }
     }
@@ -72,12 +72,12 @@ void desktop::handle_mouse_left_down(int x, int y)
     {
         if(w->inside(x, y))
         {
-            info() << "captured a window";
+            log_info() << "captured a window";
 
             w->left_mouse_down(x, y);
             if(w->getDrawState() != window::draw_state::normal)
             {
-                info() << "captured a window";
+                log_info() << "captured a window";
                 m_captured_window = w;
                 return;
             }
@@ -157,9 +157,19 @@ void desktop::remove_window(window *w)
     m_windows.erase(std::remove(m_windows.begin(), m_windows.end(), w), m_windows.end());
 }
 
+void desktop::maximize_window(window *w)
+{
+    w->maximize();
+}
+
 void desktop::refresh()
 {
     getGraphics()->refresh_screen();
+}
+
+void desktop::clear()
+{
+    getGraphics()->clear_screen();
 }
 
 void desktop::shutdown()

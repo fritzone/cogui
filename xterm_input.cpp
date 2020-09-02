@@ -1,7 +1,7 @@
 #include "input.h"
 #include <ncursesw/ncurses.h>
 
-#include "loguru.h"
+#include "log.h"
 
 bool cogui::xterm_input::init()
 {
@@ -44,6 +44,6 @@ std::vector<cogui::event> cogui::xterm_input::get_next_event()
         auto e = cogui::to_event(c);
         result.push_back(e);
     }
-    debug() << "Got " << result.size() << " events ";
+    log_debug() << "Got " << result.size() << " events ";
     return result;
 }

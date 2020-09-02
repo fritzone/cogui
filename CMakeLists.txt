@@ -14,10 +14,10 @@ else()
 endif()
 
 set(PROJECT_SOURCES
-    loguru.cpp
     cogui.cpp
     window.cpp desktop.cpp theme.cpp graphics.cpp application.cpp events.cpp mouse.cpp xterm_input.cpp gpm_input.cpp
     control.cpp button.cpp container.cpp layout.cpp menu.cpp
+    logstream.cpp
 )
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} main.cpp)
 target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm)

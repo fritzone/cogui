@@ -2,7 +2,7 @@
 #include "desktop.h"
 #include "theme.h"
 
-#include "loguru.h"
+#include "log.h"
 
 #include <memory>
 
@@ -42,7 +42,7 @@ void cogui::window::draw() const
 
 void cogui::window::click(int x, int y)
 {
-   info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
+   log_info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
 
    //firstly: see if there is an open menu
    if(m_current_menu)
@@ -76,9 +76,17 @@ void cogui::window::click(int x, int y)
        return;
    }
 
+   if(y == this->getY() && x == m_maximize_btn_pos)
+   {
+       // close click:
+       // debug() << "click on close button";
+       maximize();
+       return;
+   }
+
    if(y == this->getY() && x == m_sysmenu_btn_pos)
    {
-        info() << "click on sysmenu";
+        log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
         m_current_menu->open(x - 1, y + 1);
         return draw();
@@ -135,7 +143,7 @@ void cogui::window::mouse_move(int x, int y)
         if(getWidth() +  dx >= 5 && getHeight() + dy >= 5)
         {
             clear(); // clear is usually followed by a draw that why there is no refresh
-            // info() << "w = " << getWidth() << " nw=" << getWidth() + dx;
+            // log_info() << "w = " << getWidth() << " nw=" << getWidth() + dx;
 
             int temptative_width = m_prev_w + dx;
             int temptative_height = m_prev_h + dy;
@@ -237,7 +245,7 @@ bool cogui::window::inside(int x, int y) const
 
 void cogui::window::click()
 {
-    info() << "This window was clicked:" << this;
+    log_info() << "This window was clicked:" << this;
 }
 
 int cogui::window::minimumDrawableWidth() const
@@ -250,15 +258,16 @@ int cogui::window::minimumDrawableHeight() const
     return desktop::get().getTheme()->minimum_window_height(*this);
 }
 
-void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos) const
+void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const
 {
     m_close_btn_pos = close_pos;
     m_sysmenu_btn_pos = sysmenu_pos;
+    m_maximize_btn_pos = maximize_pos;
 }
 
 void cogui::window::left_mouse_down(int x, int y)
 {
-    // info() << "y=" << y << " topy=" << this->getY();
+    // log_info() << "y=" << y << " topy=" << this->getY();
     if( y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
         if(m_current_menu)
@@ -293,9 +302,8 @@ void cogui::window::left_mouse_down(int x, int y)
 
     // see if we have pressed the mouse on a control
     std::shared_ptr<control> under = element_under(x, y);
-    if(under)
+    if(under && !m_current_menu)
     {
-        debug() << "Under:" << under;
         press_element(under);
         return draw();
     }
@@ -315,14 +323,13 @@ void cogui::window::left_mouse_down(int x, int y)
 
 void cogui::window::left_mouse_up(int x, int y)
 {
-    info() << "UP: " << x << " " << y;
+    log_info() << "UP: " << x << " " << y;
     m_draw_state = draw_state::normal;
 
     // now release the element if there was any pressed
     std::shared_ptr<control> under = element_under(x, y);
     if(under)
     {
-        debug() << "Release Under:" << under;
         // see if the release has happened on the same control that was pressed on
         if(*m_prev_pressed == under)
         {
@@ -370,6 +377,42 @@ void cogui::window::setHasSysmenuButton(bool hasSysmenuButton)
 cogui::window::draw_state cogui::window::getDrawState() const
 {
     return m_draw_state;
+}
+
+void cogui::window::maximize()
+{
+
+    if(m_window_state == window_state::normal)
+    {
+        m_initial_x = getX();
+        m_initial_y = getY();
+        m_initial_width = getWidth();
+        m_initial_height = getHeight();
+
+        setX(0);
+        setY(0);
+        setWidth(desktop::get().getWidth() - 2);
+        setHeight(desktop::get().getHeight() - 1);
+
+        m_window_state = window_state::maximized;
+
+        reLayout();
+    }
+    else
+    {
+        desktop::get().clear();
+
+        setX(m_initial_x);
+        setY(m_initial_y);
+        setWidth(m_initial_width);
+        setHeight(m_initial_height);
+
+        m_window_state = window_state::normal;
+
+        reLayout();
+    }
+
+    redraw();
 }
 
 bool cogui::window::hasMaximizeButton() const

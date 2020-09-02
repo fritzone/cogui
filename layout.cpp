@@ -10,7 +10,7 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
     bool expandable = (m_expanded_column != -1);
     bool hiding = false;
     int last_x = 0;
-    info() << "Expandable:" << expandable;
+    log_info() << "Expandable:" << expandable;
     int last_x_before_split = 0;
 
     if(expandable)
@@ -86,7 +86,7 @@ bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_pt
     int cx = 1;
     bool expandable = (m_expanded_column != -1);
     int last_used_x = -1;
-    info() << "Expandable:" << expandable;
+    log_info() << "Expandable:" << expandable;
 
     if(expandable)
     {
@@ -120,10 +120,10 @@ bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_pt
 void cogui::layout::horizontal::expand(int c)
 {
     m_expanded_column = c;
-    info() << "Setting expand cell:" << m_expanded_column;
+    log_info() << "Setting expand cell:" << m_expanded_column;
     if(m_container)
     {
-        debug() << "Relayouting";
+        log_debug() << "Relayouting";
         m_container->reLayout(m_container->getWidth(), m_container->getHeight(), true);
     }
 }
@@ -246,10 +246,10 @@ bool cogui::layout::vertical::accept_new_size(const std::vector<std::shared_ptr<
 void cogui::layout::vertical::expand(int c)
 {
     m_expanded_row = c;
-    info() << "Setting expand cell:" << m_expanded_row;
+    log_info() << "Setting expand cell:" << m_expanded_row;
     if(m_container)
     {
-        debug() << "Relayouting";
+        log_debug() << "Relayouting";
         m_container->reLayout(m_container->getWidth(), m_container->getHeight(), true);
     }
 }
@@ -269,8 +269,6 @@ void cogui::layout::grid::arrange_controls(std::vector<std::shared_ptr<cogui::co
     {
         if(setting)
         {
-            info() << "Setting:" << c << " at " << cx << "," << cy << " as " << rc << " - " << cc;
-
             c->setX(cx);
             c->setY(cy);
             c->setHeight(recommended_height - 1);
@@ -289,14 +287,13 @@ void cogui::layout::grid::arrange_controls(std::vector<std::shared_ptr<cogui::co
 
                 if(rc == m_rows)
                 {
-                    info() << "Stopped setting controls, switched to hiding them";
+                    log_info() << "Stopped setting controls, switched to hiding them";
                     setting = false;
                 }
             }
         }
         else
         {
-            info() << "Hiding:" << c;
             c->hide();
         }
     }

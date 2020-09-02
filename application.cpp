@@ -6,12 +6,7 @@
 #include "input.h"
 #include "events.h"
 
-#include "loguru.h"
-
-cogui::application::application()
-{
-
-}
+#include "log.h"
 
 int cogui::application::run()
 {
@@ -28,12 +23,13 @@ int cogui::application::run()
     while( running() )
     {
         auto events = desktop::get().getInput()->get_next_event();
-        debug() << "Got:" << events.size() << " events";
+        log_debug() << "Got:" << events.size() << " events";
         for(auto c : events)
         {
             handle_event(c);
         }
     }
+    return 1;
 }
 
 bool cogui::application::running() const
@@ -46,44 +42,49 @@ void cogui::application::stop()
     m_running = false;
 }
 
+void cogui::application::exit(int c)
+{
+    ::exit(c);
+}
+
 void cogui::application::handle_event(cogui::event c)
 {
     switch(c)
     {
-    case cogui::event::press_escape:
-    {
-        debug() << "Escape";
-        exit(1);
-    }
-    case cogui::event::press_tab:
-    {
-        desktop::get().handle_tab();
-        break;
-    }
-    case cogui::event::mouse_left_click:
-    {
-        debug() << "left click: " << mouse::get().x() << "x" << mouse::get().y();
-        desktop::get().handle_mouse_left_click(mouse::get().x(), mouse::get().y());
-        break;
-    }
-    case cogui::event::mouse_left_press:
-    {
-        debug() << "left press: " << mouse::get().x() << "x" << mouse::get().y();
-        desktop::get().handle_mouse_left_down(mouse::get().x(), mouse::get().y());
-        break;
-    }
-    case cogui::event::mouse_left_release:
-    {
-        debug() << "left release: " << mouse::get().x() << "x" << mouse::get().y();
-        desktop::get().handle_mouse_left_up(mouse::get().x(), mouse::get().y());
-        break;
-    }
-    case cogui::event::mouse_move:
-    {
-        debug() << "move: " << mouse::get().x() << "x" << mouse::get().y();
-        desktop::get().getGraphics()->handle_mouse_movement();
-        desktop::get().handle_mouse_move(mouse::get().x(), mouse::get().y());
-        break;
-    }
+        case cogui::event::press_escape:
+        {
+            log_debug() << "Escape";
+            exit(1);
+        }
+        case cogui::event::press_tab:
+        {
+            desktop::get().handle_tab();
+            break;
+        }
+        case cogui::event::mouse_left_click:
+        {
+            log_debug() << "left click: " << mouse::get().x() << "x" << mouse::get().y();
+            desktop::get().handle_mouse_left_click(mouse::get().x(), mouse::get().y());
+            break;
+        }
+        case cogui::event::mouse_left_press:
+        {
+            log_debug() << "left press: " << mouse::get().x() << "x" << mouse::get().y();
+            desktop::get().handle_mouse_left_down(mouse::get().x(), mouse::get().y());
+            break;
+        }
+        case cogui::event::mouse_left_release:
+        {
+            log_debug() << "left release: " << mouse::get().x() << "x" << mouse::get().y();
+            desktop::get().handle_mouse_left_up(mouse::get().x(), mouse::get().y());
+            break;
+        }
+        case cogui::event::mouse_move:
+        {
+            log_debug() << "move: " << mouse::get().x() << "x" << mouse::get().y();
+            desktop::get().getGraphics()->handle_mouse_movement();
+            desktop::get().handle_mouse_move(mouse::get().x(), mouse::get().y());
+            break;
+        }
     }
 }

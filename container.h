@@ -53,6 +53,7 @@ public:
      * @param temptative_height
      */
     void reLayout(int temptative_width, int temptative_height, bool force);
+    void reLayout();
 
     /**
      * @brief element_under Will return the control which is under the X,Y pair

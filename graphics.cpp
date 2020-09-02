@@ -14,7 +14,7 @@
 #include <ncursesw/ncurses.h>
 #include <sstream>
 
-#include "loguru.h"
+#include "log.h"
 
 // code, index, foreground, background
 const std::map<int, std::tuple<int, int, int>> colorpairs =
@@ -149,7 +149,7 @@ void cogui::graphics::draw(int x, int y, const wchar_t *s, int flags)
 
     if(x < 0)
     {
-        info() << "x=" << x << " ax=" << std::abs(x) + 1;
+        log_info() << "x=" << x << " ax=" << std::abs(x) + 1;
 
         std::wstring sw(s);
         std::wstring subs = sw.substr(std::abs(x) + 1);
@@ -204,6 +204,11 @@ void cogui::graphics::turnon_current_color()
 void cogui::graphics::refresh_screen()
 {
     refresh();
+}
+
+void cogui::graphics::clear_screen()
+{
+    wclear(stdscr);
 }
 
 void cogui::graphics::handle_mouse_movement()

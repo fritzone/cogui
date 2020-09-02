@@ -51,7 +51,7 @@ std::vector<std::shared_ptr<cogui::control>>::iterator& cogui::container::focuse
 
 void cogui::container::focus_next_element()
 {
-    info() << "Focusing next element";
+    log_info() << "Focusing next element";
     if(m_focused == m_tab_order.end())
     {
         m_focused = m_tab_order.begin();
@@ -84,16 +84,14 @@ void cogui::container::press_element(std::shared_ptr<cogui::control> c)
 {
     if(m_pressed != m_tab_order.end())
     {
-        debug() << "releasing something";
+        log_debug() << "releasing something";
         (*m_pressed)->release();
     }
     m_pressed = std::find(m_tab_order.begin(), m_tab_order.end(), c);
 
-    debug() << "Pressed:" << *m_pressed;
-
     if(m_pressed == m_tab_order.end())
     {
-        warning() << "Pressed is still invalid";
+        log_warning() << "Pressed is still invalid";
     }
     c->press();
 
@@ -109,6 +107,11 @@ void cogui::container::reLayout(int temptative_width, int temptative_height, boo
             m_layout->arrange_controls(m_tab_order, this);
         }
     }
+}
+
+void cogui::container::reLayout()
+{
+    reLayout(getWidth(), getHeight(), true);
 }
 
 std::shared_ptr<cogui::control> cogui::container::element_under(int x, int y)

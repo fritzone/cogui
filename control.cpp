@@ -1,5 +1,5 @@
 #include "control.h"
-#include "loguru.h"
+#include "log.h"
 #include "desktop.h"
 #include "theme.h"
 
@@ -17,7 +17,7 @@ void cogui::control::initInitialPosition()
 
 cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_width(w), m_height(h)
 {
-    info() << "Created a control at:" << x << ", " << y;
+    log_info() << "Created a control at:" << x << ", " << y;
     initInitialPosition();
 }
 
@@ -152,7 +152,7 @@ int cogui::control::getY() const
 
 void cogui::control::setY(int y)
 {
-    debug() << "set y=" << y << " to" << (char*)m_title.c_str();
+    log_debug() << "set y=" << y << " to" << (char*)m_title.c_str();
     m_y = y;
 }
 

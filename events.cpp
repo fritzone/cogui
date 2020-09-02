@@ -1,7 +1,7 @@
 #include "events.h"
 #include "curses.h"
 #include "mouse.h"
-#include "loguru.h"
+#include "log.h"
 
 void log_event(MEVENT event)
 {
@@ -34,13 +34,13 @@ void log_event(MEVENT event)
 
     ss << " V:" << (static_cast<int>(event.bstate));
 
-    info() << ss.str();
+    log_info() << ss.str();
 
 }
 
 cogui::event cogui::to_event(int c)
 {
-    info() << "Event:" << c;
+    log_info() << "Event:" << c;
     switch (c) {
     case KEY_MOUSE:
     {
@@ -95,7 +95,7 @@ cogui::event cogui::to_event(int c)
             }
         }
         else {
-            info() << "Could not get mouse event";
+            log_info() << "Could not get mouse event";
         }
         break;
     }

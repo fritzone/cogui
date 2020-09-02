@@ -106,6 +106,11 @@ int cogui::menu::getLastSelectedIndex() const
     return m_lastSelectedIndex;
 }
 
+bool cogui::menu::isSysmenu() const
+{
+    return m_is_sysmenu;
+}
+
 int cogui::menu::getWidth() const
 {
     return m_width;

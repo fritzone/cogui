@@ -35,6 +35,7 @@ public:
     bool initialize();
     void draw(int x, int y, const wchar_t* s, int flags);
     void refresh_screen();
+    void clear_screen();
     void handle_mouse_movement();
     void shutdown();
     int getWidth() const {return m_width;}

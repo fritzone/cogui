@@ -95,6 +95,7 @@ namespace cogui
         const action& operator[](int i) const;
 
         int getLastSelectedIndex() const;
+        bool isSysmenu() const;
 
     private:
         std::vector<action> m_actions;
@@ -103,6 +104,7 @@ namespace cogui
         int m_width = 0;
         int m_height = 0;
         int m_lastSelectedIndex = -1;
+        bool m_is_sysmenu = true;
     };
 
 }

@@ -30,6 +30,12 @@ public:
         moving
     };
 
+    enum class window_state
+    {
+        normal,
+        maximized
+    };
+
     window(int x, int y, int width, int height, const std::wstring& title);
     window(int x, int y, int width, int height, const std::string& title);
     /**
@@ -99,13 +105,14 @@ public:
     void setHasSysmenuButton(bool hasSysmenuButton);
 
     draw_state getDrawState() const;
+    void maximize();
 
     bool inside(int x, int y) const override;
     void click() override;
     int minimumDrawableWidth() const override;
     int minimumDrawableHeight() const override;
 
-    void update_titlebar_btn_positions(int close_pos, int sysmenu_pos) const;
+    void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
 
     // signals
 
@@ -136,13 +143,17 @@ private:
     bool m_hasCloseButton = true;
     bool m_hasMaximizeButton = true;
     bool m_hasSysmenuButton = true;
+
     draw_state m_draw_state = draw_state::normal;
+    window_state m_window_state = window_state::normal;
+
     int m_mouse_down_x = -1;
     int m_mouse_down_y = -1;
     int m_prev_w = -1;
     int m_prev_h = -1;
     mutable int m_close_btn_pos = -1;
     mutable int m_sysmenu_btn_pos = -1;
+    mutable int m_maximize_btn_pos = -1;
 
     // this is the current menu that is shown on the screen
     menu* m_current_menu = nullptr;

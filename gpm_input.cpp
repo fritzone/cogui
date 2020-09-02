@@ -7,7 +7,7 @@
 #include <linux/keyboard.h>
 #include <string.h>
 #include <chrono>
-#include "loguru.h"
+#include "log.h"
 
 static cogui::mouse::button last_button = cogui::mouse::button::none;
 static auto t_start = std::chrono::high_resolution_clock::now();
@@ -17,14 +17,14 @@ static auto t_start = std::chrono::high_resolution_clock::now();
 
 int my_handler(Gpm_Event *event, void *data)
 {
-    // info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
+    // log_info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
 
     cogui::mouse::get().setX(event->x - 1);
     cogui::mouse::get().setY(event->y - 1);
 
     if(event->type == GPM_DOWN && event->buttons == GPM_B_LEFT) //
     {
-        info() << "Event Type: LEFT DOWN at " <<  event->x << "," << event->y;
+        log_info() << "Event Type: LEFT DOWN at " <<  event->x << "," << event->y;
         t_start = std::chrono::high_resolution_clock::now();
         last_button = cogui::mouse::button::left;
         cogui::desktop::get().handle_mouse_left_down(event->x - 1, event->y - 1);
@@ -32,7 +32,7 @@ int my_handler(Gpm_Event *event, void *data)
 
     if(event->type == GPM_DOWN && event->buttons == GPM_B_RIGHT) //
     {
-        info() << "Event Type: RIGHT DOWN at " <<  event->x << "," << event->y;
+        log_info() << "Event Type: RIGHT DOWN at " <<  event->x << "," << event->y;
         last_button = cogui::mouse::button::right;
         cogui::desktop::get().handle_mouse_right_down(event->x - 1, event->y - 1);
     }
@@ -47,18 +47,18 @@ int my_handler(Gpm_Event *event, void *data)
             double elapsed_time_ms = std::chrono::duration<double, std::milli>(t_end-t_start).count();
             if(elapsed_time_ms < 200) // this was a fast exchange handle it as a click
             {
-                info() << "Event Type: LEFT CLICK at " <<  event->x << "," << event->y;
+                log_info() << "Event Type: LEFT CLICK at " <<  event->x << "," << event->y;
                 cogui::desktop::get().handle_mouse_left_click(event->x - 1, event->y - 1);
             }
             else
             {
-                info() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
+                log_info() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
                 cogui::desktop::get().handle_mouse_left_up(event->x - 1, event->y - 1);
             }
         }
         if(last_button == cogui::mouse::button::right)
         {
-            info() << "Event Type: RIGHT UP at " <<  event->x << "," << event->y;
+            log_info() << "Event Type: RIGHT UP at " <<  event->x << "," << event->y;
             cogui::desktop::get().handle_mouse_right_up(event->x - 1, event->y - 1);
         }
         last_button = cogui::mouse::button::none;
@@ -94,7 +94,7 @@ bool cogui::gpm_input::init()
 
     if(Gpm_Open(&conn, 0) == -1)
     {
-        info() << "Cannot connect to mouse server\n";
+        log_info() << "Cannot connect to mouse server\n";
         return false;
     }
 
@@ -121,7 +121,7 @@ bool cogui::gpm_input::shutdown()
 std::vector<cogui::event> cogui::gpm_input::get_next_event()
 {
     std::vector<cogui::event> result;
-    info() << "Waiting for standard";
+    log_info() << "Waiting for standard";
     int c = Gpm_Getc(stdin);
     auto e = cogui::to_event(c);
     result.push_back(e);
