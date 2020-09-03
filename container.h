@@ -4,6 +4,7 @@
 #include "control.h"
 #include "button.h"
 #include "layout.h"
+#include "checkbox.h"
 
 #include <vector>
 #include <iterator>
@@ -22,14 +23,22 @@ public:
     {
     }
 
+    /* to add a button to the container */
     button& add_button(int x, int y, int width, int height, const std::wstring& title);
-
-
     template<typename ... Args>
     button& add_button(int x, int y, int width, int height, const std::wstring& title, Args... args)
     {
         return *add_control<button>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
+
+    /* to add a checkbox to the container */
+    checkbox& add_checkbox(int x, int y, int width, int height, const std::wstring& title);
+    template<typename ... Args>
+    checkbox& add_checkbox(int x, int y, int width, int height, const std::wstring& title, Args... args)
+    {
+        return *add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
+    }
+
 
     void draw_content() const;
     void focus_next_element();

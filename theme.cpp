@@ -4,6 +4,7 @@
 #include "window.h"
 #include "control.h"
 #include "button.h"
+#include "checkbox.h"
 
 #include "log.h"
 
@@ -282,7 +283,7 @@ void cogui::theme::draw_button(const cogui::button &b)
         if(b.getFocusState() == cogui::control::focus_state::focused)
         {
             log_info()<<"focused, drawing underlined";
-            cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw, cogui::textflags::underline);
+            cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
         }
         else
         {
@@ -291,28 +292,28 @@ void cogui::theme::draw_button(const cogui::button &b)
     }
 }
 
-void cogui::theme::draw_menu(const cogui::menu &w)
+void cogui::theme::draw_menu(const cogui::menu &m)
 {
-    int top = w.getY();
-    int h = w.getHeight();
-    int x = w.getX();
-    int wi = w.getWidth();
+    int top = m.getY();
+    int h = m.getHeight();
+    int x = m.getX();
+    int wi = m.getWidth();
     for(int y = top; y <= top + h; y++)
     {
         cogui::draw(x, y, cogui::line(wi + 2, L" "));
     }
 
-    cogui::draw(w.getX(), w.getY(), MNU_UL_CORNER);
-    cogui::draw(w.getX(), w.getY() + w.getHeight(), MNU_LL_CORNER);
-    cogui::draw(w.getX() + w.getWidth(), w.getY(), MNU_UR_CORNER);
-    cogui::draw(w.getX() + w.getWidth(), w.getY() + w.getHeight(), MNU_LR_CORNER);
+    cogui::draw(m.getX(), m.getY(), MNU_UL_CORNER);
+    cogui::draw(m.getX(), m.getY() + m.getHeight(), MNU_LL_CORNER);
+    cogui::draw(m.getX() + m.getWidth(), m.getY(), MNU_UR_CORNER);
+    cogui::draw(m.getX() + m.getWidth(), m.getY() + m.getHeight(), MNU_LR_CORNER);
 
-    cogui::draw(w.getX() + 1, w.getY(), cogui::line(w.getWidth() - 1, MNU_HORIZONTAL));
-    cogui::draw(w.getX() + 1, w.getY() + w.getHeight(), cogui::line(w.getWidth() - 1, MNU_HORIZONTAL));
+    cogui::draw(m.getX() + 1, m.getY(), cogui::line(m.getWidth() - 1, MNU_HORIZONTAL));
+    cogui::draw(m.getX() + 1, m.getY() + m.getHeight(), cogui::line(m.getWidth() - 1, MNU_HORIZONTAL));
 
-    if(w.isSysmenu())
+    if(m.isSysmenu())
     {
-        cogui::draw(w.getX(), w.getY(), MNU_SYSMENU_TOP);
+        cogui::draw(m.getX(), m.getY(), MNU_SYSMENU_TOP);
     }
 
     int mc = 0;
@@ -320,12 +321,12 @@ void cogui::theme::draw_menu(const cogui::menu &w)
     {
         cogui::draw(x, y, MNU_VERTICAL);
         cogui::draw(x + wi, y, MNU_VERTICAL);
-        log_info() << "LASTSEL:" << w.getLastSelectedIndex() << " mc=" << mc;
+        log_info() << "LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
 
-        std::wstring titleToDraw = w[mc].getTitle();
-        while(titleToDraw.length() < w.getWidth() - 1) titleToDraw += L" ";
+        std::wstring titleToDraw = m[mc].getTitle();
+        while(titleToDraw.length() < m.getWidth() - 1) titleToDraw += L" ";
 
-        if(mc == w.getLastSelectedIndex())
+        if(mc == m.getLastSelectedIndex())
         {
             desktop::get().getGraphics()->setColors(graphics::color::black, graphics::color::white);
             cogui::draw_title(x + 1, y, titleToDraw);
@@ -338,6 +339,52 @@ void cogui::theme::draw_menu(const cogui::menu &w)
 
         mc ++;
     }
+}
+
+void cogui::theme::draw_checkbox(const checkbox &c)
+{
+    if(!c.isVisible())
+    {
+        return;
+    }
+
+    int title_x = (int)(c.getX() + c.getWidth() / 2 - c.getTitle().length() / 2);
+
+    if(title_x <= c.getX())
+    {
+        title_x = c.getX() + 4;
+    }
+
+    std::wstring title_to_draw = c.getTitle();
+
+    if(title_to_draw.length() >= c.getWidth())
+    {
+        title_to_draw = title_to_draw.substr(0, c.getWidth() - 4) + L"...";
+    }
+
+
+    int drawY = c.getY() + c.getHeight() / 2;
+
+    if(c.getFocusState() == cogui::control::focus_state::focused)
+    {
+        cogui::draw(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::underline & cogui::textflags::bold);
+        cogui::draw_title(title_x, drawY, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
+    }
+    else
+    {
+        cogui::draw(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::normal);
+        cogui::draw_title(title_x, drawY, title_to_draw);
+    }
+}
+
+int cogui::theme::minimum_checkbox_width(const cogui::checkbox &c)
+{
+    return c.getTitle().length() + 2; // +2 for the checkmarek followed by a space
+}
+
+int cogui::theme::minimum_checkbox_height(const cogui::checkbox &c)
+{
+    return 1;
 }
 
 int cogui::theme::minimum_button_width(const cogui::button &b)

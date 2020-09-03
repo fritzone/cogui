@@ -7,6 +7,7 @@
 namespace cogui
 {
 
+class checkbox;
 class button;
 class window;
 class control;
@@ -20,10 +21,15 @@ public:
 
     void draw_window(const window& w);
     void draw_button(const button& b);
-    void draw_menu(const menu &w);
+    void draw_menu(const menu &m);
+    void draw_checkbox(const checkbox& c);
+
+    int minimum_checkbox_width(const checkbox& c);
+    int minimum_checkbox_height(const checkbox& c);
 
     int minimum_button_width(const button& b);
     int minimum_button_height(const button& b);
+
     int minimum_window_width(const window& w);
     int minimum_window_height(const window& w);
 
@@ -124,6 +130,14 @@ public:
     std::wstring MNU_HORIZONTAL = L"\x2500";
     std::wstring MNU_VERTICAL = L"\x2502";
     std::wstring MNU_SYSMENU_TOP =  L"\x2502 \x2514";
+
+    /******************************************************************************************************************/
+    /*                                                    CHECKBOX                                                    */
+    /******************************************************************************************************************/
+
+    std::wstring CHK_UNCHECKED = L"\x2610"; // unchecked checkbox
+    std::wstring CHK_CHECKED = L"\x2611"; // unchecked checkbox
+
 
 };
 }

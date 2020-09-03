@@ -1,5 +1,5 @@
-#ifndef BUTTON_H
-#define BUTTON_H
+#ifndef CHECKBOX_H
+#define CHECKBOX_H
 
 #include "control.h"
 
@@ -9,14 +9,14 @@
 
 namespace cogui {
 
-class button : public control
+class checkbox : public control
 {
 public:
 
-    button(int getX, int getY, int getWidth, int getHeight, const std::wstring& getTitle);
+    checkbox(int getX, int getY, int getWidth, int getHeight, const std::wstring& getTitle);
 
     template<typename ... Args>
-    button(int x, int y, int width, int height, const std::wstring& title, Args... args) : control(x, y, width, height, title)
+    checkbox(int x, int y, int width, int height, const std::wstring& title, bool checked = false, Args... args) : control(x, y, width, height, title), m_checked(checked)
     {
         auto connector = overload_unref(
             [&,this](OnClick c) { miso::connect(this, sig_on_click, c.get()); }
@@ -36,12 +36,18 @@ public:
     int minimumDrawableWidth() const override;
     int minimumDrawableHeight() const override;
 
-    using OnClick = fluent::NamedType<std::function<void(button*)>, struct OnClickHelper>;
+    using OnClick = fluent::NamedType<std::function<void(checkbox*)>, struct OnClickHelper>;
     static OnClick::argument on_click;
-    miso::signal<button*> sig_on_click;
+    miso::signal<checkbox*> sig_on_click;
+
+    bool checked() const;
+
+private:
+
+    bool m_checked = false;
 
 };
 
 }
 
-#endif // BUTTON_H
+#endif // CHECKBOX_H

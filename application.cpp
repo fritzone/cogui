@@ -88,3 +88,50 @@ void cogui::application::handle_event(cogui::event c)
         }
     }
 }
+
+std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::application::handle_command_line(int argc, char *argv[])
+{
+    std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments;
+    std::string current_flag;
+    std::string current_command;
+
+    for(int i=1; i<argc; i++)
+    {
+        bool gathering_params = true;
+        bool got_flag = false;
+        int removed_minuses = 0;
+        std::string carg = argv[i];
+        std::string save_carg = carg;
+        while(carg[0] == '-')
+        {
+            gathering_params = false;
+            got_flag = true;
+            carg = carg.substr(1);
+            removed_minuses ++ ;
+            if(removed_minuses > 2)
+            {
+                throw "Invalid argument passing: " + save_carg;
+            }
+        }
+        log_info() << carg << " saved:" << save_carg << " gather:" << gathering_params << " gotflag:" << got_flag << " current flag:" << current_flag;
+
+        if(got_flag)
+        {
+            got_flag = false;
+            current_flag = carg;
+            gathered_arguments[current_flag] = std::make_shared<arguments::on_flag>(removed_minuses == 1 ? current_flag.c_str() : "", removed_minuses == 1 ? "" : current_flag);
+        }
+        else
+        {
+            if(gathering_params)
+            {
+                gathered_arguments[current_flag]->add_parameter(carg);
+            }
+            else
+            {
+                gathering_params = true;
+            }
+        }
+    }
+    return gathered_arguments;
+}

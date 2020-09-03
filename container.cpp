@@ -14,6 +14,11 @@ cogui::button &cogui::container::add_button(int x, int y, int width, int height,
     return *add_control<button>(x, y, width, height, this, title);
 }
 
+cogui::checkbox &cogui::container::add_checkbox(int x, int y, int width, int height, const std::wstring &title)
+{
+    return *add_control<checkbox>(x, y, width, height, this, title);
+}
+
 void cogui::container::draw_content() const
 {
     const auto& cvs = m_container_stores[this];

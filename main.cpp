@@ -11,16 +11,27 @@ int main( int argc, char* argv[] )
     int bb = 0;
 
     cogui::application app(argc, argv,
-                           arguments::on_arg("f") = [&bb](std::vector<std::string> params) {
-                                    for(const auto& farg : params) {
+                            arguments::on_flag("f", "field selector", arguments::accepted_parameters{"a", "b"} ) = [&bb](std::vector<std::string> params)
+                            {
+                                    for(const auto& farg : params)
+                                    {
                                         log_info() << "fs arg:" << farg;
                                     }
                                     log_info() << "arg f:" << params.size();
                                     bb++;
-                           });
+                            },
+                            arguments::on_flag("s", "state selector") = [&bb](std::vector<std::string> params)
+                            {
+                                     for(const auto& farg : params)
+                                     {
+                                         log_info() << "s's arg:" << farg;
+                                     }
+                                     log_info() << "arg s:" << params.size();
+                                     bb++;
+                            }
+    );
 
     log_info() << "bb called:" << bb;
-
 
     auto a = cogui::window(5, 5, 70, 15, L"Raise your \U0001F450",
                            window::on_resize = [](window* win, int w,int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
@@ -53,7 +64,7 @@ int main( int argc, char* argv[] )
                            }
     );
 
-    auto& e = a.add_button(35,5, 5, 2, L"B");
+    auto& e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!");
     auto& f = a.add_button(35,5, 5, 2, L"C");
     auto& g = a.add_button(35,5, 5, 2, L"D");
     auto& h = a.add_button(35,5, 5, 2, L"E");
