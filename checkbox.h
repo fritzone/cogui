@@ -15,11 +15,12 @@ public:
 
     checkbox(int getX, int getY, int getWidth, int getHeight, const std::wstring& getTitle);
 
-    template<typename ... Args>
-    checkbox(int x, int y, int width, int height, const std::wstring& title, bool checked = false, Args... args) : control(x, y, width, height, title), m_checked(checked)
+    template<typename S, typename ... Args>
+    checkbox(int x, int y, int width, int height, const S& title, bool checked = false, Args... args) : control(x, y, width, height, title), m_checked(checked)
     {
         auto connector = overload_unref(
-            [&,this](OnClick c) { miso::connect(this, sig_on_click, c.get()); }
+            [&,this](OnClick c) { miso::connect(this, sig_on_click, c.get()); },
+            [&,this](OnStateChange s) { miso::connect(this, sig_on_state_change, s.get()); }
         );
 
         auto tup = std::make_tuple(std::forward<Args>(args)...);
@@ -36,11 +37,20 @@ public:
     int minimumDrawableWidth() const override;
     int minimumDrawableHeight() const override;
 
+    // on click signal
     using OnClick = fluent::NamedType<std::function<void(checkbox*)>, struct OnClickHelper>;
     static OnClick::argument on_click;
     miso::signal<checkbox*> sig_on_click;
 
+    // state change signal
+    using OnStateChange= fluent::NamedType<std::function<void(checkbox*,bool)>, struct OnStateChangeHelper>;
+    static OnStateChange::argument on_state_change;
+    miso::signal<checkbox*,bool> sig_on_state_change;
+
+    bool setChecked(bool);
     bool checked() const;
+    void check();
+    void uncheck();
 
 private:
 

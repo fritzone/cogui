@@ -1,6 +1,7 @@
 #include "input.h"
 #include "desktop.h"
 #include "mouse.h"
+#include "timer.h"
 
 #include <gpm.h>
 #include <ncursesw/ncurses.h>
@@ -11,20 +12,39 @@
 
 static cogui::mouse::button last_button = cogui::mouse::button::none;
 static auto t_start = std::chrono::high_resolution_clock::now();
-// the work...
 
+static timer dblClickTimer;
 
+std::string gpm_name(Gpm_Etype w)
+{
+    std::string r = "";
+    if( w & GPM_MOVE ) r += " GPM_MOVE";
+    if( w & GPM_DRAG ) r += " GPM_DRAG";
+    if( w & GPM_DOWN ) r += " GPM_DOWN";
+    if( w & GPM_UP ) r += " GPM_UP";
+    if( w & GPM_SINGLE ) r += " GPM_SINGLE";
+    if( w & GPM_DOUBLE ) r += " GPM_DOUBLE";
+    if( w & GPM_TRIPLE ) r += " GPM_TRIPLE";
+    if( w & GPM_MFLAG ) r += " GPM_MFLAG";
+    if( w & GPM_HARD ) r += " GPM_HARD";
+    if( w & GPM_ENTER ) r += " GPM_ENTER";
+    if( w & GPM_LEAVE ) r += " GPM_LEAVE";
 
-int my_handler(Gpm_Event *event, void *data)
+    return r;
+}
+
+int my_handler(Gpm_Event *event, void *)
 {
     // log_info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
 
     cogui::mouse::get().setX(event->x - 1);
     cogui::mouse::get().setY(event->y - 1);
 
+    log_debug() << "ET:" << event->type << "cl:" << event->clicks << " b:" << event->buttons << gpm_name(event->type);
+
     if(event->type == GPM_DOWN && event->buttons == GPM_B_LEFT) //
     {
-        log_info() << "Event Type: LEFT DOWN at " <<  event->x << "," << event->y;
+        log_debug() << "Event Type: LEFT DOWN at " <<  event->x << "," << event->y;
         t_start = std::chrono::high_resolution_clock::now();
         last_button = cogui::mouse::button::left;
         cogui::desktop::get().handle_mouse_left_down(event->x - 1, event->y - 1);
@@ -32,12 +52,12 @@ int my_handler(Gpm_Event *event, void *data)
 
     if(event->type == GPM_DOWN && event->buttons == GPM_B_RIGHT) //
     {
-        log_info() << "Event Type: RIGHT DOWN at " <<  event->x << "," << event->y;
+        log_debug() << "Event Type: RIGHT DOWN at " <<  event->x << "," << event->y;
         last_button = cogui::mouse::button::right;
         cogui::desktop::get().handle_mouse_right_down(event->x - 1, event->y - 1);
     }
 
-    if(event->type & GPM_UP) //
+    if(event->type & GPM_UP && event->type & GPM_SINGLE) //
     {
 
         if(last_button == cogui::mouse::button::left)
@@ -45,24 +65,39 @@ int my_handler(Gpm_Event *event, void *data)
             auto t_end = std::chrono::high_resolution_clock::now();
 
             double elapsed_time_ms = std::chrono::duration<double, std::milli>(t_end-t_start).count();
-            if(elapsed_time_ms < 200) // this was a fast exchange handle it as a click
+
+            if(elapsed_time_ms < 100) // this was a fast exchange handle it as a click
             {
-                log_info() << "Event Type: LEFT CLICK at " <<  event->x << "," << event->y;
-                cogui::desktop::get().handle_mouse_left_click(event->x - 1, event->y - 1);
+                int x = event->x;
+                int y = event->y;
+                dblClickTimer.setTimeout([x,y]()
+                {
+                    log_debug() << "Event Type: LEFT CLICK at " <<  x << "," << y;
+                    cogui::desktop::get().handle_mouse_left_click(x - 1, y - 1);
+                }, 100);
             }
             else
             {
-                log_info() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
+                log_debug() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
                 cogui::desktop::get().handle_mouse_left_up(event->x - 1, event->y - 1);
             }
         }
         if(last_button == cogui::mouse::button::right)
         {
-            log_info() << "Event Type: RIGHT UP at " <<  event->x << "," << event->y;
+            log_debug() << "Event Type: RIGHT UP at " <<  event->x << "," << event->y;
             cogui::desktop::get().handle_mouse_right_up(event->x - 1, event->y - 1);
         }
         last_button = cogui::mouse::button::none;
     }
+
+    if(event->type & GPM_UP && event->type & GPM_DOUBLE) //
+    {
+        dblClickTimer.stop();
+        log_debug() << "Event Type: DOUBLE CLICK at " <<  event->x << "," << event->y;
+        cogui::desktop::get().handle_mouse_doubleclick(event->x - 1, event->y - 1);
+
+    }
+
 
     // as a last resort, this is a move
     cogui::desktop::get().handle_mouse_move(event->x - 1, event->y - 1);
@@ -116,6 +151,7 @@ bool cogui::gpm_input::init()
 bool cogui::gpm_input::shutdown()
 {
     Gpm_Close();
+    return true;
 }
 
 std::vector<cogui::event> cogui::gpm_input::get_next_event()

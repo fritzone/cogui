@@ -118,6 +118,17 @@ void desktop::handle_mouse_right_up(int x, int y)
     }
 }
 
+void desktop::handle_mouse_doubleclick(int x, int y)
+{
+    if(m_captured_window)
+    {
+        if(m_captured_window->inside(x, y))
+        {
+            m_captured_window->doubleclick(x, y);
+        }
+    }
+}
+
 void desktop::handle_tab()
 {
     if(m_captured_window)
@@ -188,6 +199,15 @@ void desktop::resize()
 int desktop::getWidth() const {return m_graphics->getWidth();}
 
 int desktop::getHeight() const {return m_graphics->getHeight();}
+
+void desktop::redraw()
+{
+    clear();
+    for(const auto& w : m_windows)
+    {
+        w->draw();
+    }
+}
 
 desktop &desktop::get()
 {

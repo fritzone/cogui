@@ -13,10 +13,17 @@ class button : public control
 {
 public:
 
-    button(int getX, int getY, int getWidth, int getHeight, const std::wstring& getTitle);
+    button(int x, int y, int width, int height, const std::wstring& title);
+    button(int x, int y, int width, int height, const std::string& title);
+
+    template<typename S, typename ... Args>
+    button(int x, int y, int width, int height, const S& title, Args... args) : control(x, y, width, height, title)
+    {
+        init(std::forward<Args>(args)...);
+    }
 
     template<typename ... Args>
-    button(int x, int y, int width, int height, const std::wstring& title, Args... args) : control(x, y, width, height, title)
+    void init(Args... args)
     {
         auto connector = overload_unref(
             [&,this](OnClick c) { miso::connect(this, sig_on_click, c.get()); }

@@ -8,6 +8,11 @@ cogui::button::button(int x, int y, int width, int height, const std::wstring &t
 {
 }
 
+
+cogui::button::button(int x, int y, int width, int height, const std::string &title) : control(x, y, width, height, title)
+{
+}
+
 void cogui::button::draw() const
 {
     cogui::desktop::get().getTheme()->draw_button(*this);

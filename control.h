@@ -134,11 +134,12 @@ public:
     /**
      * @brief redraw Re-draws the control
      */
-    void redraw();
+    virtual void redraw();
 
     virtual int minimumDrawableWidth() const = 0;
     virtual int minimumDrawableHeight() const = 0;
     virtual void click() = 0;
+    virtual void doubleclick();
     virtual void draw() const = 0;
     virtual bool inside(int x, int y) const;
 

@@ -135,9 +135,8 @@ public:
     /*                                                    CHECKBOX                                                    */
     /******************************************************************************************************************/
 
-    std::wstring CHK_UNCHECKED = L"\x2610"; // unchecked checkbox
-    std::wstring CHK_CHECKED = L"\x2611"; // unchecked checkbox
-
+    std::wstring CHK_UNCHECKED = L"\x2610"; // L"[ ]"; // L"\x2610"; // unchecked checkbox
+    std::wstring CHK_CHECKED = L"\x2611"; // L"[X]"; // L"\x2611"; // unchecked checkbox
 
 };
 }

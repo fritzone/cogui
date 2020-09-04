@@ -135,6 +135,11 @@ void cogui::control::redraw()
     draw();
 }
 
+void cogui::control::doubleclick()
+{
+    log_info() << "Double click, ignored for this control";
+}
+
 int cogui::control::getWidth() const
 {
     return m_width;
@@ -174,4 +179,5 @@ std::wstring cogui::control::getTitle() const
 void cogui::control::setTitle(const std::wstring &title)
 {
     m_title = title;
+    redraw();
 }

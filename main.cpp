@@ -63,16 +63,23 @@ int main( int argc, char* argv[] )
                                 a.redraw();
                            }
     );
-
-    auto& e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!");
     auto& f = a.add_button(35,5, 5, 2, L"C");
-    auto& g = a.add_button(35,5, 5, 2, L"D");
+
+    auto& e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!", false,
+                             checkbox::on_state_change = [&f](checkbox*, bool checked) {
+                                f.setTitle(checked ? L"Checked" : L"Unchecked");
+                             }
+    );
+    auto& g = a.add_button(55,5, 5, 2, "Da button",
+                           button::on_click = [&e](button*){log_info() << "Thanks";
+                                e.setChecked( !e.checked() );
+    });
     auto& h = a.add_button(35,5, 5, 2, L"E");
 
     miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
     miso::connect(&c, c.sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
 
-    a.setLayout<cogui::layout::grid>(3, 3);
+    //a.setLayout<cogui::layout::grid>(3, 3);
 
     app.run();
 

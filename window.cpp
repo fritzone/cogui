@@ -12,18 +12,6 @@ cogui::window::OnMouseDown::argument cogui::window::on_mouse_down;
 cogui::window::OnMouseUp::argument cogui::window::on_mouse_up;
 cogui::window::SystemMenu::argument cogui::window::sysmenu;
 
-cogui::window::window(int x, int y, int width, int height, const std::wstring &title):
-    container(x, y, width, height, title)
-{
-    desktop::get().add_window(this);
-}
-
-cogui::window::window(int x, int y, int width, int height, const std::string &title):
-    container(x, y, width, height, title)
-{
-    desktop::get().add_window(this);
-}
-
 cogui::window::~window()
 {
     desktop::get().remove_window(this);
@@ -99,8 +87,9 @@ void cogui::window::click(int x, int y)
        release_control(under);
        // debug() << "found under ontrol";
        under->click();
-
    }
+   redraw();
+
 }
 
 void cogui::window::mouse_move(int x, int y)
@@ -258,6 +247,11 @@ int cogui::window::minimumDrawableHeight() const
     return desktop::get().getTheme()->minimum_window_height(*this);
 }
 
+void cogui::window::redraw()
+{
+    desktop::get().redraw();
+}
+
 void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const
 {
     m_close_btn_pos = close_pos;
@@ -362,6 +356,21 @@ void cogui::window::right_mouse_down(int x, int y)
 void cogui::window::right_mouse_up(int x, int y)
 {
     emit sig_on_mouse_up(this, cogui::mouse::button::right, x - this->getX(), y - this->getY());
+}
+
+void cogui::window::doubleclick(int x, int y)
+{
+    if(y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
+    {
+        maximize();
+        return;
+    }
+
+    std::shared_ptr<control> under = element_under(x, y);
+    if(under)
+    {
+        under->doubleclick();
+    }
 }
 
 bool cogui::window::hasSysmenuButton() const

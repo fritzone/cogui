@@ -36,49 +36,22 @@ public:
         maximized
     };
 
-    window(int x, int y, int width, int height, const std::wstring& title);
-    window(int x, int y, int width, int height, const std::string& title);
     /**
      * Will create a window on the current screen.
      * @param x,y - the start position of the windows
      * @param w,h - the width and height of the windows
      */
-    template<typename ... Args>
-    window(int x, int y, int width, int height, const std::wstring& title, Args... args):
-        container(x, y, width, height, title)
+    template<typename S>
+    window(int x, int y, int width, int height, const S& title) : container(x, y, width, height, title)
     {
-        desktop::get().add_window(this);
-        resolve_named_parameters(std::forward<Args>(args)...);
+        init();
     }
 
-    template<typename ... Args>
-    window(int x, int y, int width, int height, const std::string& title, Args... args):
-        container(x, y, width, height, title)
+    template<typename S, typename ... Args>
+    window(int x, int y, int width, int height, const S& title, Args... args): container(x, y, width, height, title)
     {
-        desktop::get().add_window(this);
-        resolve_named_parameters(std::forward<Args>(args)...);
+        init(std::forward<Args>(args)...);
     }
-
-    template<typename ... Args>
-    void resolve_named_parameters(Args... args)
-    {
-        auto connector = overload_unref(
-            [&,this](OnResize r) { miso::connect(this, sig_on_resize, r.get()); },
-            [&,this](OnClose c) { miso::connect(this, sig_on_close, c.get()); },
-            [&,this](OnMouseDown m) { miso::connect(this, sig_on_mouse_down, m.get()); },
-            [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
-            [&,this](SystemMenu m) {m_sysmenu = m.get();}
-        );
-
-
-        auto tup = std::make_tuple(std::forward<Args>(args)...);
-
-        for (auto const& elem : to_range(tup))
-        {
-            std::visit(connector, elem);
-        }
-    }
-
 
     ~window() override;
 
@@ -91,6 +64,7 @@ public:
     void left_mouse_up(int x, int y);
     void right_mouse_down(int x, int y);
     void right_mouse_up(int x, int y);
+    void doubleclick(int x, int y);
 
     bool resizeable() const;
     void setResizeable(bool resizeable);
@@ -111,6 +85,7 @@ public:
     void click() override;
     int minimumDrawableWidth() const override;
     int minimumDrawableHeight() const override;
+    void redraw() override;
 
     void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
 
@@ -157,6 +132,37 @@ private:
 
     // this is the current menu that is shown on the screen
     menu* m_current_menu = nullptr;
+
+private:
+
+    template<typename ... Args>
+    void init(Args... args)
+    {
+        desktop::get().add_window(this);
+        resolve_named_parameters(std::forward<Args>(args)...);
+    }
+
+    template<typename ... Args>
+    void resolve_named_parameters(Args... args)
+    {
+        auto connector = overload_unref(
+            [&,this](OnResize r) { miso::connect(this, sig_on_resize, r.get()); },
+            [&,this](OnClose c) { miso::connect(this, sig_on_close, c.get()); },
+            [&,this](OnMouseDown m) { miso::connect(this, sig_on_mouse_down, m.get()); },
+            [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
+            [&,this](SystemMenu m) {m_sysmenu = m.get();}
+        );
+
+
+        auto tup = std::make_tuple(std::forward<Args>(args)...);
+
+        for (auto const& elem : to_range(tup))
+        {
+            std::visit(connector, elem);
+        }
+    }
+
+
 };
 
 }

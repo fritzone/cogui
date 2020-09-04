@@ -25,8 +25,11 @@ public:
 
     /* to add a button to the container */
     button& add_button(int x, int y, int width, int height, const std::wstring& title);
-    template<typename ... Args>
-    button& add_button(int x, int y, int width, int height, const std::wstring& title, Args... args)
+    template<typename ... Args> button& add_button(int x, int y, int width, int height, const std::wstring& title, Args... args)
+    {
+        return *add_control<button>(x, y, width, height, this, title, std::forward<Args>(args)...);
+    }
+    template<typename ... Args> button& add_button(int x, int y, int width, int height, const std::string& title, Args... args)
     {
         return *add_control<button>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
@@ -38,7 +41,11 @@ public:
     {
         return *add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
-
+    template<typename ... Args>
+    checkbox& add_checkbox(int x, int y, int width, int height, const std::string& title, Args... args)
+    {
+        return *add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
+    }
 
     void draw_content() const;
     void focus_next_element();
@@ -157,9 +164,9 @@ private:
     /**
      * Add a control with a set of forwarded arguments as slots for specific signals
      */
-    template<typename C, typename ... Args>
+    template<typename C, typename S, typename ... Args>
     std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc,
-                                   const std::wstring& title = L"", Args... args)
+                                   const S& title = L"", Args... args)
     {
         static store<C> cc(pc);
         cc.m_controls.emplace_back(std::make_shared<C>(x, y, width, height, title,

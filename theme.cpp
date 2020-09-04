@@ -280,14 +280,16 @@ void cogui::theme::draw_button(const cogui::button &b)
 
     if(b.getHeight() >= 2)
     {
+        int title_y = b.getY() + b.getHeight() / 2;
+        cogui::draw(b.getX() + 1, title_y, cogui::line(b.getWidth() - 2, L" "));
         if(b.getFocusState() == cogui::control::focus_state::focused)
         {
-            log_info()<<"focused, drawing underlined";
-            cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
+            // log_info()<<"focused, drawing underlined";
+            cogui::draw_title(title_x, title_y, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
         }
         else
         {
-            cogui::draw_title(title_x, b.getY() + b.getHeight() / 2, title_to_draw);
+            cogui::draw_title(title_x, title_y, title_to_draw);
         }
     }
 }
@@ -321,7 +323,7 @@ void cogui::theme::draw_menu(const cogui::menu &m)
     {
         cogui::draw(x, y, MNU_VERTICAL);
         cogui::draw(x + wi, y, MNU_VERTICAL);
-        log_info() << "LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
+        // log_info() << "LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
 
         std::wstring titleToDraw = m[mc].getTitle();
         while(titleToDraw.length() < m.getWidth() - 1) titleToDraw += L" ";
@@ -350,16 +352,16 @@ void cogui::theme::draw_checkbox(const checkbox &c)
 
     int title_x = (int)(c.getX() + c.getWidth() / 2 - c.getTitle().length() / 2);
 
-    if(title_x <= c.getX())
+    if(title_x <= c.getX() + 2)
     {
         title_x = c.getX() + 4;
     }
 
     std::wstring title_to_draw = c.getTitle();
 
-    if(title_to_draw.length() >= c.getWidth())
+    if(title_to_draw.length() >= c.getWidth() - 4)
     {
-        title_to_draw = title_to_draw.substr(0, c.getWidth() - 4) + L"...";
+        title_to_draw = title_to_draw.substr(0, c.getWidth() - 4 - 4) + L"...";
     }
 
 
@@ -372,6 +374,7 @@ void cogui::theme::draw_checkbox(const checkbox &c)
     }
     else
     {
+        log_debug() << "getx:" << c.getX() << " titlex:" << title_x;
         cogui::draw(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::normal);
         cogui::draw_title(title_x, drawY, title_to_draw);
     }
@@ -394,7 +397,7 @@ int cogui::theme::minimum_button_width(const cogui::button &b)
 
 int cogui::theme::minimum_button_height(const cogui::button&)
 {
-    return 3; // topline = 0 + text = 1 + bottomline = 2
+    return 2; // topline = 0 + text = 1 + bottomline = 2
 }
 
 int cogui::theme::minimum_window_width(const cogui::window &w)

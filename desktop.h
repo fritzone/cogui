@@ -25,6 +25,7 @@ public:
     void handle_mouse_right_down(int x, int y);
     void handle_mouse_right_up(int x, int y);
 
+    void handle_mouse_doubleclick(int x, int y);
 
     void handle_tab();
 
@@ -42,6 +43,7 @@ public:
     void resize();
     int getWidth() const;
     int getHeight() const;
+    void redraw();
 
 public:
 
