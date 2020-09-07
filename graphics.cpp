@@ -8,6 +8,7 @@
 #include "mouse.h"
 #include "input.h"
 #include "cogui.h"
+#include "desktop.h"
 
 #include <wchar.h>
 
@@ -209,6 +210,7 @@ void cogui::graphics::refresh_screen()
 void cogui::graphics::clear_screen()
 {
     wclear(stdscr);
+    wrefresh(stdscr);
 }
 
 void cogui::graphics::handle_mouse_movement()
@@ -260,4 +262,60 @@ void cogui::graphics::handle_mouse_movement()
 void cogui::graphics::shutdown()
 {
     endwin();
+}
+
+void cogui::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
+{
+    std::wstring final_title;
+    wchar_t highlight_char = L'\0';
+    int highlight_pos = -1;
+    bool first_taken = false;
+
+    for(std::size_t i=0; i<s.length(); i++)
+    {
+        if(s[i] == L'&')
+        {
+            i++;
+            if( i< s.length() )
+            {
+                if( s[i] != L'&' && !first_taken)
+                {
+                    highlight_char = s[i];
+                    highlight_pos = i - 1;
+                    first_taken = true;
+                }
+                final_title += s[i];
+            }
+        }
+        else
+        {
+            final_title += s[i];
+        }
+    }
+    desktop::get().getGraphics()->draw(x, y, final_title.c_str(), flags);
+    if(highlight_char != L'\0')
+    {
+        // draw an extra space at the end, because we took away an & sign
+        desktop::get().getGraphics()->draw(x + final_title.length(), y, L' ', cogui::textflags::normal);
+
+        desktop::get().getGraphics()->draw(x + highlight_pos, y, highlight_char,
+                                           cogui::textflags::underline & cogui::textflags::bold);
+
+
+    }
+}
+
+std::wstring cogui::line(int l, std::wstring chr)
+{
+    return chr * l;
+}
+
+void cogui::draw(int x, int y, const wchar_t* s, cogui::textflags flags)
+{
+    desktop::get().getGraphics()->draw(x, y, s, flags);
+}
+
+void cogui::draw(int x, int y, const std::wstring &s, cogui::textflags flags)
+{
+    desktop::get().getGraphics()->draw(x, y, s.c_str(), flags);
 }

@@ -9,11 +9,14 @@
 #include <string.h>
 #include <chrono>
 #include "log.h"
+#include <atomic>
+#include <mutex>
 
 static cogui::mouse::button last_button = cogui::mouse::button::none;
 static auto t_start = std::chrono::high_resolution_clock::now();
 
 static timer dblClickTimer;
+static std::mutex mouseLocker;
 
 std::string gpm_name(Gpm_Etype w)
 {
@@ -33,28 +36,33 @@ std::string gpm_name(Gpm_Etype w)
     return r;
 }
 
+static bool send_click = false;
+
 int my_handler(Gpm_Event *event, void *)
 {
+    std::lock_guard<std::mutex> lk(mouseLocker);
+
     // log_info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
+    std::atomic<bool> handled = false;
 
     cogui::mouse::get().setX(event->x - 1);
     cogui::mouse::get().setY(event->y - 1);
 
-    log_debug() << "ET:" << event->type << "cl:" << event->clicks << " b:" << event->buttons << gpm_name(event->type);
+    //log_debug() << "ET:" << event->type << "cl:" << event->clicks << " b:" << event->buttons << gpm_name(event->type);
 
     if(event->type == GPM_DOWN && event->buttons == GPM_B_LEFT) //
     {
         log_debug() << "Event Type: LEFT DOWN at " <<  event->x << "," << event->y;
         t_start = std::chrono::high_resolution_clock::now();
         last_button = cogui::mouse::button::left;
-        cogui::desktop::get().handle_mouse_left_down(event->x - 1, event->y - 1);
+        handled = handled | cogui::desktop::get().handle_mouse_left_down(event->x - 1, event->y - 1);
     }
 
     if(event->type == GPM_DOWN && event->buttons == GPM_B_RIGHT) //
     {
         log_debug() << "Event Type: RIGHT DOWN at " <<  event->x << "," << event->y;
         last_button = cogui::mouse::button::right;
-        cogui::desktop::get().handle_mouse_right_down(event->x - 1, event->y - 1);
+        handled = handled | cogui::desktop::get().handle_mouse_right_down(event->x - 1, event->y - 1);
     }
 
     if(event->type & GPM_UP && event->type & GPM_SINGLE) //
@@ -66,26 +74,23 @@ int my_handler(Gpm_Event *event, void *)
 
             double elapsed_time_ms = std::chrono::duration<double, std::milli>(t_end-t_start).count();
 
-            if(elapsed_time_ms < 100) // this was a fast exchange handle it as a click
+            if(elapsed_time_ms < 200) // this was a fast exchange handle it as a click
             {
                 int x = event->x;
                 int y = event->y;
-                dblClickTimer.setTimeout([x,y]()
-                {
-                    log_debug() << "Event Type: LEFT CLICK at " <<  x << "," << y;
-                    cogui::desktop::get().handle_mouse_left_click(x - 1, y - 1);
-                }, 100);
+                log_debug() << "Event Type: LEFT CLICK at " <<  x << "," << y;
+                handled = handled | cogui::desktop::get().handle_mouse_left_click(x - 1, y - 1);
             }
             else
             {
                 log_debug() << "Event Type: LEFT UP at " <<  event->x << "," << event->y;
-                cogui::desktop::get().handle_mouse_left_up(event->x - 1, event->y - 1);
+                handled = handled | cogui::desktop::get().handle_mouse_left_up(event->x - 1, event->y - 1);
             }
         }
         if(last_button == cogui::mouse::button::right)
         {
             log_debug() << "Event Type: RIGHT UP at " <<  event->x << "," << event->y;
-            cogui::desktop::get().handle_mouse_right_up(event->x - 1, event->y - 1);
+            handled = handled | cogui::desktop::get().handle_mouse_right_up(event->x - 1, event->y - 1);
         }
         last_button = cogui::mouse::button::none;
     }
@@ -94,15 +99,20 @@ int my_handler(Gpm_Event *event, void *)
     {
         dblClickTimer.stop();
         log_debug() << "Event Type: DOUBLE CLICK at " <<  event->x << "," << event->y;
-        cogui::desktop::get().handle_mouse_doubleclick(event->x - 1, event->y - 1);
+        handled = handled | cogui::desktop::get().handle_mouse_doubleclick(event->x - 1, event->y - 1);
 
     }
 
 
     // as a last resort, this is a move
-    cogui::desktop::get().handle_mouse_move(event->x - 1, event->y - 1);
+    handled = handled | cogui::desktop::get().handle_mouse_move(event->x - 1, event->y - 1);
 
     memset(event, 0, sizeof(Gpm_Event));
+
+    if(handled)
+    {
+        //cogui::desktop::get().redraw();
+    }
 
     return 0;
 }

@@ -7,7 +7,7 @@
 #include "miso.h"
 
 #include <initializer_list>
-#include<vector>
+#include <string>
 
 namespace cogui
 {
@@ -70,11 +70,17 @@ namespace cogui
         bool m_selected = false;
     };
 
+    /**
+     * @brief The menu class is responsible for representing one menu either in the form of a sysmenu,
+     * or in the form of a popup menu, or as part of a menubar
+     */
     class menu
     {
     public:
         menu() = default;
         menu(std::initializer_list<action> l);
+        menu(const std::wstring& caption, std::initializer_list<action> l);
+        menu(const std::string& caption, std::initializer_list<action> l);
 
         void append(std::initializer_list<action> l);
 
@@ -82,6 +88,8 @@ namespace cogui
 
         // calculates the positions and opens the menu
         void open(int x, int y);
+
+        void close();
 
         int getX() const;
         int getY() const;
@@ -91,6 +99,8 @@ namespace cogui
         bool inside(int x, int y) const;
         bool mouse_move(int x, int y);
         bool click(int x, int y);
+
+        bool isOpened() const;
 
         const action& operator[](int i) const;
 
@@ -105,8 +115,24 @@ namespace cogui
         int m_height = 0;
         int m_lastSelectedIndex = -1;
         bool m_is_sysmenu = true;
+        bool m_opened = false;
+        std::wstring m_caption = L"";
     };
 
+    class menubar
+    {
+    public:
+        menubar() = default;
+        menubar(std::initializer_list<menu> entries);
+
+        menubar& operator = (std::initializer_list<menu> m);
+
+        static menubar no_mainmenu;
+
+    private:
+        std::vector<menu> m_menus;
+
+    };
 }
 
 #endif // MENU_H

@@ -8,104 +8,6 @@
 
 #include "log.h"
 
-namespace cogui
-{
-
-template <class T>
-T repeat(T str, const std::size_t n)
-{
-    if (n == 0) {
-    str.clear();
-    str.shrink_to_fit();
-    return str;
-    }
-
-    if (n == 1 || str.empty()) return str;
-
-    const auto period = str.size();
-
-    if (period == 1) {
-    str.append(n - 1, str.front());
-    return str;
-    }
-
-    str.reserve(period * n);
-
-    std::size_t m {2};
-
-    for (; m < n; m *= 2) str += str;
-
-    str.append(str.c_str(), (n - (m / 2)) * period);
-
-    return str;
-}
-
-template <typename S, typename T, typename = std::enable_if<std::is_integral<T>::value> >
-S operator*(S str, const T n)
-{
-    return repeat(std::move(str), static_cast<std::size_t>(n));
-}
-
-std::wstring line(int l, std::wstring chr)
-{
-    return chr * l;
-}
-
-template<typename T, typename S>
-void draw(T x, T y, S s, cogui::textflags flags = cogui::textflags::normal)
-{
-    desktop::get().getGraphics()->draw(x, y, s.c_str(), flags);
-}
-
-template<>
-void draw<int,const wchar_t*>(int x, int y, const wchar_t* s, cogui::textflags flags)
-{
-    desktop::get().getGraphics()->draw(x, y, s, flags);
-}
-
-void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal)
-{
-    std::wstring final_title;
-    wchar_t highlight_char = L'\0';
-    int highlight_pos = -1;
-    bool first_taken = false;
-
-    for(std::size_t i=0; i<s.length(); i++)
-    {
-        if(s[i] == L'&')
-        {
-            i++;
-            if( i< s.length() )
-            {
-                if( s[i] != L'&' && !first_taken)
-                {
-                    highlight_char = s[i];
-                    highlight_pos = i - 1;
-                    first_taken = true;
-                }
-                final_title += s[i];
-            }
-        }
-        else
-        {
-            final_title += s[i];
-        }
-    }
-    desktop::get().getGraphics()->draw(x, y, final_title.c_str(), flags);
-    if(highlight_char != L'\0')
-    {
-        // draw an extra space at the end, because we took away an & sign
-        desktop::get().getGraphics()->draw(x + final_title.length(), y, L' ', cogui::textflags::normal);
-
-        desktop::get().getGraphics()->draw(x + highlight_pos, y, highlight_char,
-                                           cogui::textflags::underline & cogui::textflags::bold);
-
-
-    }
-}
-
-} // namespace
-
 void cogui::theme::clear(const control &c)
 {
     int top = c.getY();
@@ -188,7 +90,7 @@ void cogui::theme::draw_window(const cogui::window &w)
     if(w.hasSysmenuButton())
     {
         available_width -= sysmenu_char.length();
-        cogui::draw(w.getX() + 1, w.getY(), sysmenu_char);
+        cogui::draw(w.getX() + 1, w.getY(), w.getSystemMenu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char);
         sysmenu_pos = w.getX() + 1 + 1 ;
     }
 
@@ -359,11 +261,10 @@ void cogui::theme::draw_checkbox(const checkbox &c)
 
     std::wstring title_to_draw = c.getTitle();
 
-    if(title_to_draw.length() >= c.getWidth() - 4)
+    if(static_cast<int>(title_to_draw.length()) >= c.getWidth() - 4)
     {
         title_to_draw = title_to_draw.substr(0, c.getWidth() - 4 - 4) + L"...";
     }
-
 
     int drawY = c.getY() + c.getHeight() / 2;
 
@@ -374,7 +275,6 @@ void cogui::theme::draw_checkbox(const checkbox &c)
     }
     else
     {
-        log_debug() << "getx:" << c.getX() << " titlex:" << title_x;
         cogui::draw(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::normal);
         cogui::draw_title(title_x, drawY, title_to_draw);
     }

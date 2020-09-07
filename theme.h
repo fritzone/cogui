@@ -54,6 +54,7 @@ public:
 
     // the system menu
     std::wstring WND_SYSMENU =  L"\x2561\x25bf\x255e";
+    std::wstring WND_SYSMENU_DOWN =  L"\x2561\x25b5\x255e";
 
     // the delimiters of the title
     std::wstring WND_TITLE_DELIM_LEFT = L"\x2563 ";
@@ -135,8 +136,9 @@ public:
     /*                                                    CHECKBOX                                                    */
     /******************************************************************************************************************/
 
-    std::wstring CHK_UNCHECKED = L"\x2610"; // L"[ ]"; // L"\x2610"; // unchecked checkbox
-    std::wstring CHK_CHECKED = L"\x2611"; // L"[X]"; // L"\x2611"; // unchecked checkbox
+    std::wstring CHK_UNCHECKED = L"[ ]"; // L"\x2610"; // unchecked checkbox
+    std::wstring CHK_CHECKED = L"[X]"; // L"\x2611"; // unchecked checkbox
+
 
 };
 }

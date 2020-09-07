@@ -35,16 +35,16 @@ public:
 
     struct argument
     {
-	template<typename U>
-	NamedType operator=(U&& value) const
-	{
-	    return NamedType(std::forward<U>(value));
-	}
-	argument() = default;
-	argument(argument const&) = delete;
-	argument(argument &&) = delete;
-	argument& operator=(argument const&) = delete;
-	argument& operator=(argument &&) = delete;
+    template<typename U>
+    NamedType operator=(U&& value) const
+    {
+        return NamedType(std::forward<U>(value));
+    }
+    argument() = default;
+    argument(argument const&) = delete;
+    argument(argument &&) = delete;
+    argument& operator=(argument const&) = delete;
+    argument& operator=(argument &&) = delete;
     };
 
 private:

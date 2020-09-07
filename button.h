@@ -45,7 +45,7 @@ public:
 
     using OnClick = fluent::NamedType<std::function<void(button*)>, struct OnClickHelper>;
     static OnClick::argument on_click;
-    miso::signal<button*> sig_on_click;
+    miso::signal<button*> sig_on_click{"on_click"};
 
 };
 

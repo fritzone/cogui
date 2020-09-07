@@ -41,6 +41,9 @@ int main( int argc, char* argv[] )
                            window::sysmenu = menu{
                                {L"&Select", action::selectable, action::on_trigger = [](action*){log_info() << "Clicked Select";}},
                                {L"No select", action::on_trigger = [](action*){log_info() << "Clicked No select";}}
+                           },
+                           window::mainmenu = menubar {
+                            { menu { } , menu { } }
                            }
     );
 

@@ -89,6 +89,10 @@ public:
 
     void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
 
+    menu &getSystemMenu();
+    const menu &getSystemMenu() const;
+    void closeCurrentMenu();
+
     // signals
 
     using OnResize = fluent::NamedType<std::function<void(window*,int,int)>, struct OnResizeHelper>;
@@ -110,14 +114,18 @@ public:
     using SystemMenu = fluent::NamedType<menu, struct SystemMenuHelper>;
     static SystemMenu::argument sysmenu;
 
+    // menubar
+    using MenuBar = fluent::NamedType<menubar, struct MenuBarHelper>;
+    static MenuBar::argument mainmenu;
 private:
 
     menu m_sysmenu;
+    menubar m_mainmenu = cogui::menubar::no_mainmenu;
 
     bool m_resizeable = true;
     bool m_hasCloseButton = true;
     bool m_hasMaximizeButton = true;
-    bool m_hasSysmenuButton = true;
+    bool m_hasSysmenuButton = false;
 
     draw_state m_draw_state = draw_state::normal;
     window_state m_window_state = window_state::normal;
@@ -150,7 +158,8 @@ private:
             [&,this](OnClose c) { miso::connect(this, sig_on_close, c.get()); },
             [&,this](OnMouseDown m) { miso::connect(this, sig_on_mouse_down, m.get()); },
             [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
-            [&,this](SystemMenu m) {m_sysmenu = m.get();}
+            [&,this](SystemMenu m) {m_sysmenu = m.get(); m_hasSysmenuButton = true; },
+            [&,this](MenuBar m) {m_mainmenu = m.get(); }
         );
 
 
@@ -161,8 +170,6 @@ private:
             std::visit(connector, elem);
         }
     }
-
-
 };
 
 }

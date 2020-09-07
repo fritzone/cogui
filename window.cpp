@@ -11,6 +11,7 @@ cogui::window::OnClose::argument cogui::window::on_close;
 cogui::window::OnMouseDown::argument cogui::window::on_mouse_down;
 cogui::window::OnMouseUp::argument cogui::window::on_mouse_up;
 cogui::window::SystemMenu::argument cogui::window::sysmenu;
+cogui::window::MenuBar::argument cogui::window::mainmenu;
 
 cogui::window::~window()
 {
@@ -45,6 +46,7 @@ void cogui::window::click(int x, int y)
        else
        {
            // clicked outside the menu, close it
+           m_current_menu->close();
            m_current_menu = nullptr;
            redraw();
        }
@@ -257,6 +259,22 @@ void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos
     m_close_btn_pos = close_pos;
     m_sysmenu_btn_pos = sysmenu_pos;
     m_maximize_btn_pos = maximize_pos;
+}
+
+cogui::menu &cogui::window::getSystemMenu()
+{
+    return m_sysmenu;
+}
+
+const cogui::menu &cogui::window::getSystemMenu() const
+{
+    return m_sysmenu;
+}
+
+void cogui::window::closeCurrentMenu()
+{
+    m_current_menu->close();
+    m_current_menu = nullptr;
 }
 
 void cogui::window::left_mouse_down(int x, int y)

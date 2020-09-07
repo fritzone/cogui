@@ -1,11 +1,24 @@
 #include "menu.h"
+#include <codecvt>
+#include <string>
+#include <locale>
 
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
 cogui::action::Selectable cogui::action::selectable;
+cogui::menubar cogui::menubar::no_mainmenu;
 
 cogui::menu::menu(std::initializer_list<cogui::action> l) : m_actions(l)
 {
+}
 
+cogui::menu::menu(const std::wstring &caption, std::initializer_list<cogui::action> l) : m_actions(l), m_caption(caption)
+{
+}
+
+cogui::menu::menu(const std::string &caption, std::initializer_list<cogui::action> l) : m_actions(l)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    m_caption = converter.from_bytes(caption);
 }
 
 void cogui::menu::append(std::initializer_list<cogui::action> l) {
@@ -43,9 +56,15 @@ void cogui::menu::open(int x, int y)
     }
 
     m_height = m_actions.size() + 1;
+    m_opened = true;
 
     // now gather a list of all the windows that need to be repainted when this menu disappears
 
+}
+
+void cogui::menu::close()
+{
+    m_opened = false;
 }
 
 int cogui::menu::getX() const
@@ -70,7 +89,7 @@ bool cogui::menu::inside(int x, int y) const
     return b;
 }
 
-bool cogui::menu::mouse_move(int x, int y)
+bool cogui::menu::mouse_move(int, int y)
 {
     if(m_lastSelectedIndex != y - getY() - 1)
     {
@@ -86,9 +105,15 @@ bool cogui::menu::click(int, int)
     if(m_lastSelectedIndex < m_actions.size())
     {
         m_actions[m_lastSelectedIndex].trigger();
+        m_opened = false;
         return true;
     }
     return false;
+}
+
+bool cogui::menu::isOpened() const
+{
+    return m_opened;
 }
 
 const cogui::action &cogui::menu::operator[](int i) const
@@ -157,4 +182,14 @@ void cogui::action::setTitle(const std::wstring &title)
 bool cogui::action::isSelectable() const
 {
     return m_selectable;
+}
+
+cogui::menubar::menubar(std::initializer_list<cogui::menu> entries) : m_menus(entries)
+{
+}
+
+cogui::menubar &cogui::menubar::operator =(std::initializer_list<cogui::menu> m)
+{
+    m_menus = m;
+    return *this;
 }

@@ -16,16 +16,16 @@ class menu;
 class desktop
 {
 public:
-    void handle_mouse_move(int x, int y);
+    bool handle_mouse_move(int x, int y);
 
-    void handle_mouse_left_click(int x, int y);
-    void handle_mouse_left_down(int x, int y);
-    void handle_mouse_left_up(int x, int y);
+    bool handle_mouse_left_click(int x, int y);
+    bool handle_mouse_left_down(int x, int y);
+    bool handle_mouse_left_up(int x, int y);
 
-    void handle_mouse_right_down(int x, int y);
-    void handle_mouse_right_up(int x, int y);
+    bool handle_mouse_right_down(int x, int y);
+    bool handle_mouse_right_up(int x, int y);
 
-    void handle_mouse_doubleclick(int x, int y);
+    bool handle_mouse_doubleclick(int x, int y);
 
     void handle_tab();
 

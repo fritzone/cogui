@@ -44,30 +44,58 @@ std::vector<window *> desktop::windows() const
     return m_windows;
 }
 
-void desktop::handle_mouse_move(int x, int y)
+bool desktop::handle_mouse_move(int x, int y)
 {
+    bool handled = false;
     if(m_captured_window)
     {
         m_captured_window->mouse_move(x, y);
+        handled = true;
     }
-    else {
-//        debug() << "No window is captured right now";
-    }
+    return handled;
 }
 
-void desktop::handle_mouse_left_click(int x, int y)
+bool desktop::handle_mouse_left_click(int x, int y)
 {
+    bool handled = false;
+
     for(const auto& w : m_windows)
     {
         if(w->inside(x, y))
         {
             w->click( x, y);
+            handled = true;
         }
     }
+
+    if(handled)
+    {
+        return true;
+    }
+    if(m_captured_window && m_captured_window->hasSysmenuButton() && m_captured_window->getSystemMenu().isOpened())
+    {
+        m_captured_window->closeCurrentMenu();
+        handled = true;
+        redraw();
+    }
+    else
+    {
+        for(auto& w : m_windows)
+        {
+            if(w->hasSysmenuButton())
+            {
+                w->getSystemMenu().close();
+                handled = true;
+            }
+        }
+    }
+
+    return handled;
 }
 
-void desktop::handle_mouse_left_down(int x, int y)
+bool desktop::handle_mouse_left_down(int x, int y)
 {
+    bool handled = false;
     for(const auto& w : m_windows)
     {
         if(w->inside(x, y))
@@ -79,54 +107,72 @@ void desktop::handle_mouse_left_down(int x, int y)
             {
                 log_info() << "captured a window";
                 m_captured_window = w;
-                return;
+                return true;
             }
+            handled = true;
         }
     }
+    return handled;
 }
 
-void desktop::handle_mouse_left_up(int x, int y)
+bool desktop::handle_mouse_left_up(int x, int y)
 {
+    bool handled = false;
+
     if(m_captured_window)
     {
         if(m_captured_window->inside(x, y))
         {
             m_captured_window->left_mouse_up(x, y);
         }
+        handled = true;
     }
+    return handled;
 }
 
-void desktop::handle_mouse_right_down(int x, int y)
+bool desktop::handle_mouse_right_down(int x, int y)
 {
+    bool handled = false;
+
     for(const auto& w : m_windows)
     {
         if(w->inside(x, y))
         {
             w->right_mouse_down(x, y);
         }
+        handled = true;
     }
+    return handled;
 }
 
-void desktop::handle_mouse_right_up(int x, int y)
+bool desktop::handle_mouse_right_up(int x, int y)
 {
+    bool handled = false;
+
     if(m_captured_window)
     {
         if(m_captured_window->inside(x, y))
         {
             m_captured_window->right_mouse_up(x, y);
+            handled = true;
         }
     }
+    return handled;
 }
 
-void desktop::handle_mouse_doubleclick(int x, int y)
+bool desktop::handle_mouse_doubleclick(int x, int y)
 {
+    bool handled = false;
+
     if(m_captured_window)
     {
         if(m_captured_window->inside(x, y))
         {
             m_captured_window->doubleclick(x, y);
+            handled = true;
         }
     }
+    return handled;
 }
 
 void desktop::handle_tab()
