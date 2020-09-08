@@ -20,11 +20,12 @@ cogui::window::~window()
 
 void cogui::window::draw() const
 {
-    cogui::desktop::get().getTheme()->draw_window(*this);
+    auto t = cogui::desktop::get().getTheme();
+    t->draw_window(*this);
     draw_content();
     if(m_current_menu)
     {
-        cogui::desktop::get().getTheme()->draw_menu(*m_current_menu);
+        t->draw_menu(*m_current_menu);
     }
     desktop::get().refresh();
 }

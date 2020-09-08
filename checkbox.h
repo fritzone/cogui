@@ -47,7 +47,7 @@ public:
     static OnStateChange::argument on_state_change;
     miso::signal<checkbox*,bool> sig_on_state_change;
 
-    bool setChecked(bool);
+    void setChecked(bool);
     bool checked() const;
     void check();
     void uncheck();

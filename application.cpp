@@ -8,6 +8,11 @@
 
 #include "log.h"
 
+cogui::application::~application()
+{
+    desktop::get().shutdown();
+}
+
 int cogui::application::run()
 {
     m_running = true;
@@ -44,6 +49,7 @@ void cogui::application::stop()
 
 void cogui::application::exit(int c)
 {
+    stop();
     ::exit(c);
 }
 

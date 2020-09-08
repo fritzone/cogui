@@ -5,6 +5,7 @@
 #include <functional>
 #include <variant>
 #include <array>
+#include <algorithm>
 
 template <typename Tup, typename R, typename F, std::size_t... Idxs>
 struct tuple_runtime_access_table {

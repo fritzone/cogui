@@ -1,6 +1,7 @@
 {
 	"theme": {
 		"name": "cursive",
-		"mode": "console"
+		"mode": "console",
+		"library": "cursive"
 	}
 }

@@ -1,4 +1,4 @@
-#include "theme.h"
+#include "cursive.h"
 #include "desktop.h"
 #include "graphics.h"
 #include "window.h"
@@ -8,7 +8,15 @@
 
 #include "log.h"
 
-void cogui::theme::clear(const control &c)
+#include <variant>
+#include <algorithm>
+
+extern "C" cogui::theme* create()
+{
+    return static_cast<cogui::theme*>(new cogui::themes::cursive);
+}
+
+void cogui::themes::cursive::clear(const cogui::control &c)
 {
     int top = c.getY();
     int h = c.getHeight();
@@ -20,7 +28,7 @@ void cogui::theme::clear(const control &c)
     }
 }
 
-void cogui::theme::draw_window(const cogui::window &w)
+void cogui::themes::cursive::draw_window(const cogui::window &w)
 {
     if(!w.isVisible())
     {
@@ -110,7 +118,7 @@ void cogui::theme::draw_window(const cogui::window &w)
 
 }
 
-void cogui::theme::draw_button(const cogui::button &b)
+void cogui::themes::cursive::draw_button(const cogui::button &b)
 {
     if(!b.isVisible())
     {
@@ -196,7 +204,7 @@ void cogui::theme::draw_button(const cogui::button &b)
     }
 }
 
-void cogui::theme::draw_menu(const cogui::menu &m)
+void cogui::themes::cursive::draw_menu(const cogui::menu &m)
 {
     int top = m.getY();
     int h = m.getHeight();
@@ -245,7 +253,7 @@ void cogui::theme::draw_menu(const cogui::menu &m)
     }
 }
 
-void cogui::theme::draw_checkbox(const checkbox &c)
+void cogui::themes::cursive::draw_checkbox(const checkbox &c)
 {
     if(!c.isVisible())
     {
@@ -280,27 +288,27 @@ void cogui::theme::draw_checkbox(const checkbox &c)
     }
 }
 
-int cogui::theme::minimum_checkbox_width(const cogui::checkbox &c)
+int cogui::themes::cursive::minimum_checkbox_width(const cogui::checkbox &c)
 {
     return c.getTitle().length() + 2; // +2 for the checkmarek followed by a space
 }
 
-int cogui::theme::minimum_checkbox_height(const cogui::checkbox &c)
+int cogui::themes::cursive::minimum_checkbox_height(const cogui::checkbox &c)
 {
     return 1;
 }
 
-int cogui::theme::minimum_button_width(const cogui::button &b)
+int cogui::themes::cursive::minimum_button_width(const cogui::button &b)
 {
     return b.getTitle().length() + 2; // +2 for the beginning and ending lines
 }
 
-int cogui::theme::minimum_button_height(const cogui::button&)
+int cogui::themes::cursive::minimum_button_height(const cogui::button&)
 {
     return 2; // topline = 0 + text = 1 + bottomline = 2
 }
 
-int cogui::theme::minimum_window_width(const cogui::window &w)
+int cogui::themes::cursive::minimum_window_width(const cogui::window &w)
 {
     return w.getTitle().length() + (w.getTitle().length() > 0? WND_TITLE_DELIM_LEFT.length() + WND_TITLE_DELIM_RIGHT.length() : 0) +
             (w.hasSysmenuButton() ? WND_SYSMENU.length() : 0) +
@@ -309,7 +317,12 @@ int cogui::theme::minimum_window_width(const cogui::window &w)
             ;
 }
 
-int cogui::theme::minimum_window_height(const cogui::window &)
+int cogui::themes::cursive::minimum_window_height(const cogui::window &)
 {
     return 3; // top line + content line + bottomline
+}
+
+std::string cogui::themes::cursive::name()
+{
+    return "cursive";
 }

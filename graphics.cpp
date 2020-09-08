@@ -261,6 +261,8 @@ void cogui::graphics::handle_mouse_movement()
 
 void cogui::graphics::shutdown()
 {
+    // turn off mouse
+
     endwin();
 }
 

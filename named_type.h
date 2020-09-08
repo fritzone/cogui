@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 // Enable empty base class optimization with multiple inheritance on Visual Studio.
 #if defined(_MSC_VER) && _MSC_VER >= 1910

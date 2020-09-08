@@ -30,7 +30,7 @@ public:
 class gpm_input : public input
 {
 public:
-    gpm_input();
+    gpm_input() = default;
     ~gpm_input();
     bool init() override;
     bool shutdown() override;

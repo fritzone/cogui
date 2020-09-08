@@ -117,10 +117,6 @@ int my_handler(Gpm_Event *event, void *)
     return 0;
 }
 
-cogui::gpm_input::gpm_input()
-{
-}
-
 cogui::gpm_input::~gpm_input()
 {
     shutdown();
@@ -135,8 +131,6 @@ bool cogui::gpm_input::init()
     conn.minMod     = 0;    /* want everything                   */
     conn.maxMod     = ~0;   /* all modifiers included            */
 
-
-
     if(Gpm_Open(&conn, 0) == -1)
     {
         log_info() << "Cannot connect to mouse server\n";
@@ -150,7 +144,6 @@ bool cogui::gpm_input::init()
     printf("\033[?1003h\n");
     fflush(stdout);
 
-
     curs_set(0);
     gpm_handler = my_handler;
     gpm_visiblepointer = 1;
@@ -160,6 +153,9 @@ bool cogui::gpm_input::init()
 
 bool cogui::gpm_input::shutdown()
 {
+    printf("\033[?1003l\n");
+    printf("\033[?9l\n");
+
     Gpm_Close();
     return true;
 }

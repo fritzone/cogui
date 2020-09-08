@@ -1,5 +1,7 @@
-#ifndef THEME_H
-#define THEME_H
+#ifndef THEME_CURSIVE_H
+#define THEME_CURSIVE_H
+
+#include "theme.h"
 
 #include <wchar.h>
 #include <string>
@@ -13,25 +15,35 @@ class window;
 class control;
 class menu;
 
-class theme
+namespace themes {
+
+/**
+ * @brief The cursive class is the example class for a console based theme
+ */
+class cursive final : public ::cogui::theme
 {
 public:
 
-    void clear(const control& c);
+    cursive() {}
+    virtual ~cursive() {}
 
-    void draw_window(const window& w);
-    void draw_button(const button& b);
-    void draw_menu(const menu &m);
-    void draw_checkbox(const checkbox& c);
+    void clear(const control& c) override;
 
-    int minimum_checkbox_width(const checkbox& c);
-    int minimum_checkbox_height(const checkbox& c);
+    void draw_window(const window& w) override;
+    void draw_button(const button& b) override;
+    void draw_menu(const menu &m) override;
+    void draw_checkbox(const checkbox& c) override;
 
-    int minimum_button_width(const button& b);
-    int minimum_button_height(const button& b);
+    int minimum_checkbox_width(const checkbox& c) override;
+    int minimum_checkbox_height(const checkbox& c) override;
 
-    int minimum_window_width(const window& w);
-    int minimum_window_height(const window& w);
+    int minimum_button_width(const button& b) override;
+    int minimum_button_height(const button& b) override;
+
+    int minimum_window_width(const window& w) override;
+    int minimum_window_height(const window& w) override;
+
+    std::string name() override;
 
     /******************************************************************************************************************/
     /*                                                      WINDOW                                                    */
@@ -141,6 +153,7 @@ public:
 
 
 };
+}
 }
 
 #endif // THEME_H

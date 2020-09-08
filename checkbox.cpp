@@ -32,7 +32,7 @@ int cogui::checkbox::minimumDrawableHeight() const
     return desktop::get().getTheme()->minimum_checkbox_height(*this);
 }
 
-bool cogui::checkbox::setChecked(bool c)
+void cogui::checkbox::setChecked(bool c)
 {
     m_checked = c;
     redraw();

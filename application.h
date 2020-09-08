@@ -24,7 +24,7 @@ void init(int argc, char* argv[]);
 /**
  * @brief The application class is responsible for the lifetime of an application using the cogui framework
  */
-class application
+class application final
 {
 public:
 
@@ -69,6 +69,8 @@ public:
     application() = delete;
     application(const application&) = delete;
     application(application&&) = delete;
+
+    ~application();
 
     application& operator = (const application&) = delete;
     application& operator = (application&&) = delete;

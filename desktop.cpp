@@ -1,19 +1,17 @@
 #include "desktop.h"
 #include "graphics.h"
-#include "theme.h"
+#include "theme_manager.h"
 #include "input.h"
 
 #include "window.h"
 
 #include <algorithm>
-#define LOGURU_WITH_STREAMS 1
-
 #include "log.h"
 
 namespace cogui
 {
 
-desktop::desktop() : m_theme(new theme), m_graphics(new graphics), m_input(new gpm_input)
+desktop::desktop() : m_theme(theme_manager::instance().current_theme()), m_graphics(new graphics), m_input(new gpm_input)
 {
 }
 
