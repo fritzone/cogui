@@ -6,6 +6,10 @@ set (CMAKE_CXX_STANDARD 17)
 
 include(cmake/cogui.cmake)
 include(cmake/JSONParser.cmake)
+include(cmake/FindGPM.cmake)
+if(NOT ${LIBGPM_FOUND})
+    message(FATAL_ERROR "libgpm was not found, it is required for mouse input")
+endif()
 
 STRING(TIMESTAMP TIMEZ UTC)    
 
