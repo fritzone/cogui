@@ -19,7 +19,7 @@ namespace cogui
  * @param argc the argc from main
  * @param argv the argv from main
  */
-void init(int argc, char* argv[]);
+void init(int argc, char* argv[], const std::string &theme);
 
 /**
  * @brief The application class is responsible for the lifetime of an application using the cogui framework
@@ -32,10 +32,11 @@ public:
     template<typename ... Args>
     application(int argc, char* argv[], Args&&... args)
     {
+        std::string theme = "cursive";
         try
         {
             log_info() << "application constructing or something";
-            std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments = handle_command_line(argc, argv);
+            std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments = handle_command_line(argc, argv, theme);
             auto loop = [&gathered_arguments] (auto && input)
             {
                 for(auto&[key, value] : gathered_arguments)
@@ -55,7 +56,7 @@ public:
 
             (loop(args), ...);
 
-            cogui::init(argc, argv);
+            cogui::init(argc, argv, theme);
 
         }
         catch (const arguments::invalid_parameter& e)
@@ -85,7 +86,7 @@ public:
 
 private:
     void handle_event(cogui::event c);
-    std::map<std::string, std::shared_ptr<arguments::argument_base>> handle_command_line(int argc, char*argv[]);
+    std::map<std::string, std::shared_ptr<arguments::argument_base>> handle_command_line(int argc, char*argv[], std::string &theme);
 
     template<typename ... Args>
     void print_help( Args&&... args )

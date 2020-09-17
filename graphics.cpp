@@ -98,7 +98,7 @@ cogui::graphics::~graphics()
 bool cogui::graphics::initialize()
 {
     setenv("TERM", "linux", 1);
-    setlocale(LC_ALL, "");
+    std::setlocale(LC_ALL, "");
     stdscr = initscr();
 
     if(stdscr == nullptr)

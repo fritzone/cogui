@@ -27,6 +27,7 @@ public:
     logstream& operator<<(double t);
     logstream& operator<<(const char *pChars);
     logstream& operator<<(const std::string &rString);
+    logstream& operator<<(const std::wstring ws);
     logstream& operator<<(const void *pData);
 
     logstream& operator<< (const std::chrono::system_clock::time_point& time);

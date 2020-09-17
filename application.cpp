@@ -95,7 +95,7 @@ void cogui::application::handle_event(cogui::event c)
     }
 }
 
-std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::application::handle_command_line(int argc, char *argv[])
+std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::application::handle_command_line(int argc, char *argv[], std::string& theme)
 {
     std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments;
     std::string current_flag;
@@ -108,6 +108,21 @@ std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::
         int removed_minuses = 0;
         std::string carg = argv[i];
         std::string save_carg = carg;
+
+        if(carg == "--theme") // builtin argument for selecting the theme
+        {
+            if(i + 1 < argc)
+            {
+                theme = argv[i + 1];
+                i++;
+                continue;
+            }
+            else
+            {
+                throw cogui::arguments::invalid_parameter("Argument --theme requires a parameter, the name of the theme", "--theme");
+            }
+        }
+
         while(carg[0] == '-')
         {
             gathering_params = false;
@@ -116,7 +131,7 @@ std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::
             removed_minuses ++ ;
             if(removed_minuses > 2)
             {
-                throw "Invalid argument passing: " + save_carg;
+                throw cogui::arguments::invalid_parameter("Invalid argument passing", save_carg);
             }
         }
         log_info() << carg << " saved:" << save_carg << " gather:" << gathering_params << " gotflag:" << got_flag << " current flag:" << current_flag;

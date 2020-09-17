@@ -1,5 +1,6 @@
 #include "layout.h"
 #include "container.h"
+#include "window.h"
 
 void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cogui::control> >& controls,
                                                  cogui::container * cont)
@@ -12,6 +13,7 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
     int last_x = 0;
     log_info() << "Expandable:" << expandable;
     int last_x_before_split = 0;
+    int cy = 1;
 
     if(expandable)
     {
@@ -132,9 +134,20 @@ void cogui::layout::horizontal::expand(int c)
 void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui::control> >& controls,
                                                  cogui::container * cont)
 {
-    int height = cont->getHeight();
+    cogui::window* w = dynamic_cast<cogui::window*>(cont);
+    int reduce_height = 0;
+    if(w)
+    {
+        if(w->hasMenubar())
+        {
+            reduce_height = 2;
+        }
+    }
+
+    int height = cont->getHeight() - reduce_height;
+
     int recommended_height = height / controls.size() - 1;
-    int cy = 1;
+    int cy = 1 + reduce_height;
     bool expandable = (m_expanded_row != -1);
     int last_y = 0;
     bool hiding = false;
@@ -150,7 +163,6 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
 
         for(int i=0; i<controls.size(); i++)
         {
-
             if(i == m_expanded_row)
             {
                 cy = cont->getHeight() - accumulated_height;
@@ -191,7 +203,6 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
             }
             cy += c->minimumDrawableHeight() + 1;
             last_y = cy;
-
         }
     }
     else

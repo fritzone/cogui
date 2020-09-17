@@ -93,6 +93,14 @@ public:
     const menu &getSystemMenu() const;
     void closeCurrentMenu();
 
+    // returns the main menubar of this window
+    bool hasMenubar() const
+    {
+        bool b = (&m_mainmenu == &cogui::menubar::no_mainmenu);
+        return !b;
+    }
+    const menubar &getMainMenu() const;
+
     // signals
 
     using OnResize = fluent::NamedType<std::function<void(window*,int,int)>, struct OnResizeHelper>;
@@ -161,7 +169,6 @@ private:
             [&,this](SystemMenu m) {m_sysmenu = m.get(); m_hasSysmenuButton = true; },
             [&,this](MenuBar m) {m_mainmenu = m.get(); }
         );
-
 
         auto tup = std::make_tuple(std::forward<Args>(args)...);
 

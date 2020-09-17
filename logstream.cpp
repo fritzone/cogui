@@ -3,6 +3,9 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <vector>
+#include <locale>
+#include <codecvt>
 
 logstream::logstream(int line, const char *pFile, const char *pFunc, LogLevel level) :
     mOutputStream(),
@@ -120,6 +123,19 @@ logstream &logstream::operator<<(const std::string &rString)
 {
     mOutputStream << '\"' << rString << '\"';
     return appendSpace();
+}
+
+logstream &logstream::operator<<(const std::wstring ws)
+{
+    try {
+        using convert_type = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_type, wchar_t> converter;
+        std::string s = converter.to_bytes( ws );
+        return operator <<(s);
+
+    }  catch (...) {
+        return appendSpace();
+    }
 }
 
 logstream &logstream::operator<<(const void *pData)

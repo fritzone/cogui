@@ -80,6 +80,7 @@ namespace cogui
         menu() = default;
         menu(std::initializer_list<action> l);
         menu(const std::wstring& caption, std::initializer_list<action> l);
+        menu(const wchar_t * const caption, std::initializer_list<action> l);
         menu(const std::string& caption, std::initializer_list<action> l);
 
         void append(std::initializer_list<action> l);
@@ -106,6 +107,7 @@ namespace cogui
 
         int getLastSelectedIndex() const;
         bool isSysmenu() const;
+        std::wstring caption() const;
 
     private:
         std::vector<action> m_actions;
@@ -126,6 +128,9 @@ namespace cogui
         menubar(std::initializer_list<menu> entries);
 
         menubar& operator = (std::initializer_list<menu> m);
+
+        const menu& operator[](int i) const;
+        const std::vector<menu>& items() const;
 
         static menubar no_mainmenu;
 

@@ -47,6 +47,8 @@ public:
 
 public:
 
+    static void init(const std::string& theme_name);
+
     static desktop& get();
 
     std::vector<window *> windows() const;
@@ -63,6 +65,8 @@ private:
     std::vector<window*> m_windows;
     window* m_captured_window = nullptr;
     bool m_initialized = false;
+
+    static std::string m_s_theme_name;
 };
 
 }

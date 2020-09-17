@@ -59,12 +59,13 @@ void handler(int sig)
   exit(1);
 }
 
-void cogui::init(int argc, char* argv[])
+void cogui::init(int /*argc*/, char* /*argv*/ [], const std::string& theme)
 {
     signal(SIGWINCH, do_resize);
     signal(SIGSEGV, handler);
     signal(SIGINT, handler);
 
+    cogui::desktop::init(theme);
     cogui::desktop::get();
 }
 

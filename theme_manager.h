@@ -15,6 +15,8 @@ public:
 
     std::shared_ptr<theme> current_theme();
 
+    std::shared_ptr<theme> get_theme(const std::string& theme_name);
+
 private:
     theme_manager();
     std::vector<std::shared_ptr<theme>> themes;

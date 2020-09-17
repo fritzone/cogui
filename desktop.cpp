@@ -11,8 +11,14 @@
 namespace cogui
 {
 
-desktop::desktop() : m_theme(theme_manager::instance().current_theme()), m_graphics(new graphics), m_input(new gpm_input)
+std::string desktop::m_s_theme_name;
+
+desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_theme() :
+                                                 theme_manager::instance().get_theme(m_s_theme_name)),
+                     m_graphics(new graphics),
+                     m_input(new gpm_input)
 {
+    log_info() << "Picking theme:" << m_theme->name();
 }
 
 bool desktop::initialize()
@@ -251,6 +257,11 @@ void desktop::redraw()
     {
         w->draw();
     }
+}
+
+void desktop::init(const std::string &theme_name)
+{
+    m_s_theme_name = theme_name;
 }
 
 desktop &desktop::get()

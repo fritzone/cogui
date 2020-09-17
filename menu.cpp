@@ -15,6 +15,8 @@ cogui::menu::menu(const std::wstring &caption, std::initializer_list<cogui::acti
 {
 }
 
+cogui::menu::menu(const wchar_t * const caption, std::initializer_list<cogui::action> l) : menu(std::wstring(caption), l){}
+
 cogui::menu::menu(const std::string &caption, std::initializer_list<cogui::action> l) : m_actions(l)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -136,6 +138,11 @@ bool cogui::menu::isSysmenu() const
     return m_is_sysmenu;
 }
 
+std::wstring cogui::menu::caption() const
+{
+    return m_caption;
+}
+
 int cogui::menu::getWidth() const
 {
     return m_width;
@@ -192,4 +199,18 @@ cogui::menubar &cogui::menubar::operator =(std::initializer_list<cogui::menu> m)
 {
     m_menus = m;
     return *this;
+}
+
+const cogui::menu &cogui::menubar::operator[](int i) const
+{
+    if(i < m_menus.size())
+    {
+        return m_menus[i];
+    }
+    throw "Index out of range";
+}
+
+const std::vector<cogui::menu> &cogui::menubar::items() const
+{
+    return m_menus;
 }

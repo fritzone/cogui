@@ -57,6 +57,13 @@ public:
     std::wstring WND_HORZ_LINE = L"\x2550";
     std::wstring WND_VERT_LINE = L"\x2551";
 
+    // if there is a main menu attached to this window
+    std::wstring WND_VERT_MENULINE_START = L"\x2520";
+    std::wstring WND_VERT_MENULINE_END = L"\x2528";
+    std::wstring WND_HORZ_MENULINE = L"\x2500";
+    std::wstring WND_VERT_MENULINE_START_RESIZE = L"\x255F";
+    std::wstring WND_VERT_MENULINE_END_RESIZE = L"\x2562";
+
     // if the window is resizeable this is the corner of it
     std::wstring WND_LR_RESIZE = L"\x251B";
 
@@ -148,8 +155,8 @@ public:
     /*                                                    CHECKBOX                                                    */
     /******************************************************************************************************************/
 
-    std::wstring CHK_UNCHECKED = L"[ ]"; // L"\x2610"; // unchecked checkbox
-    std::wstring CHK_CHECKED = L"[X]"; // L"\x2611"; // unchecked checkbox
+    std::wstring CHK_UNCHECKED = L"\x2610"; // unchecked checkbox
+    std::wstring CHK_CHECKED = L"\x2611"; // unchecked checkbox
 
 
 };

@@ -43,7 +43,22 @@ int main( int argc, char* argv[] )
                                {L"No select", action::on_trigger = [](action*){log_info() << "Clicked No select";}}
                            },
                            window::mainmenu = menubar {
-                            { menu { } , menu { } }
+                           {
+                                menu {
+                                        L"&File",
+                                        {
+                                            {L"&New", action::selectable, action::on_trigger = [](action*){log_info() << "New Clicked";}},
+                                            {L"&Exit", action::on_trigger = [&](action*){app.exit(1);}}
+                                        }
+                                },
+                                menu {
+                                        L"&Edit",
+                                        {
+                                            {L"&Copy", action::selectable, action::on_trigger = [](action*){log_info() << "New Clicked";}},
+                                            {L"&Paste", action::on_trigger = [](action*){log_info() << "Open Clicked";}}
+                                        }
+                               }
+                           }
                            }
     );
 

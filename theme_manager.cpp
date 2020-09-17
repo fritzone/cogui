@@ -35,6 +35,18 @@ std::shared_ptr<cogui::theme> cogui::theme_manager::current_theme()
     }
 }
 
+std::shared_ptr<cogui::theme> cogui::theme_manager::get_theme(const std::string &theme_name)
+{
+    for(const auto& theme : themes)
+    {
+        if(theme->name() == theme_name)
+        {
+            return theme;
+        }
+    }
+    return current_theme();
+}
+
 cogui::theme_manager::theme_manager()
 {
     std::string path = "/usr/local/lib/cogui/themes";

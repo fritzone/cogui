@@ -75,12 +75,19 @@ void cogui::window::click(int x, int y)
        return;
    }
 
+   // click on sysmenu?
    if(y == this->getY() && x == m_sysmenu_btn_pos)
    {
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
         m_current_menu->open(x - 1, y + 1);
         return draw();
+   }
+
+   // click on a menu from menubar
+   if(hasMenubar())
+   {
+
    }
 
    // did we click on a control by any chance?
@@ -276,6 +283,11 @@ void cogui::window::closeCurrentMenu()
 {
     m_current_menu->close();
     m_current_menu = nullptr;
+}
+
+const cogui::menubar &cogui::window::getMainMenu() const
+{
+    return m_mainmenu;
 }
 
 void cogui::window::left_mouse_down(int x, int y)
