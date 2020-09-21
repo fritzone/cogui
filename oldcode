@@ -1,0 +1,42 @@
+/*{
+    static int prev_x = -1;
+    static int prev_y = -1;
+    static wchar_t prev_char = 0;
+
+    int my = mouse::get().y();
+    int mx = mouse::get().x();
+    wchar_t char_at = chars[my][mx];
+
+    wchar_t cc[2] = {0};
+    cc[0] = char_at;
+
+    attron(COLOR_PAIR(2));
+    std::wstringstream ws;
+    ws << "x:" << mx << " y:" << my << " c:" << cc << "  ";
+    //mvaddwstr(22, 0, ws.str().c_str());
+
+
+    if(prev_char)
+    {
+        wchar_t cc2[2] = {0};
+        cc2[0] = prev_char;
+        std::wstringstream ws2;
+        ws2 << cc2;
+        attron(COLOR_PAIR(2));
+
+        mvaddwstr(prev_y, prev_x, ws2.str().c_str());
+
+    }
+
+    attron(COLOR_PAIR(1));
+    mvaddwstr(my, mx, cc);
+
+    prev_x = mx;
+    prev_y = my;
+    prev_char = char_at;
+
+    wmove(stdscr, 0, 0);
+    attron(COLOR_PAIR(2));
+
+    refresh();
+} */

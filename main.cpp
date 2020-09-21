@@ -34,8 +34,8 @@ int main( int argc, char* argv[] )
     log_info() << "bb called:" << bb;
 
     auto a = cogui::window(5, 5, 70, 15, L"Raise your \U0001F450",
-                           window::on_resize = [](window* win, int w,int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
-                           window::on_close  = [&](window* w){log_info() << "Closing this window"; app.exit(1);},
+                           window::on_resize = [](window*, int w, int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
+                           window::on_close  = [&](window*){log_info() << "Closing this window"; app.exit(1);},
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
                            window::on_mouse_up = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") up:" << x << ", " << y; },
                            window::sysmenu = menu{
@@ -43,22 +43,38 @@ int main( int argc, char* argv[] )
                                {L"No select", action::on_trigger = [](action*){log_info() << "Clicked No select";}}
                            },
                            window::mainmenu = menubar {
-                           {
+
                                 menu {
                                         L"&File",
                                         {
                                             {L"&New", action::selectable, action::on_trigger = [](action*){log_info() << "New Clicked";}},
+                                            {L"&Open", action::selectable, action::on_trigger = [](action*){log_info() << "Open Clicked";}},
+                                            {L"&Save", action::selectable, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
+                                            menu::separator_item,
                                             {L"&Exit", action::on_trigger = [&](action*){app.exit(1);}}
                                         }
                                 },
                                 menu {
                                         L"&Edit",
                                         {
-                                            {L"&Copy", action::selectable, action::on_trigger = [](action*){log_info() << "New Clicked";}},
+                                            {L"&Copy", action::on_trigger = [](action*){log_info() << "New Clicked";}},
                                             {L"&Paste", action::on_trigger = [](action*){log_info() << "Open Clicked";}}
                                         }
-                               }
-                           }
+                                },
+                                menubar::align_right_after,
+                                menu {
+                                        L"&Help",
+                                        {
+                                            {L"&About", action::selectable, action::on_trigger = [](action*){log_info() << "About Clicked";}},
+                                        }
+                                },
+                                menu {
+                                        L"&Purchase",
+                                        {
+                                            {L"&About", action::selectable, action::on_trigger = [](action*){log_info() << "About Clicked";}},
+                                        }
+                                }
+
                            }
     );
 

@@ -18,10 +18,17 @@ namespace cogui
     public:
 
         action() = default;
+        action(action&&) = default;
+
         virtual ~action();
         action(const action& o);
 
         action& operator=(const action& o);
+        action& operator=(action&& o) = default;
+
+        action(const std::wstring& title) : m_title(title)
+        {
+        }
 
         template<typename ... Args>
         action(const std::wstring& title, Args... args) : m_title(title)
@@ -87,6 +94,8 @@ namespace cogui
 
         menu& operator =(std::initializer_list<action> l);
 
+        bool operator == (const menu& rhs) const;
+
         // calculates the positions and opens the menu
         void open(int x, int y);
 
@@ -109,6 +118,8 @@ namespace cogui
         bool isSysmenu() const;
         std::wstring caption() const;
 
+        static cogui::action separator_item;
+
     private:
         std::vector<action> m_actions;
         int m_x = 0;
@@ -121,6 +132,9 @@ namespace cogui
         std::wstring m_caption = L"";
     };
 
+    /**
+     * @brief The menubar class repesents the menubar of a window
+     */
     class menubar
     {
     public:
@@ -133,6 +147,7 @@ namespace cogui
         const std::vector<menu>& items() const;
 
         static menubar no_mainmenu;
+        static cogui::menu align_right_after;
 
     private:
         std::vector<menu> m_menus;

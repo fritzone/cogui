@@ -6,12 +6,14 @@
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
 cogui::action::Selectable cogui::action::selectable;
 cogui::menubar cogui::menubar::no_mainmenu;
+cogui::menu cogui::menubar::align_right_after(L"::align_right_after", {});
+cogui::action cogui::menu::separator_item(L"::separator_item");
 
 cogui::menu::menu(std::initializer_list<cogui::action> l) : m_actions(l)
 {
 }
 
-cogui::menu::menu(const std::wstring &caption, std::initializer_list<cogui::action> l) : m_actions(l), m_caption(caption)
+cogui::menu::menu(const std::wstring &caption, std::initializer_list<cogui::action> l) : m_actions(l), m_is_sysmenu(false), m_caption(caption)
 {
 }
 
@@ -21,6 +23,7 @@ cogui::menu::menu(const std::string &caption, std::initializer_list<cogui::actio
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     m_caption = converter.from_bytes(caption);
+    m_is_sysmenu = false;
 }
 
 void cogui::menu::append(std::initializer_list<cogui::action> l) {
@@ -32,24 +35,31 @@ cogui::menu &cogui::menu::operator =(std::initializer_list<cogui::action> l)
     m_actions = l;
     return *this;
 }
+
+bool cogui::menu::operator ==(const cogui::menu &rhs) const
+{
+    return this->caption() == rhs.caption();
+}
+
 void cogui::menu::open(int x, int y)
 {
     m_x = x;
     m_y = y;
     int max_len = 0;
     bool any_selectable = false;
-    for(int i=0; i<m_actions.size(); i++)
+    for(size_t i=0; i<m_actions.size(); i++)
     {
-        if(max_len < m_actions[i].getTitle().length())
+        if(m_actions[i].getTitle() != cogui::menu::separator_item.getTitle()
+                && max_len < static_cast<int>(m_actions[i].getTitle().length()))
         {
             max_len = m_actions[i].getTitle().length();
         }
+
         if(m_actions[i].isSelectable())
         {
             any_selectable = true;
         }
     }
-
 
     m_width = max_len + 2;
     if(any_selectable)

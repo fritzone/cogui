@@ -88,6 +88,7 @@ public:
     void redraw() override;
 
     void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
+    void update_menubar_positions(menu*, std::pair<int, int>, std::pair<int, int>);
 
     menu &getSystemMenu();
     const menu &getSystemMenu() const;
@@ -99,7 +100,7 @@ public:
         bool b = (&m_mainmenu == &cogui::menubar::no_mainmenu);
         return !b;
     }
-    const menubar &getMainMenu() const;
+    menubar &getMainMenu();
 
     // signals
 
@@ -148,6 +149,10 @@ private:
 
     // this is the current menu that is shown on the screen
     menu* m_current_menu = nullptr;
+
+    // this will hold the positions where the menu was drawn
+    // key is the menu, followed by two coordinates on the screen, upper left, lower right corner
+    mutable std::map<menu*, std::pair<std::pair<int, int>, std::pair<int, int>>> m_menu_positions;
 
 private:
 

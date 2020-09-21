@@ -32,73 +32,83 @@ void cogui::window::draw() const
 
 void cogui::window::click(int x, int y)
 {
-   log_info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
+    log_info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
 
-   //firstly: see if there is an open menu
-   if(m_current_menu)
-   {
-       if(m_current_menu->inside(x, y))
-       {
-           auto tempm = m_current_menu;
-           m_current_menu = nullptr;
-           redraw();
-           tempm->click(x, y);
-       }
-       else
-       {
-           // clicked outside the menu, close it
-           m_current_menu->close();
-           m_current_menu = nullptr;
-           redraw();
-       }
-       return draw();
-   }
+    //firstly: see if there is an open menu
+    if(m_current_menu)
+    {
+        if(m_current_menu->inside(x, y))
+        {
+            auto tempm = m_current_menu;
+            m_current_menu = nullptr;
+            redraw();
+            tempm->click(x, y);
+        }
+        else
+        {
+            // clicked outside the menu, close it
+            m_current_menu->close();
+            m_current_menu = nullptr;
+            redraw();
+        }
+        return draw();
+    }
 
-   if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
-   {
-       m_draw_state = draw_state::normal;
-   }
+    if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
+    {
+        m_draw_state = draw_state::normal;
+    }
 
-   if(y == this->getY() && x == m_close_btn_pos)
-   {
-       // close click:
-       // debug() << "click on close button";
-       emit sig_on_close(this);
-       return;
-   }
+    if(y == this->getY() && x == m_close_btn_pos)
+    {
+        // close click:
+        // debug() << "click on close button";
+        emit sig_on_close(this);
+        return;
+    }
 
-   if(y == this->getY() && x == m_maximize_btn_pos)
-   {
-       // close click:
-       // debug() << "click on close button";
-       maximize();
-       return;
-   }
+    if(y == this->getY() && x == m_maximize_btn_pos)
+    {
+        // close click:
+        // debug() << "click on close button";
+        maximize();
+        return;
+    }
 
-   // click on sysmenu?
-   if(y == this->getY() && x == m_sysmenu_btn_pos)
-   {
+    // click on sysmenu?
+    if(y == this->getY() && x == m_sysmenu_btn_pos)
+    {
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
         m_current_menu->open(x - 1, y + 1);
         return draw();
-   }
+    }
 
-   // click on a menu from menubar
-   if(hasMenubar())
-   {
+    // click on a menu from menubar
+    if(hasMenubar())
+    {
+        for(auto& [m, p] : m_menu_positions)
+        {
+            log_info() << "Trying menu:" << m->caption() << "at (" <<p.first.first<<","<<p.first.second << ") - (" <<p.second.first<<","<<p.second.second << ") has (" << x << "," << y << ")";
+            if(p.first.first <=x && p.second.first >= x && p.first.second <= y && p.second.second >= y)
+            {
+                log_info() << "Found click:" << m->caption();
+                m_current_menu = m;
+                m_current_menu->open(p.first.first, p.second.second + 1);
+                return draw();
+            }
+        }
+    }
 
-   }
-
-   // did we click on a control by any chance?
-   std::shared_ptr<control> under = element_under(x, y);
-   if(under)
-   {
-       release_control(under);
-       // debug() << "found under ontrol";
-       under->click();
-   }
-   redraw();
+    // did we click on a control by any chance?
+    std::shared_ptr<control> under = element_under(x, y);
+    if(under)
+    {
+        release_control(under);
+        // debug() << "found under ontrol";
+        under->click();
+    }
+    redraw();
 
 }
 
@@ -180,6 +190,22 @@ void cogui::window::mouse_move(int x, int y)
                 if(m_current_menu->mouse_move(x, y))
                 {
                     return draw();
+                }
+            }
+            // do we have a menubar, if yes see if we are moving on in and open/close accordingly
+            if(hasMenubar() && m_current_menu != &m_sysmenu)
+            {
+                for(auto& [m, p] : m_menu_positions)
+                {
+                    log_info() << "Trying move menu:" << m->caption() << "at (" <<p.first.first<<","<<p.first.second << ") - (" <<p.second.first<<","<<p.second.second << ") has (" << x << "," << y << ")";
+                    if(p.first.first <=x && p.second.first > x && p.first.second <= y && p.second.second >= y && m!=m_current_menu)
+                    {
+                        log_info() << "Found move:" << m->caption();
+                        m_current_menu->close();
+                        m_current_menu = m;
+                        m_current_menu->open(p.first.first, p.second.second + 1);
+                        return redraw();
+                    }
                 }
             }
             return;
@@ -269,6 +295,11 @@ void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos
     m_maximize_btn_pos = maximize_pos;
 }
 
+void cogui::window::update_menubar_positions(menu * m, std::pair<int, int> ul, std::pair<int, int> lr)
+{
+    m_menu_positions[m] = {ul, lr};
+}
+
 cogui::menu &cogui::window::getSystemMenu()
 {
     return m_sysmenu;
@@ -285,7 +316,7 @@ void cogui::window::closeCurrentMenu()
     m_current_menu = nullptr;
 }
 
-const cogui::menubar &cogui::window::getMainMenu() const
+cogui::menubar &cogui::window::getMainMenu()
 {
     return m_mainmenu;
 }

@@ -88,7 +88,6 @@ void cogui::application::handle_event(cogui::event c)
         case cogui::event::mouse_move:
         {
             log_debug() << "move: " << mouse::get().x() << "x" << mouse::get().y();
-            desktop::get().getGraphics()->handle_mouse_movement();
             desktop::get().handle_mouse_move(mouse::get().x(), mouse::get().y());
             break;
         }

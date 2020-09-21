@@ -150,6 +150,8 @@ public:
     std::wstring MNU_HORIZONTAL = L"\x2500";
     std::wstring MNU_VERTICAL = L"\x2502";
     std::wstring MNU_SYSMENU_TOP =  L"\x2502 \x2514";
+    std::wstring MNU_LEFT_SEPARATOR = L"\x251c";
+    std::wstring MNU_RIGHT_SEPARATOR = L"\x2524";
 
     /******************************************************************************************************************/
     /*                                                    CHECKBOX                                                    */
@@ -157,7 +159,6 @@ public:
 
     std::wstring CHK_UNCHECKED = L"\x2610"; // unchecked checkbox
     std::wstring CHK_CHECKED = L"\x2611"; // unchecked checkbox
-
 
 };
 }

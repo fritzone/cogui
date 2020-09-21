@@ -41,68 +41,70 @@ void log_event(MEVENT event)
 cogui::event cogui::to_event(int c)
 {
     log_info() << "Event:" << c;
-    switch (c) {
-    case KEY_MOUSE:
+    switch (c)
     {
-        MEVENT event = {0};
-
-        int prev_x = mouse::get().x();
-        int prev_y = mouse::get().y();
-        bool moved = false;
-
-        if(getmouse(&event) == OK)
+        case KEY_MOUSE:
         {
+            MEVENT event = {0,0,0,0,0};
 
-            log_event(event);
+            int prev_x = mouse::get().x();
+            int prev_y = mouse::get().y();
+            bool moved = false;
 
-            if(prev_x != event.x || prev_y != event.y)
+            if(getmouse(&event) == OK)
             {
-                mouse::get().setX(event.x);
-                mouse::get().setY(event.y);
-                moved = true;
+                log_event(event);
+
+                if(prev_x != event.x || prev_y != event.y)
+                {
+                    mouse::get().setX(event.x);
+                    mouse::get().setY(event.y);
+                    moved = true;
+                }
+                if(event.bstate & BUTTON1_PRESSED)
+                {
+                    mouse::get().set_button(mouse::button::left);
+                    return cogui::event::mouse_left_press;
+                }
+                if(event.bstate & BUTTON2_PRESSED)
+                {
+                    mouse::get().set_button(mouse::button::right);
+                    return cogui::event::mouse_right_press;
+                }
+                if(event.bstate & BUTTON1_RELEASED)
+                {
+                    mouse::get().clear_button(mouse::button::left);
+                    return cogui::event::mouse_left_release;
+                }
+                if(event.bstate & BUTTON2_RELEASED)
+                {
+                    mouse::get().clear_button(mouse::button::right);
+                    return cogui::event::mouse_right_release;
+                }
+                if(event.bstate & BUTTON1_CLICKED)
+                {
+                    return cogui::event::mouse_left_click;
+                }
+                if(event.bstate & BUTTON2_CLICKED)
+                {
+                    return cogui::event::mouse_right_click;
+                }
+                if(moved)
+                {
+                    return cogui::event::mouse_move;
+                }
             }
-            if(event.bstate & BUTTON1_PRESSED)
+            else
             {
-                mouse::get().set_button(mouse::button::left);
-                return cogui::event::mouse_left_press;
+                log_info() << "Could not get mouse event";
             }
-            if(event.bstate & BUTTON2_PRESSED)
-            {
-                mouse::get().set_button(mouse::button::right);
-                return cogui::event::mouse_right_press;
-            }
-            if(event.bstate & BUTTON1_RELEASED)
-            {
-                mouse::get().clear_button(mouse::button::left);
-                return cogui::event::mouse_left_release;
-            }
-            if(event.bstate & BUTTON2_RELEASED)
-            {
-                mouse::get().clear_button(mouse::button::right);
-                return cogui::event::mouse_right_release;
-            }
-            if(event.bstate & BUTTON1_CLICKED)
-            {
-                return cogui::event::mouse_left_click;
-            }
-            if(event.bstate & BUTTON2_CLICKED)
-            {
-                return cogui::event::mouse_right_click;
-            }
-            if(moved)
-            {
-                return cogui::event::mouse_move;
-            }
+            break;
         }
-        else {
-            log_info() << "Could not get mouse event";
-        }
-        break;
+
+        case 27: return cogui::event::press_escape;
+        case 9: return cogui::event::press_tab;
+        default: return cogui::event::unknown;
     }
 
-    case 27: return cogui::event::press_escape;
-    case 9: return cogui::event::press_tab;
-    default: return cogui::event::unknown;
-    }
     return cogui::event::unknown;
 }

@@ -246,9 +246,9 @@ void desktop::resize()
     m_graphics->refresh_screen();
 }
 
-int desktop::getWidth() const {return m_graphics->getWidth();}
+int desktop::getWidth() const {return m_graphics->get_screen_width();}
 
-int desktop::getHeight() const {return m_graphics->getHeight();}
+int desktop::getHeight() const {return m_graphics->get_screen_height();}
 
 void desktop::redraw()
 {

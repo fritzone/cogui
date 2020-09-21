@@ -128,7 +128,7 @@ bool cogui::graphics::initialize()
     return true;
 }
 
-void cogui::graphics::draw(int x, int y, const wchar_t *s, int flags)
+void cogui::graphics::draw_text(int x, int y, const wchar_t *s, int flags)
 {
     auto sl = wcslen(s);
 
@@ -161,26 +161,26 @@ void cogui::graphics::draw(int x, int y, const wchar_t *s, int flags)
     mvwaddwstr(stdscr, y, x, s);
 }
 
-void cogui::graphics::draw(int x, int y, wchar_t c, int flags)
+void cogui::graphics::draw_text(int x, int y, wchar_t c, int flags)
 {
     mvwaddch(stdscr, y, x, c | flags);
 }
 
-void cogui::graphics::setFgColor(cogui::graphics::color c)
+void cogui::graphics::set_fg_color(cogui::graphics::foreground_color c)
 {
     turnoff_current_color();
     m_currentFgColor = c;
     turnon_current_color();
 }
 
-void cogui::graphics::setBgColor(cogui::graphics::color c)
+void cogui::graphics::set_bg_color(background_color c)
 {
     turnoff_current_color();
     m_currentBgColor = c;
     turnon_current_color();
 }
 
-void cogui::graphics::setColors(cogui::graphics::color fg, cogui::graphics::color bg)
+void cogui::graphics::set_colors(cogui::graphics::foreground_color fg, cogui::graphics::background_color bg)
 {
     turnoff_current_color();
     m_currentBgColor = bg;
@@ -204,69 +204,21 @@ void cogui::graphics::turnon_current_color()
 
 void cogui::graphics::refresh_screen()
 {
-    refresh();
+    ::refresh();
 }
 
 void cogui::graphics::clear_screen()
 {
-    wclear(stdscr);
-    wrefresh(stdscr);
-}
-
-void cogui::graphics::handle_mouse_movement()
-{
-    /*{
-        static int prev_x = -1;
-        static int prev_y = -1;
-        static wchar_t prev_char = 0;
-
-        int my = mouse::get().y();
-        int mx = mouse::get().x();
-        wchar_t char_at = chars[my][mx];
-
-        wchar_t cc[2] = {0};
-        cc[0] = char_at;
-
-        attron(COLOR_PAIR(2));
-        std::wstringstream ws;
-        ws << "x:" << mx << " y:" << my << " c:" << cc << "  ";
-        //mvaddwstr(22, 0, ws.str().c_str());
-
-
-        if(prev_char)
-        {
-            wchar_t cc2[2] = {0};
-            cc2[0] = prev_char;
-            std::wstringstream ws2;
-            ws2 << cc2;
-            attron(COLOR_PAIR(2));
-
-            mvaddwstr(prev_y, prev_x, ws2.str().c_str());
-
-        }
-
-        attron(COLOR_PAIR(1));
-        mvaddwstr(my, mx, cc);
-
-        prev_x = mx;
-        prev_y = my;
-        prev_char = char_at;
-
-        wmove(stdscr, 0, 0);
-        attron(COLOR_PAIR(2));
-
-        refresh();
-    } */
+    ::wclear(stdscr);
+    ::wrefresh(stdscr);
 }
 
 void cogui::graphics::shutdown()
 {
-    // turn off mouse
-
-    endwin();
+    ::endwin();
 }
 
-void cogui::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::graphics::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     std::wstring final_title;
     wchar_t highlight_char = L'\0';
@@ -294,30 +246,25 @@ void cogui::draw_title(int x, int y, const std::wstring &s, cogui::textflags fla
             final_title += s[i];
         }
     }
-    desktop::get().getGraphics()->draw(x, y, final_title.c_str(), flags);
+    desktop::get().getGraphics()->draw_text(x, y, final_title.c_str(), flags);
     if(highlight_char != L'\0')
     {
         // draw an extra space at the end, because we took away an & sign
-        desktop::get().getGraphics()->draw(x + final_title.length(), y, L' ', cogui::textflags::normal);
+        desktop::get().getGraphics()->draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
 
-        desktop::get().getGraphics()->draw(x + highlight_pos, y, highlight_char,
+        desktop::get().getGraphics()->draw_text(x + highlight_pos, y, highlight_char,
                                            cogui::textflags::underline & cogui::textflags::bold);
 
 
     }
 }
 
-std::wstring cogui::line(int l, std::wstring chr)
+void cogui::graphics::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
 {
-    return chr * l;
+    draw_text(x, y, s, static_cast<int>(flags));
 }
 
-void cogui::draw(int x, int y, const wchar_t* s, cogui::textflags flags)
+void cogui::graphics::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
-    desktop::get().getGraphics()->draw(x, y, s, flags);
-}
-
-void cogui::draw(int x, int y, const std::wstring &s, cogui::textflags flags)
-{
-    desktop::get().getGraphics()->draw(x, y, s.c_str(), flags);
+    draw_text(x, y, s.c_str(), flags);
 }

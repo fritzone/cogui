@@ -30,21 +30,31 @@ public:
         white = 8
     };
 
+    using foreground_color = color;
+    using background_color = color;
+
     graphics() noexcept;
     virtual ~graphics();
 
     bool initialize();
-    void draw(int x, int y, const wchar_t* s, int flags);
+    void shutdown();
+
+    void draw_text(int x, int y, wchar_t c, int flags);
+    void draw_text(int x, int y, const wchar_t* s, int flags);
+    void draw_text(int x, int y, const wchar_t* s, cogui::textflags flags);
+    void draw_text(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
+
+    void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
+
     void refresh_screen();
     void clear_screen();
-    void handle_mouse_movement();
-    void shutdown();
-    int getWidth() const {return m_width;}
-    int getHeight() const {return m_height;}
-    void draw(int x, int y, wchar_t c, int flags);
-    void setFgColor(color c);
-    void setBgColor(color c);
-    void setColors(color fg, color bg);
+
+    int get_screen_width() const {return m_width;}
+    int get_screen_height() const {return m_height;}
+
+    void set_fg_color(foreground_color c);
+    void set_bg_color(background_color c);
+    void set_colors(foreground_color fg, background_color bg);
 private:
     WINDOW *stdscr = nullptr;
     int m_width = -1;
@@ -58,50 +68,7 @@ private:
 };
 
 
-template <class T>
-T repeat(T str, const std::size_t n)
-{
-    if (n == 0) {
-    str.clear();
-    str.shrink_to_fit();
-    return str;
-    }
 
-    if (n == 1 || str.empty()) return str;
-
-    const auto period = str.size();
-
-    if (period == 1) {
-    str.append(n - 1, str.front());
-    return str;
-    }
-
-    str.reserve(period * n);
-
-    std::size_t m {2};
-
-    for (; m < n; m *= 2) str += str;
-
-    str.append(str.c_str(), (n - (m / 2)) * period);
-
-    return str;
-}
-
-template <typename S, typename T, typename = std::enable_if<std::is_integral<T>::value> >
-S operator*(S str, const T n)
-{
-    return repeat(std::move(str), static_cast<std::size_t>(n));
-}
-
-std::wstring line(int l, std::wstring chr);
-
-void draw(int x, int y, const wchar_t* s, cogui::textflags flags);
-
-
-void draw(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
-
-
-void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
 
 }
 

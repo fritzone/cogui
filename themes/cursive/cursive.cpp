@@ -7,6 +7,7 @@
 #include "checkbox.h"
 
 #include "log.h"
+#include "utils.h"
 
 #include <variant>
 #include <algorithm>
@@ -24,7 +25,7 @@ void cogui::themes::cursive::clear(const cogui::control &c)
     int w = c.getWidth();
     for(int y = top; y <= top + h; y++)
     {
-        cogui::draw(x, y, cogui::line(w + 2, L" "));
+        desktop::get().getGraphics()->draw_text(x, y, cogui::utils::repeated(w + 2, L" "));
     }
 }
 
@@ -40,12 +41,6 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     int drawY = w.getY();
     int drawHeight = w.getHeight();
 
-//    if(w.hasMenubar())
-//    {
-//        drawY -= 2;
-//        drawHeight += 2;
-//    }
-
     auto line_char = rs ? WND_HORZ_LINE : HORZ_LINE_RESIZE;
     auto vert_line_char = rs ? WND_VERT_LINE : VERT_LINE_RESIZE;
     auto ul_corner_char = rs ? WND_UL_CORNER : UL_CORNER_RESIZE;
@@ -59,18 +54,18 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     auto maximize_char = rs ? WND_MAXIMIZE : WND_MAXIMIZE_RESIZE;
 
     // top line
-    cogui::draw(w.getX(), drawY, ul_corner_char + cogui::line(w.getWidth(), line_char) + ur_corner_char);
+    desktop::get().getGraphics()->draw_text(w.getX(), drawY, ul_corner_char + cogui::utils::repeated(w.getWidth(), line_char) + ur_corner_char);
 
 
     // bottom line
-    cogui::draw(w.getX(), drawY + drawHeight, ll_corner_char + cogui::line(w.getWidth(), line_char) +
+    desktop::get().getGraphics()->draw_text(w.getX(), drawY + drawHeight, ll_corner_char + cogui::utils::repeated(w.getWidth(), line_char) +
         (w.resizeable() ? WND_LR_RESIZE : lr_corner_char) );
 
     // side lines
     for(int i=1; i< drawHeight; i++)
     {
-        cogui::draw(w.getX(), drawY + i, vert_line_char);
-        cogui::draw(w.getX() + w.getWidth() + 1, drawY + i, vert_line_char);
+        desktop::get().getGraphics()->draw_text(w.getX(), drawY + i, vert_line_char);
+        desktop::get().getGraphics()->draw_text(w.getX() + w.getWidth() + 1, drawY + i, vert_line_char);
     }
 
     int available_width = w.getWidth(); // -3 because of the begin and end chars for title separator
@@ -84,8 +79,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     {
         available_width -= close_char.length();
         //log_info() << "wdth:" << w.width() << " avail:" << available_width;
-
-        cogui::draw(w.getX() + available_width, drawY, close_char);
+        desktop::get().getGraphics()->draw_text(w.getX() + available_width, drawY, close_char);
         close_pos = w.getX() + available_width + 1;
 
     }
@@ -94,12 +88,12 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
         available_width -= maximize_char.length() - 1;
         // log_info() << "wdth:" << w.width() << " avail:" << available_width;
 
-        cogui::draw(w.getX() + available_width , drawY, maximize_char);
+        desktop::get().getGraphics()->draw_text(w.getX() + available_width , drawY, maximize_char);
         maximize_pos = w.getX() + available_width + 1;
         if(w.hasCloseButton()) // remove ugly close and end buttons from window titlebar
         {
             int newx = w.getX() + available_width + maximize_char.length() - 1;
-            cogui::draw(newx, drawY, L" ");
+            desktop::get().getGraphics()->draw_text(newx, drawY, L" ");
         }
     }
 
@@ -107,7 +101,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     if(w.hasSysmenuButton())
     {
         available_width -= sysmenu_char.length();
-        cogui::draw(w.getX() + 1, drawY, w.getSystemMenu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char);
+        desktop::get().getGraphics()->draw_text(w.getX() + 1, drawY, w.getSystemMenu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char);
         sysmenu_pos = w.getX() + 1 + 1 ;
     }
 
@@ -120,7 +114,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
 
         std::wstring t = title_delim_left_char + wtitle + title_delim_right_char;
 
-        cogui::draw(lefts, drawY, t);
+        desktop::get().getGraphics()->draw_text(lefts, drawY, t);
     }
 
     w.update_titlebar_btn_positions(close_pos, sysmenu_pos, maximize_pos);
@@ -129,17 +123,32 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     // do we have a menubar
     if(w.hasMenubar())
     {
-        cogui::draw(w.getX(), drawY + 2, (rs ? WND_VERT_MENULINE_START_RESIZE : WND_VERT_MENULINE_START)
-                                              + cogui::line(w.getWidth(), WND_HORZ_MENULINE)
+        desktop::get().getGraphics()->draw_text(w.getX(), drawY + 2, (rs ? WND_VERT_MENULINE_START_RESIZE : WND_VERT_MENULINE_START)
+                                              + cogui::utils::repeated(w.getWidth(), WND_HORZ_MENULINE)
                                               + (rs ? WND_VERT_MENULINE_END_RESIZE : WND_VERT_MENULINE_END)
                     );
-        auto& m = w.getMainMenu();
-        const auto& items = m.items();
+        auto& m = const_cast<cogui::menubar&>(const_cast<cogui::window&>(w).getMainMenu());
+        auto& items = m.items();
         int mdix = w.getX() + 2;
-        for(const auto& i : items)
+        for(size_t i = 0; i < items.size(); i++)
         {
-            cogui::draw_title(mdix, drawY + 1, i.caption(), cogui::textflags::bold);
-            mdix += (i.caption().length());
+            menu& itm = const_cast<cogui::menu&>(items[i]);
+            if(itm.caption() == cogui::menubar::align_right_after.caption())
+            {
+                size_t accumulated_width = 0;
+                for(size_t j=i+1; j<items.size(); j++)
+                {
+                    menu& itmj = const_cast<cogui::menu&>(items[j]);
+                    accumulated_width += itmj.caption().length();
+                }
+                mdix =  w.getX() + w.getWidth() - accumulated_width;
+            }
+            else
+            {
+                desktop::get().getGraphics()->draw_title(mdix, drawY + 1, itm.caption(), cogui::textflags::bold);
+                const_cast<cogui::window&>(w).update_menubar_positions(&itm, {mdix, drawY + 1}, {mdix + itm.caption().length(), drawY + 1});
+                mdix += (itm.caption().length());
+            }
         }
     }
 
@@ -151,9 +160,6 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
     {
         return;
     }
-
-    log_info() << "parent:" << (b.getParent() ? "HAS" : "NONE");
-
 
     auto ul_char = BTN_UL_CORNER_STATE_UP ;
     auto ll_char = BTN_LL_CORNER_STATE_UP ;
@@ -189,20 +195,20 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
     }
 
     // upper left corner
-    cogui::draw(b.getX(), b.getY(), ul_char);
-    cogui::draw(b.getX(), b.getY() + b.getHeight(), ll_char);
-    cogui::draw(b.getX() + b.getWidth(), b.getY(), ur_char);
-    cogui::draw(b.getX() + b.getWidth(), b.getY() + b.getHeight(), lr_char);
+    desktop::get().getGraphics()->draw_text(b.getX(), b.getY(), ul_char);
+    desktop::get().getGraphics()->draw_text(b.getX(), b.getY() + b.getHeight(), ll_char);
+    desktop::get().getGraphics()->draw_text(b.getX() + b.getWidth(), b.getY(), ur_char);
+    desktop::get().getGraphics()->draw_text(b.getX() + b.getWidth(), b.getY() + b.getHeight(), lr_char);
 
     // top border of button
-    cogui::draw(b.getX() + 1, b.getY(), cogui::line(b.getWidth() - 1, top_char ) );
-    cogui::draw(b.getX() + 1, b.getY() + b.getHeight(), cogui::line(b.getWidth() - 1, bottom_char) );
+    desktop::get().getGraphics()->draw_text(b.getX() + 1, b.getY(), cogui::utils::repeated(b.getWidth() - 1, top_char ) );
+    desktop::get().getGraphics()->draw_text(b.getX() + 1, b.getY() + b.getHeight(), cogui::utils::repeated(b.getWidth() - 1, bottom_char) );
 
     // side lines
     for(int i=1; i< b.getHeight(); i++)
     {
-        cogui::draw(b.getX(), b.getY() + i, left_border);
-        cogui::draw(b.getX() + b.getWidth(), b.getY() + i, right_border);
+        desktop::get().getGraphics()->draw_text(b.getX(), b.getY() + i, left_border);
+        desktop::get().getGraphics()->draw_text(b.getX() + b.getWidth(), b.getY() + i, right_border);
     }
 
     // button text
@@ -214,12 +220,12 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
     }
 
 //    log_info() << "Btn:" << title_to_draw << "TTL.length:" << title_to_draw.length() << "B.widh:" << b.getWidth();
-    if(title_to_draw.length() >= b.getWidth())
+    if(static_cast<int>(title_to_draw.length()) >= b.getWidth())
     {
         if(b.getWidth() <= 5)
         {
             title_to_draw = title_to_draw[0];
-            while(title_to_draw.length() < b.getWidth() - 2)
+            while(static_cast<int>(title_to_draw.length()) < b.getWidth() - 2 && title_to_draw.length() < 8192)
             {
                 title_to_draw += L".";
             }
@@ -234,15 +240,15 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
     if(b.getHeight() >= 2)
     {
         int title_y = b.getY() + b.getHeight() / 2;
-        cogui::draw(b.getX() + 1, title_y, cogui::line(b.getWidth() - 2, L" "));
+        desktop::get().getGraphics()->draw_text(b.getX() + 1, title_y, cogui::utils::repeated(b.getWidth() - 2, L" "));
         if(b.getFocusState() == cogui::control::focus_state::focused)
         {
             // log_info()<<"focused, drawing underlined";
-            cogui::draw_title(title_x, title_y, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
+            desktop::get().getGraphics()->draw_title(title_x, title_y, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
         }
         else
         {
-            cogui::draw_title(title_x, title_y, title_to_draw);
+            desktop::get().getGraphics()->draw_title(title_x, title_y, title_to_draw);
         }
     }
 }
@@ -255,43 +261,57 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
     int wi = m.getWidth();
     for(int y = top; y <= top + h; y++)
     {
-        cogui::draw(x, y, cogui::line(wi + 2, L" "));
+        desktop::get().getGraphics()->draw_text(x, y, cogui::utils::repeated(wi + 2, L" "));
     }
 
-    cogui::draw(m.getX(), m.getY(), MNU_UL_CORNER);
-    cogui::draw(m.getX(), m.getY() + m.getHeight(), MNU_LL_CORNER);
-    cogui::draw(m.getX() + m.getWidth(), m.getY(), MNU_UR_CORNER);
-    cogui::draw(m.getX() + m.getWidth(), m.getY() + m.getHeight(), MNU_LR_CORNER);
-
-    cogui::draw(m.getX() + 1, m.getY(), cogui::line(m.getWidth() - 1, MNU_HORIZONTAL));
-    cogui::draw(m.getX() + 1, m.getY() + m.getHeight(), cogui::line(m.getWidth() - 1, MNU_HORIZONTAL));
+    desktop::get().getGraphics()->draw_text(m.getX(), m.getY(), MNU_UL_CORNER);
+    desktop::get().getGraphics()->draw_text(m.getX(), m.getY() + m.getHeight(), MNU_LL_CORNER);
+    desktop::get().getGraphics()->draw_text(m.getX() + m.getWidth(), m.getY(), MNU_UR_CORNER);
+    desktop::get().getGraphics()->draw_text(m.getX() + m.getWidth(), m.getY() + m.getHeight(), MNU_LR_CORNER);
+    desktop::get().getGraphics()->draw_text(m.getX() + 1, m.getY() + m.getHeight(), cogui::utils::repeated(m.getWidth() - 1, MNU_HORIZONTAL));
 
     if(m.isSysmenu())
     {
-        cogui::draw(m.getX(), m.getY(), MNU_SYSMENU_TOP);
+        desktop::get().getGraphics()->draw_text(m.getX() + 1, m.getY(), cogui::utils::repeated(m.getWidth() - 1, MNU_HORIZONTAL));
+    }
+    else
+    {
+        desktop::get().getGraphics()->draw_text(m.getX() , m.getY(),  MNU_UR_CORNER + cogui::utils::repeated(m.getWidth() - 1, L" ") + MNU_UL_CORNER + MNU_HORIZONTAL);
+    }
+
+    if(m.isSysmenu())
+    {
+        desktop::get().getGraphics()->draw_text(m.getX(), m.getY(), MNU_SYSMENU_TOP);
     }
 
     int mc = 0;
     for(int y = top+1; y < top + h; y++)
     {
-        cogui::draw(x, y, MNU_VERTICAL);
-        cogui::draw(x + wi, y, MNU_VERTICAL);
+        desktop::get().getGraphics()->draw_text(x, y, MNU_VERTICAL);
+        desktop::get().getGraphics()->draw_text(x + wi, y, MNU_VERTICAL);
         // log_info() << "LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
 
         std::wstring titleToDraw = m[mc].getTitle();
-        while(titleToDraw.length() < m.getWidth() - 1) titleToDraw += L" ";
-
-        if(mc == m.getLastSelectedIndex())
+        if(titleToDraw == cogui::menu::separator_item.getTitle())
         {
-            desktop::get().getGraphics()->setColors(graphics::color::black, graphics::color::white);
-            cogui::draw_title(x + 1, y, titleToDraw);
-            desktop::get().getGraphics()->setColors(graphics::color::white, graphics::color::black);
+            desktop::get().getGraphics()->draw_text(x, y, MNU_LEFT_SEPARATOR + cogui::utils::repeated(m.getWidth() - 1, MNU_HORIZONTAL)  + MNU_RIGHT_SEPARATOR);
         }
         else
         {
-            cogui::draw_title(x + 1, y, titleToDraw);
-        }
+            while(static_cast<int>(titleToDraw.length()) < m.getWidth() - 1 && titleToDraw.length() < 8192) titleToDraw += L" ";
 
+            if(mc == m.getLastSelectedIndex())
+            {
+                desktop::get().getGraphics()->set_colors(graphics::color::black, graphics::color::white);
+                desktop::get().getGraphics()->draw_title(x + 1, y, titleToDraw);
+                desktop::get().getGraphics()->set_colors(graphics::color::white, graphics::color::black);
+            }
+            else
+            {
+                desktop::get().getGraphics()->draw_title(x + 1, y, titleToDraw);
+            }
+
+        }
         mc ++;
     }
 }
@@ -321,13 +341,13 @@ void cogui::themes::cursive::draw_checkbox(const checkbox &c)
 
     if(c.getFocusState() == cogui::control::focus_state::focused)
     {
-        cogui::draw(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::underline & cogui::textflags::bold);
-        cogui::draw_title(title_x, drawY, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
+        desktop::get().getGraphics()->draw_text(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::underline & cogui::textflags::bold);
+        desktop::get().getGraphics()->draw_title(title_x, drawY, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
     }
     else
     {
-        cogui::draw(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::normal);
-        cogui::draw_title(title_x, drawY, title_to_draw);
+        desktop::get().getGraphics()->draw_text(c.getX(), drawY, c.checked() ? CHK_CHECKED : CHK_UNCHECKED, cogui::textflags::normal);
+        desktop::get().getGraphics()->draw_title(title_x, drawY, title_to_draw);
     }
 }
 
@@ -336,7 +356,7 @@ int cogui::themes::cursive::minimum_checkbox_width(const cogui::checkbox &c)
     return c.getTitle().length() + 2; // +2 for the checkmarek followed by a space
 }
 
-int cogui::themes::cursive::minimum_checkbox_height(const cogui::checkbox &c)
+int cogui::themes::cursive::minimum_checkbox_height(const cogui::checkbox &)
 {
     return 1;
 }
@@ -369,3 +389,4 @@ std::string cogui::themes::cursive::name()
 {
     return "cursive";
 }
+
