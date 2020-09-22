@@ -7,7 +7,7 @@
 
 namespace cogui {
 
-class graphics;
+class graphics_engine;
 class theme;
 class window;
 class input;
@@ -30,7 +30,7 @@ public:
     void handle_tab();
 
     std::shared_ptr<theme> getTheme() const;
-    std::shared_ptr<graphics> getGraphics() const;
+    std::shared_ptr<graphics_engine> getGraphics() const;
     std::shared_ptr<input> getInput() const;
 
     void add_window(window* w);
@@ -59,7 +59,7 @@ private:
     bool initialize();
 
     std::shared_ptr<cogui::theme> m_theme;
-    std::shared_ptr<cogui::graphics> m_graphics;
+    std::shared_ptr<cogui::graphics_engine> m_graphics;
     std::shared_ptr<cogui::input> m_input;
 
     std::vector<window*> m_windows;
@@ -67,6 +67,7 @@ private:
     bool m_initialized = false;
 
     static std::string m_s_theme_name;
+    static std::string m_s_graphics_engine_name;
 };
 
 }

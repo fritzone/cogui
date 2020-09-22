@@ -302,9 +302,9 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
 
             if(mc == m.getLastSelectedIndex())
             {
-                desktop::get().getGraphics()->set_colors(graphics::color::black, graphics::color::white);
+                desktop::get().getGraphics()->set_colors(graphics_engine::color::black, graphics_engine::color::white);
                 desktop::get().getGraphics()->draw_title(x + 1, y, titleToDraw);
-                desktop::get().getGraphics()->set_colors(graphics::color::white, graphics::color::black);
+                desktop::get().getGraphics()->set_colors(graphics_engine::color::white, graphics_engine::color::black);
             }
             else
             {

@@ -3,7 +3,7 @@
 
 #define MAX_DESKTOP_SIZE 4096
 
-#include "graphics.h"
+#include "ncurses_engine.h"
 #include "events.h"
 #include "mouse.h"
 #include "input.h"
@@ -86,16 +86,13 @@ const std::map<int, std::tuple<int, int, int>> colorpairs =
     {1799, {63, COLOR_WHITE, COLOR_WHITE}},
 };
 
-cogui::graphics::graphics() noexcept
-{
-}
 
-cogui::graphics::~graphics()
+cogui::ncurses::~ncurses()
 {
     shutdown();
 }
 
-bool cogui::graphics::initialize()
+bool cogui::ncurses::initialize()
 {
     setenv("TERM", "linux", 1);
     std::setlocale(LC_ALL, "");
@@ -128,7 +125,7 @@ bool cogui::graphics::initialize()
     return true;
 }
 
-void cogui::graphics::draw_text(int x, int y, const wchar_t *s, int flags)
+void cogui::ncurses::draw_text(int x, int y, const wchar_t *s, int flags)
 {
     auto sl = wcslen(s);
 
@@ -161,26 +158,26 @@ void cogui::graphics::draw_text(int x, int y, const wchar_t *s, int flags)
     mvwaddwstr(stdscr, y, x, s);
 }
 
-void cogui::graphics::draw_text(int x, int y, wchar_t c, int flags)
+void cogui::ncurses::draw_text(int x, int y, wchar_t c, int flags)
 {
     mvwaddch(stdscr, y, x, c | flags);
 }
 
-void cogui::graphics::set_fg_color(cogui::graphics::foreground_color c)
+void cogui::ncurses::set_fg_color(cogui::ncurses::foreground_color c)
 {
     turnoff_current_color();
     m_currentFgColor = c;
     turnon_current_color();
 }
 
-void cogui::graphics::set_bg_color(background_color c)
+void cogui::ncurses::set_bg_color(background_color c)
 {
     turnoff_current_color();
     m_currentBgColor = c;
     turnon_current_color();
 }
 
-void cogui::graphics::set_colors(cogui::graphics::foreground_color fg, cogui::graphics::background_color bg)
+void cogui::ncurses::set_colors(cogui::ncurses::foreground_color fg, cogui::ncurses::background_color bg)
 {
     turnoff_current_color();
     m_currentBgColor = bg;
@@ -188,13 +185,18 @@ void cogui::graphics::set_colors(cogui::graphics::foreground_color fg, cogui::gr
     turnon_current_color();
 }
 
-void cogui::graphics::turnoff_current_color()
+std::string cogui::ncurses::name() const
+{
+    return "ncurses";
+}
+
+void cogui::ncurses::turnoff_current_color()
 {
     int a = (static_cast<int>(m_currentFgColor) - 1) << 8 | (static_cast<int>(m_currentBgColor) - 1);
     attroff(COLOR_PAIR(a));
 }
 
-void cogui::graphics::turnon_current_color()
+void cogui::ncurses::turnon_current_color()
 {
     int fgc = static_cast<int>(m_currentFgColor);
     int bgc = static_cast<int>(m_currentBgColor);
@@ -202,23 +204,23 @@ void cogui::graphics::turnon_current_color()
     attron(COLOR_PAIR(a));
 }
 
-void cogui::graphics::refresh_screen()
+void cogui::ncurses::refresh_screen()
 {
     ::refresh();
 }
 
-void cogui::graphics::clear_screen()
+void cogui::ncurses::clear_screen()
 {
     ::wclear(stdscr);
     ::wrefresh(stdscr);
 }
 
-void cogui::graphics::shutdown()
+void cogui::ncurses::shutdown()
 {
     ::endwin();
 }
 
-void cogui::graphics::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::ncurses::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     std::wstring final_title;
     wchar_t highlight_char = L'\0';
@@ -259,12 +261,16 @@ void cogui::graphics::draw_title(int x, int y, const std::wstring &s, cogui::tex
     }
 }
 
-void cogui::graphics::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
+void cogui::ncurses::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
 {
     draw_text(x, y, s, static_cast<int>(flags));
 }
 
-void cogui::graphics::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::ncurses::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     draw_text(x, y, s.c_str(), flags);
 }
+
+int cogui::ncurses::get_screen_width() const {return m_width;}
+
+int cogui::ncurses::get_screen_height() const {return m_height;}

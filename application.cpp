@@ -1,6 +1,5 @@
 #include "application.h"
 #include "desktop.h"
-#include "graphics.h"
 #include "mouse.h"
 #include "window.h"
 #include "input.h"

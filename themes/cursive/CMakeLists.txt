@@ -12,6 +12,6 @@ else()
 endif()
 
 add_library(${PROJECT_NAME} SHARED cursive.cpp)
-target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm)
+# target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/cogui/themes)

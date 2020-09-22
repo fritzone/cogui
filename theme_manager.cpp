@@ -4,17 +4,10 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-typedef void* dynamic_lib_handle;
-static dynamic_lib_handle load_lib(const std::string& path);
-static cogui::theme* instantiate(const dynamic_lib_handle handle);
-static void close_lib(dynamic_lib_handle handle);
+static cogui::dynamic_lib_handle load_lib(const std::string& path);
+static cogui::theme* instantiate(const cogui::dynamic_lib_handle handle);
+static void close_lib(cogui::dynamic_lib_handle handle);
 
-struct dynamic_lib {
-    std::string			path;
-    dynamic_lib_handle  handle;
-
-    dynamic_lib(std::string p) : path(p), handle(nullptr) {}
-};
 
 cogui::theme_manager &cogui::theme_manager::instance()
 {
@@ -26,7 +19,7 @@ std::shared_ptr<cogui::theme> cogui::theme_manager::current_theme()
 {
     if(!themes.empty())
     {
-        return themes[0];
+        return themes[0].second;
     }
     else
     {
@@ -37,7 +30,7 @@ std::shared_ptr<cogui::theme> cogui::theme_manager::current_theme()
 
 std::shared_ptr<cogui::theme> cogui::theme_manager::get_theme(const std::string &theme_name)
 {
-    for(const auto& theme : themes)
+    for(const auto& [lib, theme] : themes)
     {
         if(theme->name() == theme_name)
         {
@@ -50,50 +43,64 @@ std::shared_ptr<cogui::theme> cogui::theme_manager::get_theme(const std::string 
 cogui::theme_manager::theme_manager()
 {
     std::string path = "/usr/local/lib/cogui/themes";
-    std::vector<dynamic_lib> libs;
-    for (const auto & entry : fs::directory_iterator(path))
-    {
-        log_info() << "Using theme library:" << entry.path();
-        libs.push_back(dynamic_lib(entry.path()));
-    }
-    for (auto& l : libs)
-    {
-        l.handle = load_lib(l.path);
-    }
-
 
     // instantiate!
-    for (auto& l : libs)
+    for (const auto & entry : fs::directory_iterator(path))
     {
-        auto lib = instantiate(l.handle);
-        std::shared_ptr<theme> spl = std::shared_ptr<theme>(lib);
-        log_info() << "Created theme:" << spl->name();
-        themes.push_back( spl );
+        std::shared_ptr<dynamic_lib> l = std::make_shared<dynamic_lib>(entry.path());
+        themes.emplace_back(l, std::shared_ptr<theme>(instantiate(l->handle)));
     }
 
 }
 
-static dynamic_lib_handle load_lib(const std::string& path) {
-    std::cout << "Trying to open: " << path << std::endl;
-    return dlopen(path.data() , RTLD_NOW); // get a handle to the lib, may be nullptr.
-            // RTLD_NOW ensures that all the symbols are resolved immediately. This means that
-            // if a symbol cannot be found, the program will crash now instead of later.
+static cogui::dynamic_lib_handle load_lib(const std::string& path)
+{
+    cogui::dynamic_lib_handle h = dlopen(path.data() , RTLD_NOW);
+    if(!h)
+    {
+        log_error() << "Could not load:" << path;
+    }
+
+    return h;
 }
 
-static void close_lib(dynamic_lib_handle handle) {
+static void close_lib(cogui::dynamic_lib_handle handle)
+{
+    log_info() << "Cleaning up";
     dlclose(handle);
 }
 
-static cogui::theme* instantiate(const dynamic_lib_handle handle) {
-
-    if (handle == nullptr) return nullptr;
+static cogui::theme* instantiate(const cogui::dynamic_lib_handle handle)
+{
+    if (handle == nullptr)
+    {
+        log_error() << "Trying to instantiate a NULL handle";
+        return nullptr;
+    }
 
     void *maker = dlsym(handle , "create");
 
-    if (maker == nullptr) return nullptr;
+    if (maker == nullptr)
+    {
+        log_error() << "Can't load maker function";
+
+        return nullptr;
+    }
 
     typedef cogui::theme * (*fptr)();
     fptr func = reinterpret_cast<fptr>(reinterpret_cast<void*>(maker));
 
     return func();
 }
+
+cogui::dynamic_lib::dynamic_lib(const std::string& p) : path(p), handle(nullptr)
+{
+    handle = load_lib(p);
+}
+
+cogui::dynamic_lib::~dynamic_lib()
+{
+    log_info() << "destroyed:" << path;
+    close_lib(handle);
+}
+

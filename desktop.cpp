@@ -1,6 +1,8 @@
 #include "desktop.h"
-#include "graphics.h"
+
+#include "graphics_engine_manager.h"
 #include "theme_manager.h"
+
 #include "input.h"
 
 #include "window.h"
@@ -12,13 +14,16 @@ namespace cogui
 {
 
 std::string desktop::m_s_theme_name;
+std::string desktop::m_s_graphics_engine_name;
 
 desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_theme() :
                                                  theme_manager::instance().get_theme(m_s_theme_name)),
-                     m_graphics(new graphics),
+                     m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_engine() :
+                                                         graphics_engine_manager::instance().get_engine(m_s_graphics_engine_name)),
                      m_input(new gpm_input)
 {
     log_info() << "Picking theme:" << m_theme->name();
+    log_info() << "Picking graphics engine:" << m_graphics->name();
 }
 
 bool desktop::initialize()
@@ -194,7 +199,7 @@ std::shared_ptr<theme> desktop::getTheme() const
     return m_theme;
 }
 
-std::shared_ptr<graphics> desktop::getGraphics() const
+std::shared_ptr<graphics_engine> desktop::getGraphics() const
 {
     return m_graphics;
 }
