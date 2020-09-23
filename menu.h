@@ -84,6 +84,8 @@ namespace cogui
     class menu
     {
     public:
+
+
         menu() = default;
         menu(std::initializer_list<action> l);
         menu(const std::wstring& caption, std::initializer_list<action> l);

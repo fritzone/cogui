@@ -74,12 +74,12 @@ void cogui::control::unfocus()
     m_focus_state = focus_state::not_focused;
 }
 
-cogui::control::focus_state cogui::control::getFocusState() const
+cogui::control::focus_state cogui::control::get_focus_state() const
 {
     return m_focus_state;
 }
 
-bool cogui::control::hasFocus() const
+bool cogui::control::has_focus() const
 {
     return m_focus_state == focus_state::focused;
 }
@@ -94,12 +94,12 @@ void cogui::control::hide()
     m_visible = false;
 }
 
-bool cogui::control::isVisible() const
+bool cogui::control::is_visible() const
 {
     return m_visible ;
 }
 
-void cogui::control::control::setFocusState(const cogui::control::focus_state &focus_state)
+void cogui::control::control::set_focus_state(const cogui::control::focus_state &focus_state)
 {
     m_focus_state = focus_state;
 }
@@ -114,17 +114,17 @@ void cogui::control::release()
     m_state = press_state::released;
 }
 
-bool cogui::control::isPressed() const
+bool cogui::control::is_pressed() const
 {
     return m_state == press_state::pressed;
 }
 
-cogui::control::press_state cogui::control::state() const
+cogui::control::press_state cogui::control::get_press_state() const
 {
     return m_state;
 }
 
-void cogui::control::setState(cogui::control::press_state s)
+void cogui::control::set_press_state(cogui::control::press_state s)
 {
     m_state = s;
 }

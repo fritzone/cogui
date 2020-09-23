@@ -7,7 +7,7 @@ typedef struct _win_st WINDOW;
 
 namespace cogui {
 
-// hmm, maybe we should include the cursed headers
+namespace graphic_engines {
 
 class ncurses : public graphics_engine
 {
@@ -30,8 +30,7 @@ public:
     void set_bg_color(background_color c) override;
     void set_colors(foreground_color fg, background_color bg) override;
     std::string name() const override;
-
-
+    void clear_area(int x, int y, int width, int height) override;
 
 private:
     WINDOW *stdscr = nullptr;
@@ -44,6 +43,7 @@ private:
     void turnoff_current_color();
     void turnon_current_color();
 };
+}
 }
 
 #endif // NCURSES_ENGINE_H

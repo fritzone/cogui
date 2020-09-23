@@ -5,7 +5,9 @@
 
 namespace cogui
 {
+
 typedef void* dynamic_lib_handle;
+typedef void* function_address;
 
 struct dynamic_lib final
 {
@@ -15,6 +17,10 @@ struct dynamic_lib final
     std::string	path;
     cogui::dynamic_lib_handle handle;
 };
+
+cogui::dynamic_lib_handle load_lib(const std::string& path);
+void close_lib(cogui::dynamic_lib_handle handle);
+function_address load_function(dynamic_lib_handle l, const char* fun);
 
 }
 

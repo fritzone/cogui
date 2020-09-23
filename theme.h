@@ -10,6 +10,9 @@ class theme
 {
 public:
 
+    static const char* type;
+    static const char* path;
+
     theme() {}
     virtual ~theme() {}
 

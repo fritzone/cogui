@@ -63,7 +63,7 @@ void cogui::container::focus_next_element()
     }
     else
     {
-        (*m_focused)->setFocusState(cogui::control::focus_state::not_focused);
+        (*m_focused)->set_focus_state(cogui::control::focus_state::not_focused);
         ++m_focused;
         if(m_focused == m_tab_order.end())
         {
@@ -71,7 +71,7 @@ void cogui::container::focus_next_element()
         }
     }
 
-    (*m_focused)->setFocusState(cogui::control::focus_state::focused);
+    (*m_focused)->set_focus_state(cogui::control::focus_state::focused);
 
 }
 
@@ -79,10 +79,10 @@ void cogui::container::focus_element(std::shared_ptr<cogui::control> c)
 {
     if(m_focused != m_tab_order.end())
     {
-        (*m_focused)->setFocusState(cogui::control::focus_state::not_focused);
+        (*m_focused)->set_focus_state(cogui::control::focus_state::not_focused);
     }
     m_focused = std::find(m_tab_order.begin(), m_tab_order.end(), c);
-    c->setFocusState(cogui::control::focus_state::focused);
+    c->set_focus_state(cogui::control::focus_state::focused);
 }
 
 void cogui::container::press_element(std::shared_ptr<cogui::control> c)

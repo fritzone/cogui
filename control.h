@@ -116,20 +116,20 @@ public:
 
     void focus();
     void unfocus();
-    bool hasFocus() const;
+    bool has_focus() const;
 
     void show();
     void hide();
-    bool isVisible() const;
+    bool is_visible() const;
 
-    focus_state getFocusState() const;
-    void setFocusState(const focus_state &focus_state);
+    focus_state get_focus_state() const;
+    void set_focus_state(const focus_state &focus_state);
 
     void press();
     void release();
-    bool isPressed() const;
-    press_state state() const;
-    void setState(press_state s);
+    bool is_pressed() const;
+    press_state get_press_state() const;
+    void set_press_state(press_state s);
 
     /**
      * @brief redraw Re-draws the control

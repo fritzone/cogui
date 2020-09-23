@@ -6,9 +6,39 @@
 namespace cogui
 {
 
+class textflags
+{
+public:
+    enum value : uint64_t
+    {
+        v_normal = 0,
+        v_bold = 1 << 9,
+        v_underline = 1 << 13
+    };
+
+    static textflags normal;
+    static textflags bold;
+    static textflags underline;
+
+    textflags() = default;
+
+    textflags(value a) : m_value(a) { }
+    textflags(int a) : m_value(a) { }
+
+    int operator &(const textflags& o) const;
+
+    operator int() const;
+
+private:
+    int m_value;
+};
+
 class graphics_engine
 {
 public:
+
+    static const char* type;
+    static const char* path;
 
     enum class color
     {
@@ -43,6 +73,8 @@ public:
 
     virtual void refresh_screen() = 0;
     virtual void clear_screen() = 0;
+
+    virtual void clear_area(int x, int y, int width, int height) = 0;
 
     virtual int get_screen_width() const = 0;
     virtual int get_screen_height() const = 0;

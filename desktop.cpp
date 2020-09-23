@@ -1,7 +1,6 @@
 #include "desktop.h"
 
-#include "graphics_engine_manager.h"
-#include "theme_manager.h"
+#include "extension_manager.h"
 
 #include "input.h"
 
@@ -16,10 +15,9 @@ namespace cogui
 std::string desktop::m_s_theme_name;
 std::string desktop::m_s_graphics_engine_name;
 
-desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_theme() :
-                                                 theme_manager::instance().get_theme(m_s_theme_name)),
-                     m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_engine() :
-                                                         graphics_engine_manager::instance().get_engine(m_s_graphics_engine_name)),
+desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(m_s_theme_name)),
+                     m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_loadable() :
+                                                         graphics_engine_manager::instance().get_loadable(m_s_graphics_engine_name)),
                      m_input(new gpm_input)
 {
     log_info() << "Picking theme:" << m_theme->name();

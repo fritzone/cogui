@@ -6,35 +6,25 @@
 #include "button.h"
 #include "menu.h"
 #include "arguments.h"
+#include "desktop.h"
+#include "control.h"
+#include "checkbox.h"
+#include "graphics_engine.h"
+#include "log.h"
+#include "utils.h"
 
 namespace cogui {
 
-class textflags
-{
-public:
-    enum value : uint64_t
-    {
-        v_normal = 0,
-        v_bold = 1 << 9,
-        v_underline = 1 << 13
-    };
+    /**
+     * @brief MAX_CAPTION_WIDTH The maximum width of the captions for each of the UI elements
+     */
+    static const int MAX_CAPTION_WIDTH = 256;
 
-    static textflags normal;
-    static textflags bold;
-    static textflags underline;
-
-    textflags() = default;
-
-    textflags(value a) : m_value(a) { }
-    textflags(int a) : m_value(a) { }
-
-    int operator &(const textflags& o) const;
-
-    operator int() const;
-
-private:
-    int m_value;
-};
+    /**
+     * @brief graphics will return the current graphics engine.
+     * @return the current graphics engine
+     */
+    std::shared_ptr<graphics_engine> graphics();
 
 }
 

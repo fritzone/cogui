@@ -17,6 +17,12 @@
 
 #include "log.h"
 
+
+extern "C" cogui::graphics_engine* create()
+{
+    return static_cast<cogui::graphics_engine*>(new cogui::graphic_engines::ncurses);
+}
+
 // code, index, foreground, background
 const std::map<int, std::tuple<int, int, int>> colorpairs =
 {
@@ -87,12 +93,12 @@ const std::map<int, std::tuple<int, int, int>> colorpairs =
 };
 
 
-cogui::ncurses::~ncurses()
+cogui::graphic_engines::ncurses::~ncurses()
 {
     shutdown();
 }
 
-bool cogui::ncurses::initialize()
+bool cogui::graphic_engines::ncurses::initialize()
 {
     setenv("TERM", "linux", 1);
     std::setlocale(LC_ALL, "");
@@ -125,7 +131,7 @@ bool cogui::ncurses::initialize()
     return true;
 }
 
-void cogui::ncurses::draw_text(int x, int y, const wchar_t *s, int flags)
+void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, int flags)
 {
     auto sl = wcslen(s);
 
@@ -158,26 +164,26 @@ void cogui::ncurses::draw_text(int x, int y, const wchar_t *s, int flags)
     mvwaddwstr(stdscr, y, x, s);
 }
 
-void cogui::ncurses::draw_text(int x, int y, wchar_t c, int flags)
+void cogui::graphic_engines::ncurses::draw_text(int x, int y, wchar_t c, int flags)
 {
     mvwaddch(stdscr, y, x, c | flags);
 }
 
-void cogui::ncurses::set_fg_color(cogui::ncurses::foreground_color c)
+void cogui::graphic_engines::ncurses::set_fg_color(cogui::graphic_engines::ncurses::foreground_color c)
 {
     turnoff_current_color();
     m_currentFgColor = c;
     turnon_current_color();
 }
 
-void cogui::ncurses::set_bg_color(background_color c)
+void cogui::graphic_engines::ncurses::set_bg_color(background_color c)
 {
     turnoff_current_color();
     m_currentBgColor = c;
     turnon_current_color();
 }
 
-void cogui::ncurses::set_colors(cogui::ncurses::foreground_color fg, cogui::ncurses::background_color bg)
+void cogui::graphic_engines::ncurses::set_colors(cogui::graphic_engines::ncurses::foreground_color fg, cogui::graphic_engines::ncurses::background_color bg)
 {
     turnoff_current_color();
     m_currentBgColor = bg;
@@ -185,18 +191,26 @@ void cogui::ncurses::set_colors(cogui::ncurses::foreground_color fg, cogui::ncur
     turnon_current_color();
 }
 
-std::string cogui::ncurses::name() const
+std::string cogui::graphic_engines::ncurses::name() const
 {
     return "ncurses";
 }
 
-void cogui::ncurses::turnoff_current_color()
+void cogui::graphic_engines::ncurses::clear_area(int x, int y, int width, int height)
+{
+    for(int rc = y; rc <= y + height; rc++)
+    {
+        draw_text(x, rc, cogui::utils::repeated(width, L" "));
+    }
+}
+
+void cogui::graphic_engines::ncurses::turnoff_current_color()
 {
     int a = (static_cast<int>(m_currentFgColor) - 1) << 8 | (static_cast<int>(m_currentBgColor) - 1);
     attroff(COLOR_PAIR(a));
 }
 
-void cogui::ncurses::turnon_current_color()
+void cogui::graphic_engines::ncurses::turnon_current_color()
 {
     int fgc = static_cast<int>(m_currentFgColor);
     int bgc = static_cast<int>(m_currentBgColor);
@@ -204,23 +218,23 @@ void cogui::ncurses::turnon_current_color()
     attron(COLOR_PAIR(a));
 }
 
-void cogui::ncurses::refresh_screen()
+void cogui::graphic_engines::ncurses::refresh_screen()
 {
     ::refresh();
 }
 
-void cogui::ncurses::clear_screen()
+void cogui::graphic_engines::ncurses::clear_screen()
 {
     ::wclear(stdscr);
     ::wrefresh(stdscr);
 }
 
-void cogui::ncurses::shutdown()
+void cogui::graphic_engines::ncurses::shutdown()
 {
     ::endwin();
 }
 
-void cogui::ncurses::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     std::wstring final_title;
     wchar_t highlight_char = L'\0';
@@ -261,16 +275,16 @@ void cogui::ncurses::draw_title(int x, int y, const std::wstring &s, cogui::text
     }
 }
 
-void cogui::ncurses::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
+void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
 {
     draw_text(x, y, s, static_cast<int>(flags));
 }
 
-void cogui::ncurses::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::graphic_engines::ncurses::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     draw_text(x, y, s.c_str(), flags);
 }
 
-int cogui::ncurses::get_screen_width() const {return m_width;}
+int cogui::graphic_engines::ncurses::get_screen_width() const {return m_width;}
 
-int cogui::ncurses::get_screen_height() const {return m_height;}
+int cogui::graphic_engines::ncurses::get_screen_height() const {return m_height;}

@@ -52,6 +52,10 @@ foreach(theme_header ${THEMES_INCLUDE})
 endforeach()
 file(APPEND ${CMAKE_BINARY_DIR}/themes.h "#endif\n")
 
+# Generate the cpp file for the theme's install directory
+file(WRITE ${CMAKE_BINARY_DIR}/theme.cpp "#include <theme.h>\n")
+file(APPEND ${CMAKE_BINARY_DIR}/theme.cpp "const char* cogui::theme::type=\"theme\";\n")
+file(APPEND ${CMAKE_BINARY_DIR}/theme.cpp "const char* cogui::theme::path=\"${CMAKE_INSTALL_PREFIX}/lib/cogui/themes\";\n")
 ###################################################
 #         Sorting out the graphic engines         #
 ###################################################
@@ -89,13 +93,20 @@ foreach(engine_header ${ENGINES_INCLUDE})
 endforeach()
 file(APPEND ${CMAKE_BINARY_DIR}/graphic_engines.h "#endif\n")
 
+
+# Generate the cpp file for the graphics engines install directory
+file(WRITE ${CMAKE_BINARY_DIR}/graphics_engine.cpp "#include <graphics_engine.h>\n")
+file(APPEND ${CMAKE_BINARY_DIR}/graphics_engine.cpp "const char* cogui::graphics_engine::type=\"graphics_engine\";\n")
+file(APPEND ${CMAKE_BINARY_DIR}/graphics_engine.cpp "const char* cogui::graphics_engine::path=\"${CMAKE_INSTALL_PREFIX}/lib/cogui/graphic_engines\";\n")
 ###################################################
 #    The core of the project is handled here      #
 ###################################################
 
 set(PROJECT_SOURCES
-	${CMAKE_BINARY_DIR}/themes.h
-    cogui.cpp theme_manager.cpp graphics_engine_manager.cpp
+        ${CMAKE_BINARY_DIR}/theme.cpp
+        ${CMAKE_BINARY_DIR}/graphics_engine.cpp
+
+    cogui.cpp dynamic_library.cpp
     window.cpp desktop.cpp 
     application.cpp events.cpp mouse.cpp xterm_input.cpp gpm_input.cpp arguments.cpp
     control.cpp button.cpp container.cpp layout.cpp menu.cpp checkbox.cpp
