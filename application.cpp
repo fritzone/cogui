@@ -27,7 +27,7 @@ int cogui::application::run()
     while( running() )
     {
         auto events = desktop::get().getInput()->get_next_event();
-        log_debug() << "Got:" << events.size() << " events";
+        //log_debug() << "Got:" << events.size() << " events";
         for(auto c : events)
         {
             handle_event(c);

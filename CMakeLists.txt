@@ -114,7 +114,7 @@ set(PROJECT_SOURCES
 )
 
 add_library(${PROJECT_NAME}  ${PROJECT_SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm)
+target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm termkey)
 
 add_executable(cogui_ex main.cpp)
 target_link_libraries(cogui_ex ${PROJECT_NAME})

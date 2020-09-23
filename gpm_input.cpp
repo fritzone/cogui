@@ -12,6 +12,7 @@
 #include <atomic>
 #include <mutex>
 
+
 static cogui::mouse::button last_button = cogui::mouse::button::none;
 static auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -42,7 +43,7 @@ int my_handler(Gpm_Event *event, void *)
 {
     std::lock_guard<std::mutex> lk(mouseLocker);
 
-    // log_info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
+    log_info() << "Event Type: " <<  event->type << " at " <<  event->x << "," << event->y << " buttons:" << (int)event->buttons;
     std::atomic<bool> handled = false;
 
     cogui::mouse::get().setX(event->x - 1);
@@ -163,9 +164,53 @@ bool cogui::gpm_input::shutdown()
 std::vector<cogui::event> cogui::gpm_input::get_next_event()
 {
     std::vector<cogui::event> result;
-    log_info() << "Waiting for standard";
+    //log_info() << "Waiting for standard";
     int c = Gpm_Getc(stdin);
     auto e = cogui::to_event(c);
     result.push_back(e);
     return result;
+}
+
+
+bool cogui::termkey_input::init()
+{
+    TERMKEY_CHECK_VERSION;
+    tk = termkey_new(0, TERMKEY_FLAG_SPACESYMBOL|TERMKEY_FLAG_CTRLC);
+    if(!tk) {
+      fprintf(stderr, "Cannot allocate termkey instance\n");
+      exit(1);
+    }
+
+    // mouse movement reported too
+    printf("\033[?1003h\n");
+}
+
+std::vector<cogui::event> cogui::termkey_input::get_next_event()
+{
+    std::vector<cogui::event> result;
+
+    TermKeyResult ret;
+    TermKeyKey key;
+    ret = termkey_waitkey(tk, &key);
+    if(ret == TERMKEY_RES_EOF) return result;
+
+    if(key.type == TERMKEY_TYPE_MOUSE) {
+      int line, col;
+      termkey_interpret_mouse(tk, &key, NULL, NULL, &line, &col);
+      log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
+
+      cogui::mouse::get().setX(col - 1);
+      cogui::mouse::get().setY(line - 1);
+
+      cogui::desktop::get().handle_mouse_move(col - 1, line - 1);
+
+    }
+
+    return result;
+}
+
+bool cogui::termkey_input::shutdown()
+{
+    printf("\033[?1003l\n");
+    termkey_destroy(tk);
 }

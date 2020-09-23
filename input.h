@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include "events.h"
+#include <termkey.h>
 
 #include <vector>
 
@@ -13,6 +14,7 @@ namespace cogui {
 class input
 {
 public:
+    virtual ~input() = default;
     virtual bool init() = 0;
     virtual bool shutdown() = 0;
     virtual std::vector<cogui::event> get_next_event() = 0;
@@ -37,7 +39,18 @@ public:
     std::vector<cogui::event> get_next_event() override;
 };
 
+class termkey_input : public input
+{
+public:
+    termkey_input() = default;
+    ~termkey_input() = default;
+    bool init() override;
+    bool shutdown() override;
+    std::vector<cogui::event> get_next_event() override;
+    TermKey *tk;
 
+
+};
 
 }
 #endif // INPUT_H

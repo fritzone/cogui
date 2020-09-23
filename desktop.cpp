@@ -18,7 +18,7 @@ std::string desktop::m_s_graphics_engine_name;
 desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(m_s_theme_name)),
                      m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_loadable() :
                                                          graphics_engine_manager::instance().get_loadable(m_s_graphics_engine_name)),
-                     m_input(new gpm_input)
+                     m_input(new termkey_input)
 {
     log_info() << "Picking theme:" << m_theme->name();
     log_info() << "Picking graphics engine:" << m_graphics->name();
