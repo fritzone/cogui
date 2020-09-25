@@ -1,7 +1,7 @@
 #include "menu.h"
-#include <codecvt>
+#include "utils.h"
+
 #include <string>
-#include <locale>
 
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
 cogui::action::Selectable cogui::action::selectable;
@@ -21,8 +21,7 @@ cogui::menu::menu(const wchar_t * const caption, std::initializer_list<cogui::ac
 
 cogui::menu::menu(const std::string &caption, std::initializer_list<cogui::action> l) : m_actions(l)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    m_caption = converter.from_bytes(caption);
+    m_caption = cogui::utils::std2ws(caption);
     m_is_sysmenu = false;
 }
 
@@ -221,6 +220,11 @@ const cogui::menu &cogui::menubar::operator[](int i) const
 }
 
 const std::vector<cogui::menu> &cogui::menubar::items() const
+{
+    return m_menus;
+}
+
+std::vector<cogui::menu> &cogui::menubar::items()
 {
     return m_menus;
 }

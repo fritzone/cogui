@@ -85,7 +85,7 @@ public:
     void exit(int c = 0);
 
 private:
-    void handle_event(cogui::event c);
+    //void handle_event(cogui::event c);
     std::map<std::string, std::shared_ptr<arguments::argument_base>> handle_command_line(int argc, char*argv[], std::string &theme);
 
     template<typename ... Args>

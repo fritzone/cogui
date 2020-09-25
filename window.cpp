@@ -116,7 +116,7 @@ void cogui::window::mouse_move(int x, int y)
 {
     if(m_draw_state == draw_state::moving)
     {
-        // debug() << "mouse moving at" <<x<<", "<<y;
+        log_debug() << "mouse moving at" <<x<<","<<y;
 
         int new_x = x - m_mouse_down_x;
         int new_y = y - m_mouse_down_y;
@@ -140,6 +140,8 @@ void cogui::window::mouse_move(int x, int y)
     else
     if(m_draw_state == draw_state::resizing)
     {
+        log_debug() << "mouse resizing at" <<x<<","<<y;
+
         int dx = x - m_mouse_down_x - this->getX();
         int dy = y - m_mouse_down_y - this->getY();
 
@@ -185,10 +187,16 @@ void cogui::window::mouse_move(int x, int y)
         // do we have an opened menu? That takes priority over controls
         if(m_current_menu)
         {
+            log_debug() << "opened menu at" <<x<<","<<y;
+
             if(m_current_menu->inside(x, y))
             {
+                log_debug() << "opened menu handles at" <<x<<","<<y;
+
                 if(m_current_menu->mouse_move(x, y))
                 {
+                    log_debug() << "opened menu handled at" <<x<<","<<y << ", redrawing";
+
                     return draw();
                 }
             }
@@ -215,7 +223,7 @@ void cogui::window::mouse_move(int x, int y)
         if(under)
         {
 
-            //debug ()<< "got under element " << under;
+            log_debug ()<< "got under element: " << under->getTitle();
 
             if(m_prev_pressed != m_tab_order.end() && !m_tab_order.empty())
             {
@@ -223,6 +231,7 @@ void cogui::window::mouse_move(int x, int y)
                 {
                     m_pressed = m_prev_pressed;
                     (*m_pressed)->press();
+                    log_debug ()<< "got under element: " << under->getTitle() << "pressing and redrawing";
 
                     return draw();
                 }
@@ -230,6 +239,8 @@ void cogui::window::mouse_move(int x, int y)
             }
             else
             {
+                log_debug ()<< "got under element: " << under->getTitle() << "focusing and redrawing";
+
                 focus_element(under);
                 return draw();
             }
@@ -247,6 +258,8 @@ void cogui::window::mouse_move(int x, int y)
             m_pressed = m_tab_order.end();
             m_focused = m_tab_order.end();
 
+            log_debug ()<< "NO under element, but pressed != tab_order.end : " << (*m_prev_pressed)->getTitle() << "and redrawing";
+
             return draw();
         }
     }
@@ -254,7 +267,9 @@ void cogui::window::mouse_move(int x, int y)
     // now if there was a control we have focused on, unfocus it since we moved outside of it
     if(m_focused != m_tab_order.end() && !m_tab_order.empty())
     {
+        log_debug ()<< "NO under element, but focused != tab_order.end : " << (*m_focused)->getTitle() << "and redrawing";
         (*m_focused)->unfocus();
+        m_focused = m_tab_order.end();
         return draw();
     }
 }
@@ -319,6 +334,28 @@ void cogui::window::closeCurrentMenu()
 cogui::menubar &cogui::window::getMainMenu()
 {
     return m_mainmenu;
+}
+
+void cogui::window::register_menubar_hotkeys()
+{
+    auto& items = m_mainmenu.items();
+    for(size_t i = 0; i < items.size(); i++)
+    {
+        menu& itm = const_cast<cogui::menu&>(items[i]);
+        std::wstring caption = itm.caption();
+        auto andp = caption.find(L"&");
+        if(andp != std::string::npos && andp < caption.length() - 1)
+        {
+            std::wstring keydata;
+            keydata += (wchar_t)caption[andp + 1];
+            log_info() << "Hotkey found for" << caption << "as:" << keydata;
+            cogui::events::key* hk = new cogui::events::key(cogui::events::key_class::key_textinput, true, false, false, keydata);
+            std::shared_ptr<cogui::events::key> sp;
+            sp.reset(hk);
+            sp->set_as_hotkey();
+            m_menubar_openers[sp] = &items[i];
+        }
+    }
 }
 
 void cogui::window::left_mouse_down(int x, int y)
@@ -433,6 +470,28 @@ void cogui::window::doubleclick(int x, int y)
     {
         under->doubleclick();
     }
+}
+
+
+bool cogui::window::keypress(std::shared_ptr<cogui::events::key> k)
+{
+    log_info() << "Key:" << k->get_chardata();
+
+    // first try: was it a hotkey to open a menu?
+    for(auto& [hk, m] : m_menubar_openers)
+    {
+        if(*hk == *k)
+        {
+            auto p = m_menu_positions[m];
+            m_current_menu = m;
+            m_current_menu->open(p.first.first, p.second.second + 1);
+            draw();
+            return true;
+        }
+    }
+
+    // second try: if we do have an open menu let's see if we pressed a button which is in the menu itself and activate it
+    return false;
 }
 
 bool cogui::window::hasSysmenuButton() const

@@ -147,6 +147,7 @@ namespace cogui
 
         const menu& operator[](int i) const;
         const std::vector<menu>& items() const;
+        std::vector<menu>& items();
 
         static menubar no_mainmenu;
         static cogui::menu align_right_after;

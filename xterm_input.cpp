@@ -35,14 +35,14 @@ bool cogui::xterm_input::shutdown()
 
 }
 
-std::vector<cogui::event> cogui::xterm_input::get_next_event()
+std::vector<std::shared_ptr<cogui::events::event>> cogui::xterm_input::get_next_event()
 {
-    std::vector<cogui::event> result;
+    std::vector<std::shared_ptr<cogui::events::event>> result;
     int c = ERR;
     while ((c = getch()) != ERR)
     {
-        auto e = cogui::to_event(c);
-        result.push_back(e);
+        /*auto e = cogui::to_event(c);
+        result.push_back(e);*/
     }
     log_debug() << "Got " << result.size() << " events ";
     return result;

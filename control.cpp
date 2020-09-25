@@ -3,8 +3,6 @@
 #include "desktop.h"
 #include "theme.h"
 
-#include <locale>
-#include <codecvt>
 #include <string>
 
 void cogui::control::initInitialPosition()
@@ -30,8 +28,7 @@ cogui::control::control(int x, int y, int width, int height, const std::wstring 
 cogui::control::control(int x, int y, int width, int height, const std::string &title) :
     cogui::control::control(x, y, width, height)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    m_title = converter.from_bytes(title);
+    m_title = cogui::utils::std2ws(title);
 }
 
 int cogui::control::getHeight() const

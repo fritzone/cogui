@@ -61,8 +61,17 @@ logstream &logstream::operator<<(bool t)
 
 logstream &logstream::operator<<(char t)
 {
-    mOutputStream << t;
+    std::string s = "";
+    s += t;
+    mOutputStream << s;
     return appendSpace();
+}
+
+logstream &logstream::operator<<(wchar_t t)
+{
+    std::wstring s;
+    s += t;
+    return operator <<(s);
 }
 
 logstream &logstream::operator<<(signed short t)
@@ -125,7 +134,7 @@ logstream &logstream::operator<<(const std::string &rString)
     return appendSpace();
 }
 
-logstream &logstream::operator<<(const std::wstring ws)
+logstream &logstream::operator<<(const std::wstring& ws)
 {
     try {
         using convert_type = std::codecvt_utf8<wchar_t>;

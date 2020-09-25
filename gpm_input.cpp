@@ -2,6 +2,7 @@
 #include "desktop.h"
 #include "mouse.h"
 #include "timer.h"
+#include "utils.h"
 
 #include <gpm.h>
 #include <ncursesw/ncurses.h>
@@ -161,13 +162,13 @@ bool cogui::gpm_input::shutdown()
     return true;
 }
 
-std::vector<cogui::event> cogui::gpm_input::get_next_event()
+std::vector<std::shared_ptr<cogui::events::event>> cogui::gpm_input::get_next_event()
 {
-    std::vector<cogui::event> result;
+    std::vector<std::shared_ptr<cogui::events::event>> result;
     //log_info() << "Waiting for standard";
     int c = Gpm_Getc(stdin);
-    auto e = cogui::to_event(c);
-    result.push_back(e);
+    //auto e = cogui::to_event(c);
+    //result.push_back(e);
     return result;
 }
 
@@ -183,28 +184,123 @@ bool cogui::termkey_input::init()
 
     // mouse movement reported too
     printf("\033[?1003h\n");
+    prev_curs = curs_set (0);
+    if(prev_curs == ERR)
+    {
+        prev_curs = 1;
+    }
+
 }
 
-std::vector<cogui::event> cogui::termkey_input::get_next_event()
+std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_next_event()
 {
-    std::vector<cogui::event> result;
+    std::vector<std::shared_ptr<cogui::events::event>> result;
 
     TermKeyResult ret;
     TermKeyKey key;
+    memset(&key, 0, sizeof (TermKeyKey));
     ret = termkey_waitkey(tk, &key);
-    if(ret == TERMKEY_RES_EOF) return result;
+    if(ret != TERMKEY_RES_KEY) return result;
+    bool handled = false;
 
-    if(key.type == TERMKEY_TYPE_MOUSE) {
-      int line, col;
-      termkey_interpret_mouse(tk, &key, NULL, NULL, &line, &col);
-      log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
+    if(key.type == TERMKEY_TYPE_MOUSE)
+    {
+        TermKeyMouseEvent ev;
+        int button;
+        int line, col;
+        termkey_interpret_mouse(tk, &key, &ev, &button, &line, &col);
+        log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
 
-      cogui::mouse::get().setX(col - 1);
-      cogui::mouse::get().setY(line - 1);
+        cogui::mouse::get().setX(col - 1);
+        cogui::mouse::get().setY(line - 1);
 
-      cogui::desktop::get().handle_mouse_move(col - 1, line - 1);
+        if(ev == 1) // Press
+        {
+            if(button == 1) // Left
+            {
+                t_start = std::chrono::high_resolution_clock::now();
+                last_button = cogui::mouse::button::left;
+//                handled = handled | cogui::desktop::get().handle_mouse_left_down(col - 1, line - 1);
+                result.push_back(cogui::events::event::create<cogui::events::mouse_left_down>(col-1, line-1));
+            }
+
+            if(button == 3) // Right
+            {
+                last_button = cogui::mouse::button::right;
+                //handled = handled | cogui::desktop::get().handle_mouse_right_down(col - 1, line - 1);
+                result.push_back(cogui::events::event::create<cogui::events::mouse_right_down>(col-1, line-1));
+
+            }
+
+        }
+        else
+        if(ev == 3) // Release
+        {
+            if(last_button == cogui::mouse::button::left)
+            {
+                auto t_end = std::chrono::high_resolution_clock::now();
+
+                double elapsed_time_ms = std::chrono::duration<double, std::milli>(t_end-t_start).count();
+
+                if(elapsed_time_ms < 200) // this was a fast exchange handle it as a click
+                {
+                    log_debug() << "Event Type: LEFT CLICK at " <<  col - 1 << "," << line - 1;
+//                    handled = handled | cogui::desktop::get().handle_mouse_left_click(col - 1, line - 1);
+                    result.push_back(cogui::events::event::create<cogui::events::mouse_left_click>(col-1, line-1));
+
+                }
+                else
+                {
+                    log_debug() << "Event Type: LEFT UP at " <<  col - 1<< "," << line - 1;
+                    //handled = handled | cogui::desktop::get().handle_mouse_left_up(col - 1, line - 1);
+                    result.push_back(cogui::events::event::create<cogui::events::mouse_left_up>(col-1, line-1));
+
+                }
+            }
+            else
+            if(last_button == cogui::mouse::button::right)
+            {
+                log_debug() << "Event Type: RIGHT UP at " <<  col - 1 << "," << line - 1;
+                //handled = handled | cogui::desktop::get().handle_mouse_right_up(col - 1, line - 1);
+                result.push_back(cogui::events::event::create<cogui::events::mouse_right_up>(col-1, line-1));
+            }
+            else    // just move around, strangely the plain move is reported as release
+            {
+                //cogui::desktop::get().handle_mouse_move(col - 1, line - 1);
+                result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
+
+            }
+
+
+            last_button = cogui::mouse::button::none;
+        }
+        else
+        if(ev == 2) //Drag
+        {
+            //cogui::desktop::get().handle_mouse_move(col - 1, line - 1);
+            result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
+
+        }
 
     }
+    else
+    {
+        TermKeyFormat format = TERMKEY_FORMAT_VIM;
+        char buffer[50];
+        termkey_strfkey(tk, buffer, sizeof buffer, &key, format);
+        log_info() << buffer;
+
+        bool alt_press = key.modifiers & TERMKEY_KEYMOD_ALT;
+        bool ctrl_press = key.modifiers & TERMKEY_KEYMOD_CTRL;
+        bool shift_press = key.modifiers & TERMKEY_KEYMOD_SHIFT;
+
+        if(key.type == TERMKEY_TYPE_UNICODE) {
+            result.push_back(cogui::events::event::create<cogui::events::key>(cogui::events::key_class::key_textinput,
+                                                                              alt_press, shift_press, ctrl_press,
+                                                                              cogui::utils::std2ws(key.utf8)));
+        }
+    }
+
 
     return result;
 }
@@ -212,5 +308,9 @@ std::vector<cogui::event> cogui::termkey_input::get_next_event()
 bool cogui::termkey_input::shutdown()
 {
     printf("\033[?1003l\n");
+    printf("\033[?9l\n");
     termkey_destroy(tk);
+    curs_set(prev_curs);
+
+    return true;
 }

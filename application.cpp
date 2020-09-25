@@ -27,10 +27,10 @@ int cogui::application::run()
     while( running() )
     {
         auto events = desktop::get().getInput()->get_next_event();
-        //log_debug() << "Got:" << events.size() << " events";
+        log_debug() << "Got:" << events.size() << " events";
         for(auto c : events)
         {
-            handle_event(c);
+            c->handle();
         }
     }
     return 1;
@@ -52,8 +52,10 @@ void cogui::application::exit(int c)
     ::exit(c);
 }
 
+/*
 void cogui::application::handle_event(cogui::event c)
 {
+
     switch(c)
     {
         case cogui::event::press_escape:
@@ -91,7 +93,7 @@ void cogui::application::handle_event(cogui::event c)
             break;
         }
     }
-}
+}*/
 
 std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::application::handle_command_line(int argc, char *argv[], std::string& theme)
 {

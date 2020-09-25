@@ -2,6 +2,8 @@
 #define UTILS_H
 
 #include <string>
+#include <locale>
+#include <codecvt>
 
 namespace cogui {
 
@@ -47,7 +49,26 @@ static std::wstring repeated(int l, std::wstring chr)
     return chr * l;
 }
 
+static std::wstring std2ws(const std::string& s)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring result = converter.from_bytes(s);
+    return result;
+}
 
+static std::wstring std2ws(const char* c)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring result = converter.from_bytes(c);
+    return result;
+}
+
+static std::wstring str2upper(const std::wstring s)
+{
+    std::wstring result = s;
+    transform(result.begin(), result.end(), result.begin(), towlower);
+    return result;
+}
 
 }
 

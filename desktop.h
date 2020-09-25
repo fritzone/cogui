@@ -1,6 +1,8 @@
 #ifndef DESKTOP_H
 #define DESKTOP_H
 
+#include "events.h"
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -28,6 +30,8 @@ public:
     bool handle_mouse_doubleclick(int x, int y);
 
     void handle_tab();
+
+    bool handle_key(std::shared_ptr<cogui::events::key> k);
 
     std::shared_ptr<theme> getTheme() const;
     std::shared_ptr<graphics_engine> getGraphics() const;

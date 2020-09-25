@@ -56,6 +56,7 @@ bool desktop::handle_mouse_move(int x, int y)
     bool handled = false;
     if(m_captured_window)
     {
+        log_debug() << "Captured window handles";
         m_captured_window->mouse_move(x, y);
         handled = true;
     }
@@ -66,7 +67,7 @@ bool desktop::handle_mouse_left_click(int x, int y)
 {
     bool handled = false;
 
-    for(const auto& w : m_windows)
+    for(auto& w : m_windows)
     {
         if(w->inside(x, y))
         {
@@ -191,6 +192,16 @@ void desktop::handle_tab()
         refresh();
     }
 }
+
+bool desktop::handle_key(std::shared_ptr<cogui::events::key> k)
+{
+    if(m_captured_window)
+    {
+        return m_captured_window->keypress(k);
+    }
+    return false;
+}
+
 
 std::shared_ptr<theme> desktop::getTheme() const
 {

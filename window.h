@@ -66,6 +66,9 @@ public:
     void right_mouse_up(int x, int y);
     void doubleclick(int x, int y);
 
+    /* keyboard press event */
+    bool keypress(std::shared_ptr<cogui::events::key> k);
+
     bool resizeable() const;
     void setResizeable(bool resizeable);
 
@@ -154,6 +157,9 @@ private:
     // key is the menu, followed by two coordinates on the screen, upper left, lower right corner
     mutable std::map<menu*, std::pair<std::pair<int, int>, std::pair<int, int>>> m_menu_positions;
 
+    // this will hold the hotkey and the associated menubar item
+    std::map<std::shared_ptr<cogui::events::key>, menu*> m_menubar_openers;
+
 private:
 
     template<typename ... Args>
@@ -181,7 +187,17 @@ private:
         {
             std::visit(connector, elem);
         }
+
+        // see if we have mainmenu
+        if(hasMenubar())
+        {
+            register_menubar_hotkeys();
+        }
     }
+
+private:
+
+    void register_menubar_hotkeys();
 };
 
 }
