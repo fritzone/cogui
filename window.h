@@ -6,6 +6,7 @@
 #include "desktop.h"
 #include "mouse.h"
 #include "menu.h"
+#include "menubar.h"
 
 #include "named_type.h"
 #include "tuple_iterator.h"
@@ -195,9 +196,39 @@ private:
         }
     }
 
+    template<class T> bool activate_menu(T chooser)
+    {
+        if(m_current_menu)
+        {
+            auto m_prev_menu = m_current_menu;
+            m_current_menu = nullptr;
+            redraw(); // this redraws the desktop since the menu might have covered some other window
+            m_current_menu = m_prev_menu;
+        }
+
+        m_current_menu = chooser(m_current_menu);
+        if(m_menu_positions.count(m_current_menu))
+        {
+            auto p = m_menu_positions[m_current_menu];
+
+            m_current_menu->open(p.first.first, p.second.second + 1);
+            m_current_menu->activate_action(0);
+            draw();
+        }
+        else
+        {
+            log_error() << "Lost a menu somewhere";
+            return false;
+        }
+
+        return true;
+    }
+
 private:
 
     void register_menubar_hotkeys();
+    bool activate_previous_menu();
+    bool activate_next_menu();
 };
 
 }

@@ -173,6 +173,18 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::gpm_input::get_next_ev
 }
 
 
+
+std::map<TermKeySym, cogui::events::key_class> cogui::termkey_input::m_keymap =
+{
+    {TERMKEY_SYM_UP, cogui::events::key_class::key_up},
+    {TERMKEY_SYM_DOWN, cogui::events::key_class::key_down},
+    {TERMKEY_SYM_LEFT, cogui::events::key_class::key_left},
+    {TERMKEY_SYM_RIGHT, cogui::events::key_class::key_right},
+    {TERMKEY_SYM_ESCAPE, cogui::events::key_class::key_escape},
+    {TERMKEY_SYM_ENTER, cogui::events::key_class::key_return}
+
+};
+
 bool cogui::termkey_input::init()
 {
     TERMKEY_CHECK_VERSION;
@@ -285,19 +297,31 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
     }
     else
     {
-        TermKeyFormat format = TERMKEY_FORMAT_VIM;
+        TermKeyFormat format = TERMKEY_FORMAT_LONGMOD;
         char buffer[50];
         termkey_strfkey(tk, buffer, sizeof buffer, &key, format);
-        log_info() << buffer;
+        log_info() << buffer << "type:" << key.type;
 
         bool alt_press = key.modifiers & TERMKEY_KEYMOD_ALT;
         bool ctrl_press = key.modifiers & TERMKEY_KEYMOD_CTRL;
         bool shift_press = key.modifiers & TERMKEY_KEYMOD_SHIFT;
 
-        if(key.type == TERMKEY_TYPE_UNICODE) {
+        if(key.type == TERMKEY_TYPE_UNICODE)
+        {
             result.push_back(cogui::events::event::create<cogui::events::key>(cogui::events::key_class::key_textinput,
                                                                               alt_press, shift_press, ctrl_press,
                                                                               cogui::utils::std2ws(key.utf8)));
+        }
+        else
+        if(key.type == TERMKEY_TYPE_KEYSYM)
+        {
+            if(m_keymap.find(key.code.sym) != m_keymap.end())
+            {
+                log_info() << "Got a symbol key" << buffer;
+                result.push_back(cogui::events::event::create<cogui::events::key>(m_keymap[key.code.sym],
+                                                                                  alt_press, shift_press, ctrl_press,
+                                                                                  cogui::utils::std2ws(buffer)));
+            }
         }
     }
 

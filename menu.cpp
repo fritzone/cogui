@@ -3,35 +3,40 @@
 
 #include <string>
 
-cogui::action::OnTrigger::argument cogui::action::on_trigger;
-cogui::action::Selectable cogui::action::selectable;
-cogui::menubar cogui::menubar::no_mainmenu;
-cogui::menu cogui::menubar::align_right_after(L"::align_right_after", {});
 cogui::action cogui::menu::separator_item(L"::separator_item");
 
 cogui::menu::menu(std::initializer_list<cogui::action> l) : m_actions(l)
 {
+    register_action_activators();
 }
 
 cogui::menu::menu(const std::wstring &caption, std::initializer_list<cogui::action> l) : m_actions(l), m_is_sysmenu(false), m_caption(caption)
 {
+    register_action_activators();
 }
 
-cogui::menu::menu(const wchar_t * const caption, std::initializer_list<cogui::action> l) : menu(std::wstring(caption), l){}
+cogui::menu::menu(const wchar_t * const caption, std::initializer_list<cogui::action> l) : menu(std::wstring(caption), l)
+{
+    register_action_activators();
+}
 
 cogui::menu::menu(const std::string &caption, std::initializer_list<cogui::action> l) : m_actions(l)
 {
     m_caption = cogui::utils::std2ws(caption);
     m_is_sysmenu = false;
+    register_action_activators();
 }
 
-void cogui::menu::append(std::initializer_list<cogui::action> l) {
+void cogui::menu::append(std::initializer_list<cogui::action> l)
+{
     m_actions.insert(m_actions.end(), l.begin(), l.end());
+    register_action_activators();
 }
 
 cogui::menu &cogui::menu::operator =(std::initializer_list<cogui::action> l)
 {
     m_actions = l;
+    register_action_activators();
     return *this;
 }
 
@@ -68,9 +73,6 @@ void cogui::menu::open(int x, int y)
 
     m_height = m_actions.size() + 1;
     m_opened = true;
-
-    // now gather a list of all the windows that need to be repainted when this menu disappears
-
 }
 
 void cogui::menu::close()
@@ -113,13 +115,91 @@ bool cogui::menu::mouse_move(int, int y)
 bool cogui::menu::click(int, int)
 {
     // here we have clicked on the action at m_lastSelectedIndex
-    if(m_lastSelectedIndex < m_actions.size())
+    if(m_lastSelectedIndex < static_cast<int>(m_actions.size()))
     {
         m_actions[m_lastSelectedIndex].trigger();
         m_opened = false;
         return true;
     }
     return false;
+}
+
+bool cogui::menu::keypress(std::shared_ptr<cogui::events::key> k)
+{
+    if(*k == cogui::events::key_class::key_up)
+    {
+        activate_previous_action();
+        return true;
+
+    }
+    else
+    if(*k == cogui::events::key_class::key_down)
+    {
+        activate_next_action();
+        return true;
+    }
+    // Now let's see if this key is a hotkey key for and action in this menu this
+    return false;
+}
+
+void cogui::menu::activate_action(size_t index)
+{
+    if(index < m_actions.size())
+    {
+        m_lastSelectedIndex = index;
+    }
+}
+
+void cogui::menu::activate_next_action()
+{
+    int p = m_lastSelectedIndex;
+    m_lastSelectedIndex ++;
+    if(m_lastSelectedIndex == static_cast<int>(m_actions.size()))
+    {
+        m_lastSelectedIndex = 0;
+    }
+
+    while(m_actions[m_lastSelectedIndex].getTitle() == separator_item.getTitle())
+    {
+        m_lastSelectedIndex ++;
+        if(m_lastSelectedIndex == static_cast<int>(m_actions.size()))
+        {
+            m_lastSelectedIndex = p;
+            return;
+        }
+    }
+}
+
+void cogui::menu::activate_previous_action()
+{
+    int p = m_lastSelectedIndex;
+    m_lastSelectedIndex --;
+
+    if(m_lastSelectedIndex == -1)
+    {
+        m_lastSelectedIndex = m_actions.size() - 1;
+    }
+
+    // do not select separators while drawing the menu
+    while(m_actions[m_lastSelectedIndex].getTitle() == separator_item.getTitle())
+    {
+        m_lastSelectedIndex --;
+        if(m_lastSelectedIndex == -1)
+        {
+            m_lastSelectedIndex = p;
+            return;
+        }
+    }
+}
+
+void cogui::menu::trigger_action(size_t index)
+{
+
+}
+
+void cogui::menu::trigger_current_action()
+{
+
 }
 
 bool cogui::menu::isOpened() const
@@ -129,7 +209,7 @@ bool cogui::menu::isOpened() const
 
 const cogui::action &cogui::menu::operator[](int i) const
 {
-    if(i < m_actions.size())
+    if(i < static_cast<int>(m_actions.size()) && i >= 0)
     {
         return m_actions[i];
     }
@@ -152,79 +232,28 @@ std::wstring cogui::menu::caption() const
     return m_caption;
 }
 
+void cogui::menu::register_action_activators()
+{
+    for(size_t i = 0; i < m_actions.size(); i++)
+    {
+        auto& a = const_cast<cogui::action&>(m_actions[i]);
+        std::wstring caption = a.getTitle();
+        auto andp = caption.find(L"&");
+        if(andp != std::string::npos && andp < caption.length() - 1)
+        {
+            std::wstring keydata;
+            keydata += (wchar_t)caption[andp + 1];
+            log_info() << "Hotkey found for action" << caption << "as:" << keydata;
+            cogui::events::key* hk = new cogui::events::key(cogui::events::key_class::key_textinput, false, false, false, keydata);
+            std::shared_ptr<cogui::events::key> sp;
+            sp.reset(hk);
+            sp->set_as_hotkey();
+            m_action_activators[sp] = &m_actions[i];
+        }
+    }
+}
+
 int cogui::menu::getWidth() const
 {
     return m_width;
-}
-
-cogui::action::~action()
-{
-    sig_on_trigger.disconnect(this, m_conn.get(), true);
-}
-
-cogui::action::action(const cogui::action &o)
-{
-    m_title = o.m_title;
-    m_conn = o.m_conn;
-    miso::connect(this, sig_on_trigger, m_conn.get());
-}
-
-cogui::action &cogui::action::operator=(const cogui::action &o)
-{
-    m_title = o.m_title;
-    sig_on_trigger.disconnect(this, m_conn.get());
-    sig_on_trigger = o.sig_on_trigger;
-    m_conn = o.m_conn;
-    miso::connect(this, sig_on_trigger, m_conn.get());
-
-    return *this;
-}
-
-void cogui::action::trigger()
-{
-    emit sig_on_trigger(this);
-}
-
-std::wstring cogui::action::getTitle() const
-{
-    return m_title;
-}
-
-void cogui::action::setTitle(const std::wstring &title)
-{
-    m_title = title;
-}
-
-bool cogui::action::isSelectable() const
-{
-    return m_selectable;
-}
-
-cogui::menubar::menubar(std::initializer_list<cogui::menu> entries) : m_menus(entries)
-{
-}
-
-cogui::menubar &cogui::menubar::operator =(std::initializer_list<cogui::menu> m)
-{
-    m_menus = m;
-    return *this;
-}
-
-const cogui::menu &cogui::menubar::operator[](int i) const
-{
-    if(i < m_menus.size())
-    {
-        return m_menus[i];
-    }
-    throw "Index out of range";
-}
-
-const std::vector<cogui::menu> &cogui::menubar::items() const
-{
-    return m_menus;
-}
-
-std::vector<cogui::menu> &cogui::menubar::items()
-{
-    return m_menus;
 }

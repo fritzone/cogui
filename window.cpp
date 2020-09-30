@@ -1,6 +1,7 @@
 #include "window.h"
 #include "desktop.h"
 #include "theme.h"
+#include "action.h"
 
 #include "log.h"
 
@@ -358,15 +359,25 @@ void cogui::window::register_menubar_hotkeys()
     }
 }
 
+bool cogui::window::activate_previous_menu()
+{
+    return activate_menu(std::bind(&menubar::before, &m_mainmenu, std::placeholders::_1));
+}
+
+bool cogui::window::activate_next_menu()
+{
+    return activate_menu(std::bind(&menubar::after, &m_mainmenu, std::placeholders::_1));
+}
+
 void cogui::window::left_mouse_down(int x, int y)
 {
-    // log_info() << "y=" << y << " topy=" << this->getY();
+    log_debug() << "MOUSE DOWN: y=" << y << " topy=" << this->getY();
     if( y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
         if(m_current_menu)
         {
             m_current_menu = nullptr;
-            redraw();
+            redraw(); // this redraws the desktop since the menu might have covered some other window
         }
 
         // see: outside of sysmenu, maximize, close
@@ -416,7 +427,7 @@ void cogui::window::left_mouse_down(int x, int y)
 
 void cogui::window::left_mouse_up(int x, int y)
 {
-    log_info() << "UP: " << x << " " << y;
+    log_debug() << "MOUSE UP: " << x << " " << y;
     m_draw_state = draw_state::normal;
 
     // now release the element if there was any pressed
@@ -475,22 +486,70 @@ void cogui::window::doubleclick(int x, int y)
 
 bool cogui::window::keypress(std::shared_ptr<cogui::events::key> k)
 {
-    log_info() << "Key:" << k->get_chardata();
+    log_debug() << "Key:" << k->get_chardata();
 
     // first try: was it a hotkey to open a menu?
     for(auto& [hk, m] : m_menubar_openers)
     {
         if(*hk == *k)
         {
-            auto p = m_menu_positions[m];
-            m_current_menu = m;
-            m_current_menu->open(p.first.first, p.second.second + 1);
-            draw();
-            return true;
+            if(m_menu_positions.count(m))
+            {
+                m_current_menu = nullptr;
+                redraw();
+
+                auto p = m_menu_positions[m];
+                m_current_menu = m;
+                m_current_menu->open(p.first.first, p.second.second + 1);
+                m_current_menu->activate_action(0);
+                draw();
+                return true;
+            }
         }
     }
 
     // second try: if we do have an open menu let's see if we pressed a button which is in the menu itself and activate it
+    if(m_current_menu)
+    {
+        // this will handle hotkeys for the menu and up/down
+        if(m_current_menu->keypress(k))
+        {
+            draw();
+            return true;
+        }
+
+        // let's see if this is right/left, if yes deactivate the current menu and activate the next/previous one
+        // if handled, they will also redraw the screen
+        if(*k == cogui::events::key_class::key_left)
+        {
+            if(activate_previous_menu())
+            {
+                return true;
+            }
+        }
+        if(*k == cogui::events::key_class::key_right)
+        {
+            if(activate_next_menu())
+            {
+                return true;
+            }
+        }
+
+        // if we press Esc, we should this close the open menu
+        if(*k == cogui::events::key_class::key_escape)
+        {
+            m_current_menu = nullptr;
+            redraw(); // this redraws the desktop since the menu might have covered some other window
+            return true;
+        }
+
+        // if we press Enter/Return we should activate the currently selected action
+        if(*k == cogui::events::key_class::key_return || *k == cogui::events::key_class::key_kp_enter)
+        {
+
+        }
+
+    }
     return false;
 }
 

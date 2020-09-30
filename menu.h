@@ -5,77 +5,16 @@
 #include "tuple_iterator.h"
 #include "overload_impl.h"
 #include "miso.h"
+#include "events.h"
+#include "action.h"
 
 #include <initializer_list>
 #include <string>
+#include <map>
+#include <memory>
 
 namespace cogui
 {
-    class action
-    {
-        using Selectable = bool;
-
-    public:
-
-        action() = default;
-        action(action&&) = default;
-
-        virtual ~action();
-        action(const action& o);
-
-        action& operator=(const action& o);
-        action& operator=(action&& o) = default;
-
-        action(const std::wstring& title) : m_title(title)
-        {
-        }
-
-        template<typename ... Args>
-        action(const std::wstring& title, Args... args) : m_title(title)
-        {
-            resolve_named_parameters(std::forward<Args>(args)...);
-        }
-        template<typename ... Args>
-        action(const std::wstring& title, Selectable s, Args... args) : m_title(title), m_selectable(true)
-        {
-            resolve_named_parameters(std::forward<Args>(args)...);
-        }
-
-        template<typename ... Args>
-        void resolve_named_parameters(Args... args)
-        {
-            auto connector = overload_unref(
-                [&,this](OnTrigger c) { m_conn = c; miso::connect(this, sig_on_trigger, c.get()); }
-            );
-
-            auto tup = std::make_tuple(std::forward<Args>(args)...);
-
-            for (auto const& elem : to_range(tup))
-            {
-                std::visit(connector, elem);
-            }
-        }
-
-        void trigger();
-        std::wstring getTitle() const;
-        void setTitle(const std::wstring &getTitle);
-
-        // triggering signal
-        using OnTrigger = fluent::NamedType<std::function<void(action*)>, struct OnTriggerHelper>;
-        static OnTrigger::argument on_trigger;
-        miso::signal<action*> sig_on_trigger {"on_trigger"};
-
-        // whether it is selectable or not
-        static Selectable selectable;
-
-        bool isSelectable() const;
-
-    private:
-        std::wstring m_title;
-        OnTrigger m_conn;
-        bool m_selectable = false;
-        bool m_selected = false;
-    };
 
     /**
      * @brief The menu class is responsible for representing one menu either in the form of a sysmenu,
@@ -112,6 +51,15 @@ namespace cogui
         bool mouse_move(int x, int y);
         bool click(int x, int y);
 
+        bool keypress(std::shared_ptr<cogui::events::key> k);
+
+        void activate_action(size_t index);
+        void activate_next_action();
+        void activate_previous_action();
+
+        void trigger_action(size_t index);
+        void trigger_current_action();
+
         bool isOpened() const;
 
         const action& operator[](int i) const;
@@ -132,30 +80,15 @@ namespace cogui
         bool m_is_sysmenu = true;
         bool m_opened = false;
         std::wstring m_caption = L"";
-    };
-
-    /**
-     * @brief The menubar class repesents the menubar of a window
-     */
-    class menubar
-    {
-    public:
-        menubar() = default;
-        menubar(std::initializer_list<menu> entries);
-
-        menubar& operator = (std::initializer_list<menu> m);
-
-        const menu& operator[](int i) const;
-        const std::vector<menu>& items() const;
-        std::vector<menu>& items();
-
-        static menubar no_mainmenu;
-        static cogui::menu align_right_after;
+        std::map<std::shared_ptr<cogui::events::key>, action*> m_action_activators;
 
     private:
-        std::vector<menu> m_menus;
+
+        void register_action_activators();
+
 
     };
+
 }
 
 #endif // MENU_H

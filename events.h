@@ -157,6 +157,9 @@ public:
         }
         return false;
     }
+
+    bool operator == (key_class r);
+
     std::shared_ptr<key> getptr()
     {
         return shared_from_this();

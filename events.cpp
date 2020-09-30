@@ -95,6 +95,12 @@ std::wstring cogui::events::key::get_chardata()
     return m_chardata;
 }
 
+bool cogui::events::key::operator ==(cogui::events::key_class r)
+{
+    log_debug() << "Comparing" << (int)m_type << "with" << (int)r;
+    return this->m_type == r;
+}
+
 cogui::events::mouse_move::mouse_move(int x, int y) : mouse_event(x, y) {}
 
 bool cogui::events::mouse_move::handle()

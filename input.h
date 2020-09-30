@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 namespace cogui {
 
@@ -52,6 +53,7 @@ public:
     std::vector<std::shared_ptr<cogui::events::event>> get_next_event() override;
     TermKey *tk;
     int prev_curs = 1;
+    static std::map<TermKeySym, cogui::events::key_class> m_keymap;
 
 };
 
