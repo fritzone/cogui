@@ -5,6 +5,8 @@
 #include <utility>
 #include <variant>
 
+#include "key.h"
+
 // Enable empty base class optimization with multiple inheritance on Visual Studio.
 #if defined(_MSC_VER) && _MSC_VER >= 1910
 #  define FLUENT_EBCO __declspec(empty_bases)
@@ -46,6 +48,11 @@ public:
         argument(argument &&) = delete;
         argument& operator=(argument const&) = delete;
         argument& operator=(argument &&) = delete;
+
+        argument& operator()(const cogui::key&)
+        {
+            return *this;
+        }
     };
 
 private:

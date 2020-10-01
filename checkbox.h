@@ -2,6 +2,7 @@
 #define CHECKBOX_H
 
 #include "control.h"
+#include "miso.h"
 
 #include "named_type.h"
 #include "tuple_iterator.h"

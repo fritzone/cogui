@@ -181,7 +181,30 @@ std::map<TermKeySym, cogui::events::key_class> cogui::termkey_input::m_keymap =
     {TERMKEY_SYM_LEFT, cogui::events::key_class::key_left},
     {TERMKEY_SYM_RIGHT, cogui::events::key_class::key_right},
     {TERMKEY_SYM_ESCAPE, cogui::events::key_class::key_escape},
-    {TERMKEY_SYM_ENTER, cogui::events::key_class::key_return}
+    {TERMKEY_SYM_ENTER, cogui::events::key_class::key_return},
+    {TERMKEY_SYM_TAB, cogui::events::key_class::key_tab},
+    {TERMKEY_SYM_INSERT, cogui::events::key_class::key_insert},
+    {TERMKEY_SYM_DELETE, cogui::events::key_class::key_delete},
+    {TERMKEY_SYM_HOME, cogui::events::key_class::key_home},
+    {TERMKEY_SYM_END, cogui::events::key_class::key_end},
+    {TERMKEY_SYM_PAGEUP, cogui::events::key_class::key_pgup},
+    {TERMKEY_SYM_PAGEDOWN, cogui::events::key_class::key_pgdn},
+    {TERMKEY_SYM_BACKSPACE, cogui::events::key_class::key_backspace},
+    {TERMKEY_SYM_KPDIV, cogui::events::key_class::key_kp_div},
+    {TERMKEY_SYM_KPMULT, cogui::events::key_class::key_kp_mul},
+    {TERMKEY_SYM_KPMINUS, cogui::events::key_class::key_kp_minus},
+    {TERMKEY_SYM_KPPLUS, cogui::events::key_class::key_kp_plus},
+    {TERMKEY_SYM_KPENTER, cogui::events::key_class::key_kp_enter},
+    {TERMKEY_SYM_KP0, cogui::events::key_class::key_kp_0},
+    {TERMKEY_SYM_KP1, cogui::events::key_class::key_kp_1},
+    {TERMKEY_SYM_KP2, cogui::events::key_class::key_kp_2},
+    {TERMKEY_SYM_KP3, cogui::events::key_class::key_kp_3},
+    {TERMKEY_SYM_KP4, cogui::events::key_class::key_kp_4},
+    {TERMKEY_SYM_KP5, cogui::events::key_class::key_kp_5},
+    {TERMKEY_SYM_KP6, cogui::events::key_class::key_kp_6},
+    {TERMKEY_SYM_KP7, cogui::events::key_class::key_kp_7},
+    {TERMKEY_SYM_KP8, cogui::events::key_class::key_kp_8},
+    {TERMKEY_SYM_KP9, cogui::events::key_class::key_kp_9}
 
 };
 
@@ -308,7 +331,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
 
         if(key.type == TERMKEY_TYPE_UNICODE)
         {
-            result.push_back(cogui::events::event::create<cogui::events::key>(cogui::events::key_class::key_textinput,
+            result.push_back(cogui::events::event::create<cogui::events::keypress>(cogui::events::key_class::key_textinput,
                                                                               alt_press, shift_press, ctrl_press,
                                                                               cogui::utils::std2ws(key.utf8)));
         }
@@ -318,7 +341,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
             if(m_keymap.find(key.code.sym) != m_keymap.end())
             {
                 log_info() << "Got a symbol key" << buffer;
-                result.push_back(cogui::events::event::create<cogui::events::key>(m_keymap[key.code.sym],
+                result.push_back(cogui::events::event::create<cogui::events::keypress>(m_keymap[key.code.sym],
                                                                                   alt_press, shift_press, ctrl_press,
                                                                                   cogui::utils::std2ws(buffer)));
             }

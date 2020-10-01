@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "key.h"
 #include "container.h"
 #include "miso.h"
 #include "desktop.h"
@@ -16,8 +17,26 @@
 #include <tuple>
 #include <functional>
 
+
+
+
 namespace cogui
 {
+
+class window;
+
+
+class OnHotkey : public fluent::NamedType<std::function<void(cogui::window*)>, struct HotkeyHelper>
+{
+public:
+
+    OnHotkey& operator()(cogui::key)
+    {
+        return *this;
+    }
+
+};
+
 
 class window : public container
 {
@@ -65,10 +84,10 @@ public:
     void left_mouse_up(int x, int y);
     void right_mouse_down(int x, int y);
     void right_mouse_up(int x, int y);
-    void doubleclick(int x, int y);
+    void doubleclick(int x, int y) override;
 
     /* keyboard press event */
-    bool keypress(std::shared_ptr<cogui::events::key> k);
+    bool keypress(std::shared_ptr<cogui::events::keypress> k);
 
     bool resizeable() const;
     void setResizeable(bool resizeable);
@@ -112,16 +131,22 @@ public:
     using OnMouseDown = fluent::NamedType<std::function<void(window*,mouse::button,int,int)>, struct OnMouseDownHelper>;
     using OnMouseUp = fluent::NamedType<std::function<void(window*,mouse::button,int,int)>, struct OnMouseUpHelper>;
     using OnClose = fluent::NamedType<std::function<void(window*)>, struct OnCloseHelper>;
+    using OnKeypress = fluent::NamedType<std::function<void(window*, std::shared_ptr<cogui::key>)>, struct OnKeypressHelper>;
 
     static OnResize::argument on_resize;
     static OnClose::argument on_close;
     static OnMouseDown::argument on_mouse_down;
     static OnMouseUp::argument on_mouse_up;
+    static OnKeypress::argument on_keypress;
+    static OnHotkey::argument on_hotkey;
 
     miso::signal<window*, int, int> sig_on_resize {"on_resize"};
     miso::signal<window*> sig_on_close {"on_close"};
-    miso::signal<window*,mouse::button,int,int> sig_on_mouse_down {"mouse_down"};
-    miso::signal<window*,mouse::button,int,int> sig_on_mouse_up {"mouse_up"};
+    miso::signal<window*,mouse::button,int,int> sig_on_mouse_down {"on_mouse_down"};
+    miso::signal<window*,mouse::button,int,int> sig_on_mouse_up {"on_mouse_up"};
+    miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_keypress {"on_keypress"};
+    miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_hotkey {"on_hotkey"};
+
 
     // system menu
     using SystemMenu = fluent::NamedType<menu, struct SystemMenuHelper>;
@@ -159,7 +184,7 @@ private:
     mutable std::map<menu*, std::pair<std::pair<int, int>, std::pair<int, int>>> m_menu_positions;
 
     // this will hold the hotkey and the associated menubar item
-    std::map<std::shared_ptr<cogui::events::key>, menu*> m_menubar_openers;
+    std::map<std::shared_ptr<cogui::events::keypress>, menu*> m_menubar_openers;
 
 private:
 
@@ -176,6 +201,7 @@ private:
         auto connector = overload_unref(
             [&,this](OnResize r) { miso::connect(this, sig_on_resize, r.get()); },
             [&,this](OnClose c) { miso::connect(this, sig_on_close, c.get()); },
+            [&,this](OnKeypress k) { miso::connect(this, sig_on_keypress, k.get()); },
             [&,this](OnMouseDown m) { miso::connect(this, sig_on_mouse_down, m.get()); },
             [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
             [&,this](SystemMenu m) {m_sysmenu = m.get(); m_hasSysmenuButton = true; },

@@ -14,6 +14,7 @@
 #include "graphics_engine.h"
 #include "log.h"
 #include "utils.h"
+#include "key.h"
 
 namespace cogui {
 

@@ -77,25 +77,25 @@ cogui::event cogui::to_event(int c)
 }
 */
 
-cogui::events::key::key(cogui::events::key_class type, bool alt, bool shift, bool ctrl, const std::wstring &chardata) : m_type(type),
+cogui::events::keypress::keypress(cogui::events::key_class type, bool alt, bool shift, bool ctrl, const std::wstring &chardata) : m_type(type),
     m_alt(alt), m_shift(shift), m_ctrl(ctrl), m_chardata(chardata)
 {
 
 }
 
-bool cogui::events::key::handle()
+bool cogui::events::keypress::handle()
 {
-    std::shared_ptr<cogui::events::key> copy = std::make_shared<cogui::events::key>(m_type, m_alt, m_shift, m_ctrl, m_chardata);
+    std::shared_ptr<cogui::events::keypress> copy = std::make_shared<cogui::events::keypress>(m_type, m_alt, m_shift, m_ctrl, m_chardata);
     return cogui::desktop::get().handle_key(copy);
 
 }
 
-std::wstring cogui::events::key::get_chardata()
+std::wstring cogui::events::keypress::get_chardata()
 {
     return m_chardata;
 }
 
-bool cogui::events::key::operator ==(cogui::events::key_class r)
+bool cogui::events::keypress::operator ==(cogui::events::key_class r)
 {
     log_debug() << "Comparing" << (int)m_type << "with" << (int)r;
     return this->m_type == r;

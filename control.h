@@ -2,7 +2,6 @@
 #define CONTROL_H
 
 #include "log.h"
-#include "miso.h"
 
 #include "named_type.h"
 #include "tuple_iterator.h"
@@ -139,7 +138,7 @@ public:
     virtual int minimumDrawableWidth() const = 0;
     virtual int minimumDrawableHeight() const = 0;
     virtual void click() = 0;
-    virtual void doubleclick();
+    virtual void doubleclick(int,int);
     virtual void draw() const = 0;
     virtual bool inside(int x, int y) const;
 

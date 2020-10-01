@@ -7,6 +7,8 @@
 namespace cogui
 {
 
+
+
 namespace events
 {
 
@@ -27,8 +29,16 @@ enum class event_type
 
 enum class key_class
 {
+    // the generic key for any character related key
     key_textinput,
+
+    // if a key is a modifier, such as Alt, Ctrl, Shift
+    key_modifier,
+
+    // Escape
     key_escape,
+
+    // The function keys
     key_f1,
     key_f2,
     key_f3,
@@ -41,24 +51,46 @@ enum class key_class
     key_f10,
     key_f11,
     key_f12,
+
+    // space modifier keys
     key_tab,
+    key_space,
+    key_backspace,
+    key_return,
+
+    // The big 6
     key_insert,
     key_delete,
     key_home,
     key_end,
     key_pgup,
     key_pgdn,
+
+    // Arrows
     key_left,
     key_right,
     key_up,
     key_down,
-    key_backspace,
-    key_return,
+
+    // keypad keys
     key_kp_div,
     key_kp_mul,
     key_kp_minus,
     key_kp_plus,
-    key_kp_enter
+    key_kp_enter,
+    key_kp_0,
+    key_kp_1,
+    key_kp_2,
+    key_kp_3,
+    key_kp_4,
+    key_kp_5,
+    key_kp_6,
+    key_kp_7,
+    key_kp_8,
+    key_kp_9,
+
+    // no key
+    key_none
 };
 
 
@@ -139,13 +171,14 @@ public:
 };
 
 
-class key : public event, public std::enable_shared_from_this<key>
+class keypress : public event, public std::enable_shared_from_this<keypress>
 {
 public:
-    key(key_class type, bool alt, bool shift, bool ctrl, const std::wstring& chardata);
+    keypress() = default;
+    keypress(key_class type, bool alt, bool shift, bool ctrl, const std::wstring& chardata);
     bool handle() override;
     std::wstring get_chardata();
-    bool operator == (const key& rhs) const
+    bool operator == (const keypress& rhs) const
     {
         bool first_check = (m_type == rhs.m_type && m_alt == rhs.m_alt && m_shift == rhs.m_shift && m_ctrl == rhs.m_ctrl && m_chardata == rhs.m_chardata);
         if(first_check) return true;
@@ -160,25 +193,64 @@ public:
 
     bool operator == (key_class r);
 
-    std::shared_ptr<key> getptr()
+    std::shared_ptr<keypress> getptr()
     {
         return shared_from_this();
     }
+
     void set_as_hotkey()
     {
         m_hotkey = true;
     }
+
     bool is_hotkey()
     {
         return m_hotkey;
     }
 
+    key_class get_type() const
+    {
+        return m_type;
+    }
+
+    void set_type(key_class nt)
+    {
+        m_type = nt;
+    }
+
+    void set_alt_modifier(bool b)
+    {
+        m_alt = b;
+    }
+    void set_ctrl_modifier(bool b)
+    {
+        m_ctrl = b;
+    }
+    void set_shift_modifier(bool b)
+    {
+        m_shift = b;
+    }
+
+    bool get_alt() const { return m_alt; }
+    bool get_ctrl() const { return m_ctrl; }
+    bool get_shift() const { return m_shift; }
+
+    void set_chardata(const std::wstring chardata)
+    {
+        m_chardata = chardata;
+    }
+
+    std::wstring get_chardata() const
+    {
+        return m_chardata;
+    }
+
 private:
-    key_class m_type;
-    bool m_alt;
-    bool m_shift;
-    bool m_ctrl;
-    std::wstring m_chardata;
+    key_class m_type = key_class::key_none;
+    bool m_alt = false;
+    bool m_shift = false;
+    bool m_ctrl = false;
+    std::wstring m_chardata = L"";
     bool m_hotkey = false;
 };
 

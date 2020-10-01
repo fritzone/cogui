@@ -75,7 +75,10 @@ int main( int argc, char* argv[] )
                                         }
                                 }
 
-                           }
+                           },
+                           window::on_keypress = [&](window*, std::shared_ptr<cogui::key> k){log_info() << "pressed a key:" << k->get_character();}
+
+                           // window::on_hotkey(cogui::key::F2) = [&](window*, std::shared_ptr<cogui::key>){log_info() << "pressed a key:";}
     );
 
     auto& b = a.add_button(5,5, 10, 2, L"&Vertical layout",

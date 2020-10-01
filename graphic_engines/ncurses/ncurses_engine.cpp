@@ -95,6 +95,7 @@ const std::map<int, std::tuple<int, int, int>> colorpairs =
 
 cogui::graphic_engines::ncurses::~ncurses()
 {
+    log_info() << "Shutting down ncurses";
     shutdown();
 }
 

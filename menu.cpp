@@ -124,7 +124,7 @@ bool cogui::menu::click(int, int)
     return false;
 }
 
-bool cogui::menu::keypress(std::shared_ptr<cogui::events::key> k)
+bool cogui::menu::keypress(std::shared_ptr<cogui::events::keypress> k)
 {
     if(*k == cogui::events::key_class::key_up)
     {
@@ -244,8 +244,8 @@ void cogui::menu::register_action_activators()
             std::wstring keydata;
             keydata += (wchar_t)caption[andp + 1];
             log_info() << "Hotkey found for action" << caption << "as:" << keydata;
-            cogui::events::key* hk = new cogui::events::key(cogui::events::key_class::key_textinput, false, false, false, keydata);
-            std::shared_ptr<cogui::events::key> sp;
+            cogui::events::keypress* hk = new cogui::events::keypress(cogui::events::key_class::key_textinput, false, false, false, keydata);
+            std::shared_ptr<cogui::events::keypress> sp;
             sp.reset(hk);
             sp->set_as_hotkey();
             m_action_activators[sp] = &m_actions[i];

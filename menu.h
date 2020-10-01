@@ -51,7 +51,7 @@ namespace cogui
         bool mouse_move(int x, int y);
         bool click(int x, int y);
 
-        bool keypress(std::shared_ptr<cogui::events::key> k);
+        bool keypress(std::shared_ptr<cogui::events::keypress> k);
 
         void activate_action(size_t index);
         void activate_next_action();
@@ -80,7 +80,7 @@ namespace cogui
         bool m_is_sysmenu = true;
         bool m_opened = false;
         std::wstring m_caption = L"";
-        std::map<std::shared_ptr<cogui::events::key>, action*> m_action_activators;
+        std::map<std::shared_ptr<cogui::events::keypress>, action*> m_action_activators;
 
     private:
 

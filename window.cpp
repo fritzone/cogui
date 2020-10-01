@@ -9,6 +9,7 @@
 
 cogui::window::OnResize::argument cogui::window::on_resize;
 cogui::window::OnClose::argument cogui::window::on_close;
+cogui::window::OnKeypress::argument cogui::window::on_keypress;
 cogui::window::OnMouseDown::argument cogui::window::on_mouse_down;
 cogui::window::OnMouseUp::argument cogui::window::on_mouse_up;
 cogui::window::SystemMenu::argument cogui::window::sysmenu;
@@ -350,8 +351,8 @@ void cogui::window::register_menubar_hotkeys()
             std::wstring keydata;
             keydata += (wchar_t)caption[andp + 1];
             log_info() << "Hotkey found for" << caption << "as:" << keydata;
-            cogui::events::key* hk = new cogui::events::key(cogui::events::key_class::key_textinput, true, false, false, keydata);
-            std::shared_ptr<cogui::events::key> sp;
+            cogui::events::keypress* hk = new cogui::events::keypress(cogui::events::key_class::key_textinput, true, false, false, keydata);
+            std::shared_ptr<cogui::events::keypress> sp;
             sp.reset(hk);
             sp->set_as_hotkey();
             m_menubar_openers[sp] = &items[i];
@@ -479,12 +480,12 @@ void cogui::window::doubleclick(int x, int y)
     std::shared_ptr<control> under = element_under(x, y);
     if(under)
     {
-        under->doubleclick();
+        under->doubleclick(x,y);
     }
 }
 
 
-bool cogui::window::keypress(std::shared_ptr<cogui::events::key> k)
+bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
 {
     log_debug() << "Key:" << k->get_chardata();
 
@@ -550,6 +551,13 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::key> k)
         }
 
     }
+
+    // emit it as a signal, since noone took it over
+
+    std::shared_ptr<cogui::key> keys = std::make_shared<cogui::key>(*k);
+
+    emit sig_on_keypress(this, keys);
+
     return false;
 }
 

@@ -132,7 +132,7 @@ void cogui::control::redraw()
     draw();
 }
 
-void cogui::control::doubleclick()
+void cogui::control::doubleclick(int, int)
 {
     log_info() << "Double click, ignored for this control";
 }

@@ -24,6 +24,11 @@ desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance()
     log_info() << "Picking graphics engine:" << m_graphics->name();
 }
 
+desktop::~desktop()
+{
+    shutdown();
+}
+
 bool desktop::initialize()
 {
     bool b = true;
@@ -193,7 +198,7 @@ void desktop::handle_tab()
     }
 }
 
-bool desktop::handle_key(std::shared_ptr<cogui::events::key> k)
+bool desktop::handle_key(std::shared_ptr<cogui::events::keypress> k)
 {
     if(m_captured_window)
     {
@@ -281,8 +286,15 @@ void desktop::init(const std::string &theme_name)
 desktop &desktop::get()
 {
     static desktop d;
-    static bool desk_init = d.initialize();
-    d.m_initialized = desk_init;
+    if(!d.m_initialized)
+    {
+        static bool desk_init = d.initialize();
+        d.m_initialized = desk_init;
+        if(!d.m_initialized)
+        {
+            log_error() << "Cannot initialize the desktop";
+        }
+    }
     return d;
 }
 

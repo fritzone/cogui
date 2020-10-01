@@ -31,7 +31,7 @@ public:
 
     void handle_tab();
 
-    bool handle_key(std::shared_ptr<cogui::events::key> k);
+    bool handle_key(std::shared_ptr<cogui::events::keypress> k);
 
     std::shared_ptr<theme> getTheme() const;
     std::shared_ptr<graphics_engine> getGraphics() const;
@@ -60,6 +60,7 @@ public:
 private:
 
     desktop();
+    ~desktop();
     bool initialize();
 
     std::shared_ptr<cogui::theme> m_theme;
