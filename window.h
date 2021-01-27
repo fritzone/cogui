@@ -23,21 +23,6 @@
 namespace cogui
 {
 
-class window;
-
-
-class OnHotkey : public fluent::NamedType<std::function<void(cogui::window*)>, struct HotkeyHelper>
-{
-public:
-
-    OnHotkey& operator()(cogui::key)
-    {
-        return *this;
-    }
-
-};
-
-
 class window : public container
 {
 public:
@@ -133,19 +118,26 @@ public:
     using OnClose = fluent::NamedType<std::function<void(window*)>, struct OnCloseHelper>;
     using OnKeypress = fluent::NamedType<std::function<void(window*, std::shared_ptr<cogui::key>)>, struct OnKeypressHelper>;
 
+
+    
     static OnResize::argument on_resize;
     static OnClose::argument on_close;
     static OnMouseDown::argument on_mouse_down;
     static OnMouseUp::argument on_mouse_up;
     static OnKeypress::argument on_keypress;
-    static OnHotkey::argument on_hotkey;
+    
+
 
     miso::signal<window*, int, int> sig_on_resize {"on_resize"};
     miso::signal<window*> sig_on_close {"on_close"};
     miso::signal<window*,mouse::button,int,int> sig_on_mouse_down {"on_mouse_down"};
     miso::signal<window*,mouse::button,int,int> sig_on_mouse_up {"on_mouse_up"};
     miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_keypress {"on_keypress"};
-    miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_hotkey {"on_hotkey"};
+    
+    // hotkey map
+    using HotkeyT = fluent::NamedType<hotkey_associations, struct HotkeyHelper>;
+    static HotkeyT::argument hotkeys;
+    //miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_hotkey {"on_hotkey"};
 
 
     // system menu
@@ -159,6 +151,7 @@ private:
 
     menu m_sysmenu;
     menubar m_mainmenu = cogui::menubar::no_mainmenu;
+    hotkey_associations m_hotkeys;
 
     bool m_resizeable = true;
     bool m_hasCloseButton = true;
@@ -205,7 +198,9 @@ private:
             [&,this](OnMouseDown m) { miso::connect(this, sig_on_mouse_down, m.get()); },
             [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
             [&,this](SystemMenu m) {m_sysmenu = m.get(); m_hasSysmenuButton = true; },
-            [&,this](MenuBar m) {m_mainmenu = m.get(); }
+            [&,this](MenuBar m) {m_mainmenu = m.get(); },
+            [&,this](HotkeyT h) {m_hotkeys = h.get(); }
+
         );
 
         auto tup = std::make_tuple(std::forward<Args>(args)...);
@@ -219,6 +214,11 @@ private:
         if(hasMenubar())
         {
             register_menubar_hotkeys();
+        }
+
+        for(auto& h : m_hotkeys)
+        {
+            h->set_window(this);
         }
     }
 

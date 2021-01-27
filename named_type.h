@@ -49,10 +49,11 @@ public:
         argument& operator=(argument const&) = delete;
         argument& operator=(argument &&) = delete;
 
-        argument& operator()(const cogui::key&)
+        /*argument& operator[](const cogui::key&)
         {
             return *this;
-        }
+        }*/
+
     };
 
 private:

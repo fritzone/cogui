@@ -346,8 +346,34 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
                                                                                   cogui::utils::std2ws(buffer)));
             }
         }
-    }
+        else
+        if(key.type == TERMKEY_TYPE_FUNCTION)
+        {
+            log_info() << "Got a function key" << buffer;
 
+            static const std::map<std::string,cogui::events::key_class> function_keys{
+                {"F1", cogui::events::key_class::key_f1},
+                {"F2", cogui::events::key_class::key_f2},
+                {"F3", cogui::events::key_class::key_f3},
+                {"F4", cogui::events::key_class::key_f4},
+                {"F5", cogui::events::key_class::key_f5},
+                {"F6", cogui::events::key_class::key_f6},
+                {"F7", cogui::events::key_class::key_f7},
+                {"F8", cogui::events::key_class::key_f8},
+                {"F9", cogui::events::key_class::key_f9},
+                {"F10", cogui::events::key_class::key_f10},
+                {"F11", cogui::events::key_class::key_f11},
+                {"F12", cogui::events::key_class::key_f12}
+            };
+
+            if(function_keys.find(buffer) != function_keys.end())
+            {
+                result.push_back(cogui::events::event::create<cogui::events::keypress>(function_keys.at(buffer),
+                                                                                  alt_press, shift_press, ctrl_press,
+                                                                                  cogui::utils::std2ws(buffer)));
+            }
+        }
+    }
 
     return result;
 }

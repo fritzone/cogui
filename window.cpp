@@ -10,6 +10,7 @@
 cogui::window::OnResize::argument cogui::window::on_resize;
 cogui::window::OnClose::argument cogui::window::on_close;
 cogui::window::OnKeypress::argument cogui::window::on_keypress;
+cogui::window::HotkeyT::argument cogui::window::hotkeys;
 cogui::window::OnMouseDown::argument cogui::window::on_mouse_down;
 cogui::window::OnMouseUp::argument cogui::window::on_mouse_up;
 cogui::window::SystemMenu::argument cogui::window::sysmenu;
@@ -549,7 +550,18 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
         {
 
         }
+    }
 
+    // see if this was one of the hotkeys that were registered
+    for(const auto& hkh : m_hotkeys)
+    {
+        log_debug() << "K=" << k->get_chardata() << " H:" << hkh->k->generator().get_chardata();
+
+        if(*k == hkh->k->generator())
+        {
+            hkh->handle();
+            return true;
+        }
     }
 
     // emit it as a signal, since noone took it over

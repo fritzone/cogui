@@ -3,7 +3,56 @@
 
 #include "events.h"
 
+#include <map>
+#include <initializer_list>
+#include <vector>
+
 namespace cogui {
+
+class window;
+class key;
+
+struct hh_base
+{
+    hh_base() = default;
+    virtual bool handle() = 0;
+    virtual void set_window(window*) = 0;
+};
+
+template<typename H> struct hotkey_handler : public hh_base
+{
+    hotkey_handler(H h) : m_handler(h) {}
+
+    virtual bool handle() override
+    {
+        m_handler(m_window);
+        return true;
+    }
+
+    virtual void set_window(cogui::window *win) override
+    {
+        m_window = win;
+    }
+
+    H m_handler;
+    cogui::window* m_window = nullptr;
+
+};
+
+struct abstract_hotkey_handler
+{
+    template<class H>
+    abstract_hotkey_handler(H h) : m_hh(new hotkey_handler(h)) {}
+    virtual bool handle() {return m_hh->handle();}
+    std::shared_ptr<hh_base> m_hh;
+    cogui::key* k = nullptr;
+    void set_window(cogui::window *win)
+    {
+        m_hh->set_window(win);
+    }
+};
+
+
 
 class key
 {
@@ -102,7 +151,7 @@ public:
     static cogui::key Ctrl;
     static cogui::key Shift;
 
-    // used to kreate hotkeys
+    // used to create hotkeys
     key operator + (const key& other);
 
     key(const events::keypress& generator);
@@ -112,11 +161,47 @@ public:
     {
         return m_generator.get_chardata();
     }
+    
+    template<class H> std::shared_ptr<abstract_hotkey_handler> operator = (H h)
+    {
+        std::shared_ptr<abstract_hotkey_handler> ahh = std::make_shared<abstract_hotkey_handler>(h);
+        ahh->k = this;
+        return ahh;
+    }
+
+    events::keypress& generator()
+    {
+        return m_generator;
+    }
 
 private:
     events::keypress m_generator;
 };
 
+using hotkey_associations = std::vector<std::shared_ptr<abstract_hotkey_handler>>;
+    
+template <const cogui::key* K> struct on
+{
+    static cogui::key& press;
+};
+
+
+/*
+class window;
+
+#include <functional>
+
+    template<class KeyCode> 
+    using OnKey = fluent::NamedType<std::function<void(window*, KeyCode)>, struct OnKeyHelper<KeyCode>::key>;
+    
+    template<class KeyCode> struct OnKeyHelper
+    {
+        using key = KeyCode;
+    };
+
+    
+    template<> struct on_key<cogui::key::A> {  };
+*/    
 }
 
 #endif // KEY_H
