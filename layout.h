@@ -24,8 +24,22 @@ public:
     container *getContainer() const;
     void setContainer(container *container);
 
+    /**
+     * @brief spacing returns the space that is between the controls in a layout
+     * @return
+     */
+    int spacing() const;
+
+    /**
+     * @brief setSpacing sets the spacing between the controls in the layout
+     */
+    void set_spacing(int s);
+
 protected:
     container* m_container = nullptr;
+
+private:
+    int m_spacing = 1;
 };
 
 class horizontal  : public abstract
@@ -91,7 +105,7 @@ public:
     {}
 
     /**
-     * @brief arrange_controls will arrange the controls in a horizontal layout inside the
+     * @brief arrange_controls will arrange the controls in a grid layout inside the
      * given containers' limits
      */
     void arrange_controls(std::vector<std::shared_ptr<cogui::control>>&, container*) override ;

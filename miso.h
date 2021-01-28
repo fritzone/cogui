@@ -40,7 +40,7 @@ void connect_i(void* sig_addr, void* obj, T &&f, std::vector<common_slot_base *>
     func_and_bool<FT> fb{std::make_shared<FT>(std::forward<T>(f)), active, reinterpret_cast<void *>(&f), obj, sig_addr};
     bool already_in = false;
 
-    log_debug() << "looking for in:" << &f << " for obj:" << obj;
+    // log_debug() << "looking for in:" << &f << " for obj:" << obj;
     std::for_each(sh.slots.begin(), sh.slots.end(),
                   [&](func_and_bool<FT> &s)
                     {
@@ -104,7 +104,7 @@ template<class T> emitter<T> *emitter<T>::minstance = nullptr;
 
 template<class T, class... Args>
 emitter<T> &&operator <<(internal::emitter<T> &&e, signal<Args...> &s) {
-    log_debug() << "emitting: " << &s << " as " << s.name();
+    // log_debug() << "emitting: " << &s << " as " << s.name();
     s.delayed_dispatch( e.sender() );
     return std::forward<internal::emitter<T>>(e);
 }
@@ -126,7 +126,7 @@ class signal final
         void run_slots(void* sig_addr, void*sender_obj, Args... args) override {
             std::for_each(slots.begin(), slots.end(), [&](internal::func_and_bool<FT>& s)
             {
-                log_debug() << "trying: (s.obj) " << s.obj << "==" << sender_obj << " (sender_obj) and (s.sig_addr)" << s.sig_addr << "==" << sig_addr << " (sig_addr)";
+                // log_debug() << "trying: (s.obj) " << s.obj << "==" << sender_obj << " (sender_obj) and (s.sig_addr)" << s.sig_addr << "==" << sig_addr << " (sig_addr)";
                 if (s.active && s.obj == sender_obj && s.sig_addr == sig_addr) (*(s.ft.get()))(args...);
             }
             );

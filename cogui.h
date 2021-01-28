@@ -15,6 +15,7 @@
 #include "log.h"
 #include "utils.h"
 #include "key.h"
+#include "scrollbar.h"
 
 namespace cogui {
 

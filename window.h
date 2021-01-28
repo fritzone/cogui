@@ -8,6 +8,7 @@
 #include "mouse.h"
 #include "menu.h"
 #include "menubar.h"
+#include "scrollbar.h"
 
 #include "named_type.h"
 #include "tuple_iterator.h"
@@ -16,9 +17,6 @@
 #include <string>
 #include <tuple>
 #include <functional>
-
-
-
 
 namespace cogui
 {
@@ -94,6 +92,7 @@ public:
     int minimumDrawableWidth() const override;
     int minimumDrawableHeight() const override;
     void redraw() override;
+    int first_available_row() const override;
 
     void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
     void update_menubar_positions(menu*, std::pair<int, int>, std::pair<int, int>);
@@ -109,24 +108,21 @@ public:
         return !b;
     }
     menubar &getMainMenu();
+    scrollbar& get_scrollbar();
+    const scrollbar& get_scrollbar() const;
 
     // signals
-
     using OnResize = fluent::NamedType<std::function<void(window*,int,int)>, struct OnResizeHelper>;
     using OnMouseDown = fluent::NamedType<std::function<void(window*,mouse::button,int,int)>, struct OnMouseDownHelper>;
     using OnMouseUp = fluent::NamedType<std::function<void(window*,mouse::button,int,int)>, struct OnMouseUpHelper>;
     using OnClose = fluent::NamedType<std::function<void(window*)>, struct OnCloseHelper>;
     using OnKeypress = fluent::NamedType<std::function<void(window*, std::shared_ptr<cogui::key>)>, struct OnKeypressHelper>;
 
-
-    
     static OnResize::argument on_resize;
     static OnClose::argument on_close;
     static OnMouseDown::argument on_mouse_down;
     static OnMouseUp::argument on_mouse_up;
     static OnKeypress::argument on_keypress;
-    
-
 
     miso::signal<window*, int, int> sig_on_resize {"on_resize"};
     miso::signal<window*> sig_on_close {"on_close"};
@@ -137,8 +133,6 @@ public:
     // hotkey map
     using HotkeyT = fluent::NamedType<hotkey_associations, struct HotkeyHelper>;
     static HotkeyT::argument hotkeys;
-    //miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_hotkey {"on_hotkey"};
-
 
     // system menu
     using SystemMenu = fluent::NamedType<menu, struct SystemMenuHelper>;
@@ -147,11 +141,17 @@ public:
     // menubar
     using MenuBar = fluent::NamedType<menubar, struct MenuBarHelper>;
     static MenuBar::argument mainmenu;
+
+    // scrollbar
+    using ScrollBar = fluent::NamedType<scrollbar, struct ScrollBarHelper>;
+    static ScrollBar::argument scrollbars;
+
 private:
 
     menu m_sysmenu;
     menubar m_mainmenu = cogui::menubar::no_mainmenu;
     hotkey_associations m_hotkeys;
+    scrollbar m_scrollbar;
 
     bool m_resizeable = true;
     bool m_hasCloseButton = true;
@@ -199,8 +199,8 @@ private:
             [&,this](OnMouseUp m) { miso::connect(this, sig_on_mouse_up, m.get()); },
             [&,this](SystemMenu m) {m_sysmenu = m.get(); m_hasSysmenuButton = true; },
             [&,this](MenuBar m) {m_mainmenu = m.get(); },
-            [&,this](HotkeyT h) {m_hotkeys = h.get(); }
-
+            [&,this](HotkeyT h) {m_hotkeys = h.get(); },
+            [&,this](ScrollBar s) {m_scrollbar = s.get(); }
         );
 
         auto tup = std::make_tuple(std::forward<Args>(args)...);
@@ -216,9 +216,38 @@ private:
             register_menubar_hotkeys();
         }
 
+        // register the receiving window for the hotkeys
         for(auto& h : m_hotkeys)
         {
             h->set_window(this);
+        }
+
+        if(m_scrollbar.get_orientation() != scrollbar::orientation::so_none)
+        {
+            if(m_scrollbar.get_orientation() == scrollbar::orientation::so_both)
+            {
+                m_horizontal_scrollbar.reset(new scrollbar);
+                m_horizontal_scrollbar->set_orientation(scrollbar::orientation::so_horizontal);
+                m_horizontal_scrollbar->set_parent(this);
+                m_vertical_scrollbar.reset(new scrollbar);
+                m_vertical_scrollbar->set_orientation(scrollbar::orientation::so_vertical);
+                m_vertical_scrollbar->set_parent(this);
+            }
+            else
+            if(m_scrollbar.get_orientation() == scrollbar::orientation::so_vertical)
+            {
+                m_vertical_scrollbar.reset(new scrollbar);
+                m_vertical_scrollbar->set_orientation(scrollbar::orientation::so_vertical);
+                m_vertical_scrollbar->set_parent(this);
+            }
+            else
+            if(m_scrollbar.get_orientation() == scrollbar::orientation::so_horizontal)
+            {
+                m_horizontal_scrollbar.reset(new scrollbar);
+                m_horizontal_scrollbar->set_orientation(scrollbar::orientation::so_horizontal);
+                m_horizontal_scrollbar->set_parent(this);
+            }
+
         }
     }
 

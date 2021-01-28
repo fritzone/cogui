@@ -109,7 +109,7 @@ set(PROJECT_SOURCES
     cogui.cpp dynamic_library.cpp
     window.cpp desktop.cpp 
     application.cpp events.cpp mouse.cpp xterm_input.cpp gpm_input.cpp arguments.cpp action.cpp menubar.cpp key.cpp
-    control.cpp button.cpp container.cpp layout.cpp menu.cpp checkbox.cpp
+    control.cpp button.cpp container.cpp layout.cpp menu.cpp checkbox.cpp scrollbar.cpp
     logstream.cpp
 )
 

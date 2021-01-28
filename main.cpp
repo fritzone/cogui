@@ -81,7 +81,8 @@ int main( int argc, char* argv[] )
                                on<&key::F2>::press = [&](window*){log_info() << "pressed the F2 key";},
                                on<&key::F3>::press = [&](window*){log_info() << "pressed the F3 key";},
                                on< &key::F4 >::press = [&](window* w){log_info() << "pressed the F4 key"; w->setTitle(L"F4 pressed");}
-                           }
+                           },
+                           window::scrollbars = scrollbar::both
                            /*  */
     );
 

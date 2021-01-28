@@ -15,6 +15,7 @@ cogui::window::OnMouseDown::argument cogui::window::on_mouse_down;
 cogui::window::OnMouseUp::argument cogui::window::on_mouse_up;
 cogui::window::SystemMenu::argument cogui::window::sysmenu;
 cogui::window::MenuBar::argument cogui::window::mainmenu;
+cogui::window::ScrollBar::argument cogui::window::scrollbars;
 
 cogui::window::~window()
 {
@@ -306,6 +307,11 @@ void cogui::window::redraw()
     desktop::get().redraw();
 }
 
+int cogui::window::first_available_row() const
+{
+    return desktop::get().getTheme()->first_available_row(*this);
+}
+
 void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const
 {
     m_close_btn_pos = close_pos;
@@ -337,6 +343,16 @@ void cogui::window::closeCurrentMenu()
 cogui::menubar &cogui::window::getMainMenu()
 {
     return m_mainmenu;
+}
+
+cogui::scrollbar &cogui::window::get_scrollbar()
+{
+    return m_scrollbar;
+}
+
+const cogui::scrollbar &cogui::window::get_scrollbar() const
+{
+    return m_scrollbar;
 }
 
 void cogui::window::register_menubar_hotkeys()

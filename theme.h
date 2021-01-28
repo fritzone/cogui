@@ -25,12 +25,14 @@ public:
     virtual void draw_button(const button& b) = 0;
     virtual void draw_menu(const menu &m) = 0;
     virtual void draw_checkbox(const checkbox& c) = 0;
+    virtual void draw_scrollbar(const scrollbar& s) = 0;
     virtual int minimum_checkbox_width(const checkbox& c) = 0;
     virtual int minimum_checkbox_height(const checkbox& c) = 0;
     virtual int minimum_button_width(const button& b) = 0;
     virtual int minimum_button_height(const button& b) = 0;
     virtual int minimum_window_width(const window& w) = 0;
     virtual int minimum_window_height(const window& w) = 0;
+    virtual int first_available_row(const window& w) = 0;
 
     virtual std::string name() = 0;
 };

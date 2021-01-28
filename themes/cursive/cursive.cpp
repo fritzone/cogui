@@ -142,6 +142,27 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
         }
     }
 
+
+    // and the scrollbar, finally
+    switch(w.get_scrollbar().get_orientation())
+    {
+    case cogui::scrollbar::orientation::so_none:
+        break;
+
+    case cogui::scrollbar::orientation::so_horizontal:
+        draw_scrollbar(w.get_horizontal_scrollbar());
+        break;
+
+    case cogui::scrollbar::orientation::so_both:
+        draw_scrollbar(w.get_horizontal_scrollbar());
+        draw_scrollbar(w.get_vertical_scrollbar());
+        break;
+
+    case cogui::scrollbar::orientation::so_vertical:
+        draw_scrollbar(w.get_vertical_scrollbar());
+        break;
+    }
+
 }
 
 void cogui::themes::cursive::draw_button(const cogui::button &b)
@@ -343,6 +364,68 @@ void cogui::themes::cursive::draw_checkbox(const checkbox &c)
     }
 }
 
+void cogui::themes::cursive::draw_scrollbar(const cogui::scrollbar &s)
+{
+    control* c = s.get_parent();
+    if(!c)
+    {
+        return;
+    }
+
+    // do we have a vertical scrollbar?
+    if(s.get_orientation() == scrollbar::orientation::so_vertical)
+    {
+        int x = c->getX();
+        int w = c->getWidth();
+        int y = c->getY() + c->first_available_row(); // no need to draw scrollbar on menu
+        int h = c->getHeight() - c->first_available_row() - 1;
+
+        cogui::graphics()->draw_text(x + w + 1, y, SCROLL_UP_ARROW, cogui::textflags::normal);
+        cogui::graphics()->draw_text(x + w + 1, y + h, SCROLL_DOWN_ARROW, cogui::textflags::normal);
+
+        int handle_counter = 0;
+        for(int i=y + 1; i<y+h; i++)
+        {
+            cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_BODY, cogui::textflags::normal);
+            if(handle_counter == s.get_handle_position())
+            {
+                cogui::graphics()->set_bg_color(graphics_engine::color::white);
+                cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE, cogui::textflags::normal);
+                cogui::graphics()->set_bg_color(graphics_engine::color::black);
+            }
+            handle_counter ++;
+        }
+
+    }
+
+    // do we have a horizontal scrollbar?
+    if(s.get_orientation() == scrollbar::orientation::so_horizontal)
+    {
+        int x = c->getX();
+        int h = c->getHeight();
+        int w = c->getWidth();
+        int y = c->getY();
+
+        cogui::graphics()->draw_text(x + 1, y + h, SCROLL_LEFT_ARROW, cogui::textflags::normal);
+        cogui::graphics()->draw_text(x +  w, y + h, SCROLL_RIGHT_ARROW, cogui::textflags::normal);
+        int handle_counter = 0;
+        for(int i =x + 2; i<= x + w - 1; i++)
+        {
+            cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_BODY, cogui::textflags::normal);
+            if(handle_counter == s.get_handle_position())
+            {
+                cogui::graphics()->set_bg_color(graphics_engine::color::white);
+                cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE, cogui::textflags::normal);
+                cogui::graphics()->set_bg_color(graphics_engine::color::black);
+            }
+            handle_counter ++;
+        }
+
+
+    }
+
+}
+
 int cogui::themes::cursive::minimum_checkbox_width(const cogui::checkbox &c)
 {
     return c.getTitle().length() + 2; // +2 for the checkmarek followed by a space
@@ -375,6 +458,12 @@ int cogui::themes::cursive::minimum_window_width(const cogui::window &w)
 int cogui::themes::cursive::minimum_window_height(const cogui::window &)
 {
     return 3; // top line + content line + bottomline
+}
+
+int cogui::themes::cursive::first_available_row(const cogui::window &w)
+{
+    if(w.hasMenubar()) return 3;
+    return 1;
 }
 
 std::string cogui::themes::cursive::name()

@@ -33,6 +33,7 @@ public:
     void draw_button(const button& b) override;
     void draw_menu(const menu &m) override;
     void draw_checkbox(const checkbox& c) override;
+    void draw_scrollbar(const scrollbar& s) override;
 
     int minimum_checkbox_width(const checkbox& c) override;
     int minimum_checkbox_height(const checkbox& c) override;
@@ -42,6 +43,8 @@ public:
 
     int minimum_window_width(const window& w) override;
     int minimum_window_height(const window& w) override;
+
+    int first_available_row(const window& w) override;
 
     std::string name() override;
 
@@ -159,6 +162,18 @@ public:
 
     std::wstring CHK_UNCHECKED = L"\x2610"; // unchecked checkbox
     std::wstring CHK_CHECKED = L"\x2611"; // unchecked checkbox
+
+    /******************************************************************************************************************/
+    /*                                                    SCROLLBAR                                                   */
+    /******************************************************************************************************************/
+    std::wstring SCROLL_UP_ARROW = L"\x2353";
+    std::wstring SCROLL_DOWN_ARROW = L"\x234c";
+    std::wstring SCROLL_VERTICAL_BODY = L"\x2395";
+    std::wstring SCROLL_VERTICAL_HANDLE = L"\x233c";
+    std::wstring SCROLL_LEFT_ARROW = L"\x2343";
+    std::wstring SCROLL_RIGHT_ARROW = L"\x2344";
+    std::wstring SCROLL_HORIZONTAL_BODY = L"\x2337";
+    std::wstring SCROLL_HORIZONTAL_HANDLE = L"\x233c";
 
 };
 }

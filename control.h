@@ -12,6 +12,8 @@
 namespace cogui
 {
 
+class scrollbar;
+
 class control
 {
 public:
@@ -99,6 +101,24 @@ public:
      */
     void setY(int y);
 
+    /**
+     * @brief setBounds Will relocate the control to the given position, given size
+     *
+     * @param x the X coordinate
+     * @param y the Y coordinate
+     * @param w the width
+     * @param h the height
+     */
+    void setBounds(int x, int y, int w, int h);
+
+    /**
+     * @brief first_available_row will return the first row which is available to the content of the containeir to
+     * draw the controls of it. For example, if there is a menu, it will return +2, in order for the content to not to
+     * occupy the menu
+     * @return
+     */
+    virtual int first_available_row() const { return 1; };
+
     int getWidth() const;
     void setWidth(int width);
 
@@ -129,6 +149,10 @@ public:
     bool is_pressed() const;
     press_state get_press_state() const;
     void set_press_state(press_state s);
+
+    const scrollbar& get_horizontal_scrollbar() const;
+
+    const scrollbar& get_vertical_scrollbar() const;
 
     /**
      * @brief redraw Re-draws the control
@@ -162,6 +186,8 @@ protected:
     int m_maximumHeight = -1;
 
     bool m_visible = true;
+    std::shared_ptr<scrollbar> m_horizontal_scrollbar = nullptr;
+    std::shared_ptr<scrollbar> m_vertical_scrollbar = nullptr;
 
 private:
     void initInitialPosition();

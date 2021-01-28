@@ -126,6 +126,16 @@ void cogui::control::set_press_state(cogui::control::press_state s)
     m_state = s;
 }
 
+const cogui::scrollbar &cogui::control::get_horizontal_scrollbar() const
+{
+    return *m_horizontal_scrollbar;
+}
+
+const cogui::scrollbar &cogui::control::get_vertical_scrollbar() const
+{
+    return *m_vertical_scrollbar;
+}
+
 void cogui::control::redraw()
 {
     clear();
@@ -156,6 +166,14 @@ void cogui::control::setY(int y)
 {
     log_debug() << "set y=" << y << " to" << (char*)m_title.c_str();
     m_y = y;
+}
+
+void cogui::control::setBounds(int x, int y, int w, int h)
+{
+    setX(x);
+    setY(y);
+    setWidth(w);
+    setHeight(h);
 }
 
 int cogui::control::getX() const

@@ -6,24 +6,23 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
                                                  cogui::container * cont)
 {
     int width = cont->getWidth();
-    int recommended_width = width / controls.size() - 1;
+    int recommended_width = width / controls.size() - spacing() * controls.size();
     int cx = 1;
     bool expandable = (m_expanded_column != -1);
     bool hiding = false;
     int last_x = 0;
     log_info() << "Expandable:" << expandable;
     int last_x_before_split = 0;
-    int cy = 1;
 
     if(expandable)
     {
         int accumulated_width = 0;
-        for(int i = m_expanded_column; i<controls.size(); i++)
+        for(auto i = m_expanded_column; i<controls.size(); i++)
         {
             accumulated_width += controls[i]->minimumDrawableWidth() + 1; // +1 since the next control start +1
         }
 
-        for(int i=0; i<controls.size(); i++)
+        for(auto i=0; i<controls.size(); i++)
         {
             if(i == m_expanded_column)
             {
@@ -43,11 +42,7 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
             if(!hiding)
             {
                 c->show();
-                c->setX(cx);
-                c->setY(1);
-                c->setHeight(cont->getHeight() - 2);
-
-                c->setWidth(c->minimumDrawableWidth());
+                c->setBounds(cx, cont->first_available_row(), c->minimumDrawableWidth(), cont->getHeight() - cont->first_available_row() - spacing());
             }
             else
             {
@@ -55,11 +50,7 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
                 if(cx > last_x_before_split)
                 {
                     c->show();
-                    c->setX(cx);
-                    c->setY(1);
-                    c->setHeight(cont->getHeight() - 2);
-
-                    c->setWidth(c->minimumDrawableWidth());
+                    c->setBounds(cx, cont->first_available_row(), c->minimumDrawableWidth(), cont->getHeight() - cont->first_available_row() - spacing());
                     hiding = false;
                 }
             }
@@ -74,16 +65,13 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
         for (auto& c : controls)
         {
             c->show();
-            c->setX(cx);
-            c->setY(1);
-            c->setHeight(cont->getHeight() - 2);
-            c->setWidth(recommended_width - 1);
-            cx += recommended_width + 1;
+            c->setBounds(cx, cont->first_available_row(), recommended_width - spacing(), cont->getHeight() - cont->first_available_row() - spacing());
+            cx += recommended_width + spacing();
         }
     }
 }
 
-bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_ptr<control>>&controls, int new_width, int new_height)
+bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_ptr<control>>&controls, int new_width, int )
 {
     int cx = 1;
     bool expandable = (m_expanded_column != -1);
@@ -134,20 +122,10 @@ void cogui::layout::horizontal::expand(int c)
 void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui::control> >& controls,
                                                  cogui::container * cont)
 {
-    cogui::window* w = dynamic_cast<cogui::window*>(cont);
-    int reduce_height = 0;
-    if(w)
-    {
-        if(w->hasMenubar())
-        {
-            reduce_height = 2;
-        }
-    }
 
-    int height = cont->getHeight() - reduce_height;
-
-    int recommended_height = height / controls.size() - 1;
-    int cy = 1 + reduce_height;
+    int height = cont->getHeight() - cont->first_available_row() - 1;
+    int recommended_height = height / controls.size() - spacing() * controls.size();
+    int cy = cont->first_available_row() ;
     bool expandable = (m_expanded_row != -1);
     int last_y = 0;
     bool hiding = false;
@@ -318,4 +296,14 @@ cogui::container *cogui::layout::abstract::getContainer() const
 void cogui::layout::abstract::setContainer(cogui::container *container)
 {
     m_container = container;
+}
+
+int cogui::layout::abstract::spacing() const
+{
+    return m_spacing;
+}
+
+void cogui::layout::abstract::set_spacing(int s)
+{
+    m_spacing = s;
 }
