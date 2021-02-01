@@ -150,7 +150,7 @@ public:
     press_state get_press_state() const;
     void set_press_state(press_state s);
 
-    const scrollbar& get_horizontal_scrollbar() const;
+    const scrollbar &get_horizontal_scrollbar() const;
 
     const scrollbar& get_vertical_scrollbar() const;
 
@@ -161,11 +161,15 @@ public:
 
     virtual int minimumDrawableWidth() const = 0;
     virtual int minimumDrawableHeight() const = 0;
-    virtual void click() = 0;
     virtual void doubleclick(int,int);
     virtual void draw() const = 0;
-    virtual bool inside(int x, int y) const;
 
+    virtual bool inside(int x, int y) const;
+    virtual void click() = 0;
+
+    std::shared_ptr<scrollbar> mouse_down_on_scrollbar_decrease(int x, int y);
+
+    std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_increase(int x, int y);
 protected:
 
     int m_x = 0;

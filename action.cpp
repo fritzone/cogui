@@ -1,7 +1,7 @@
 #include "action.h"
 
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
-cogui::action::Selectable cogui::action::selectable;
+cogui::action::Selectable::argument cogui::action::selectable;
 
 cogui::action::~action()
 {
@@ -10,9 +10,11 @@ cogui::action::~action()
 
 cogui::action::action(const cogui::action &o)
 {
-    m_title = o.m_title;
+    *this = o;
+    /*m_title = o.m_title;
     m_conn = o.m_conn;
-    miso::connect(this, sig_on_trigger, m_conn.get());
+    m_selectable = o.m_selectable;
+    miso::connect(this, sig_on_trigger, m_conn.get());*/
 }
 
 cogui::action &cogui::action::operator=(const cogui::action &o)
@@ -21,6 +23,7 @@ cogui::action &cogui::action::operator=(const cogui::action &o)
     sig_on_trigger.disconnect(this, m_conn.get());
     sig_on_trigger = o.sig_on_trigger;
     m_conn = o.m_conn;
+    m_selectable = o.m_selectable;
     miso::connect(this, sig_on_trigger, m_conn.get());
 
     return *this;

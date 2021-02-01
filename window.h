@@ -107,8 +107,7 @@ public:
         bool b = (&m_mainmenu == &cogui::menubar::no_mainmenu);
         return !b;
     }
-    menubar &getMainMenu();
-    scrollbar& get_scrollbar();
+    menubar &get_main_menu();
     const scrollbar& get_scrollbar() const;
 
     // signals

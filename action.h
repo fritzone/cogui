@@ -12,8 +12,6 @@ namespace cogui {
 
 class action
 {
-    using Selectable = bool;
-
 public:
 
     action() = default;
@@ -34,26 +32,14 @@ public:
     {
         resolve_named_parameters(std::forward<Args>(args)...);
     }
+
     template<typename ... Args>
-    action(const std::wstring& title, Selectable s, Args... args) : m_title(title), m_selectable(true)
+    action(const std::wstring& title, cogui::key hotkey, Args... args) : m_title(title)
     {
         resolve_named_parameters(std::forward<Args>(args)...);
     }
 
-    template<typename ... Args>
-    void resolve_named_parameters(Args... args)
-    {
-        auto connector = overload_unref(
-            [&,this](OnTrigger c) { m_conn = c; miso::connect(this, sig_on_trigger, c.get()); }
-        );
 
-        auto tup = std::make_tuple(std::forward<Args>(args)...);
-
-        for (auto const& elem : to_range(tup))
-        {
-            std::visit(connector, elem);
-        }
-    }
 
     void trigger();
     std::wstring getTitle() const;
@@ -65,9 +51,26 @@ public:
     miso::signal<action*> sig_on_trigger {"on_trigger"};
 
     // whether it is selectable or not
-    static Selectable selectable;
+    using Selectable = fluent::NamedType<bool, struct OnSelectableHelper>;
+    static Selectable::argument selectable;
 
     bool isSelectable() const;
+
+    template<typename ... Args>
+    void resolve_named_parameters(Args... args)
+    {
+        auto connector = overload_unref(
+            [&,this](OnTrigger c) { m_conn = c; miso::connect(this, sig_on_trigger, c.get()); },
+            [&,this](Selectable s) {m_selectable = s.get(); log_debug() << (m_selectable ? "SSSSSSSSSSSSSSSS" : "XXXXXXXXXXXXXxxx");}
+        );
+
+        auto tup = std::make_tuple(std::forward<Args>(args)...);
+
+        for (auto const& elem : to_range(tup))
+        {
+            std::visit(connector, elem);
+        }
+    }
 
 private:
     std::wstring m_title;

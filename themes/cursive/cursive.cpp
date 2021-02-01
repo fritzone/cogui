@@ -117,7 +117,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
                                               + cogui::utils::repeated(drawWidth, WND_HORZ_MENULINE)
                                               + (rs ? WND_VERT_MENULINE_END_RESIZE : WND_VERT_MENULINE_END)
                     );
-        auto& m = const_cast<cogui::menubar&>(const_cast<cogui::window&>(w).getMainMenu());
+        auto& m = const_cast<cogui::menubar&>(const_cast<cogui::window&>(w).get_main_menu());
         auto& items = m.items();
         int mdix = drawX + 2;
         for(size_t i = 0; i < items.size(); i++)
@@ -273,6 +273,19 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
     int drawX = m.getX();
     int drawWidth = m.getWidth();
 
+    bool one_is_selectable = false;
+    // see if there is a menu action which is selectable or not
+    for(int i=0; i<m.get_action_count(); i++)
+    {
+        if(m[i].isSelectable())
+        {
+            one_is_selectable = true;
+            break;
+        }
+    }
+
+    log_debug() << (one_is_selectable ? "ONE_IS_SELECTABLE" : "NO SELECTABLES");
+
     cogui::graphics()->clear_area(drawX, drawY, drawWidth, drawHeight);
 
     cogui::graphics()->draw_text(drawX, drawY, MNU_UL_CORNER);
@@ -303,6 +316,16 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
         log_debug() << "menu LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
 
         std::wstring titleToDraw = m[mc].getTitle();
+
+        if(m[mc].isSelectable())
+        {
+            titleToDraw = CHK_UNCHECKED + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + titleToDraw;
+        }
+        else if (titleToDraw != cogui::menu::separator_item.getTitle() && one_is_selectable)
+        {
+            titleToDraw = MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR +titleToDraw;
+        }
+
         if(titleToDraw == cogui::menu::separator_item.getTitle())
         {
             cogui::graphics()->draw_text(drawX, y, MNU_LEFT_SEPARATOR + cogui::utils::repeated(drawWidth - 1, MNU_HORIZONTAL)  + MNU_RIGHT_SEPARATOR);
@@ -324,6 +347,11 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
 
         }
         mc ++;
+        if(mc >= m.get_action_count())
+        {
+            log_warning() << "an action counter passed over the menu";
+            break;
+        }
     }
 }
 
@@ -364,7 +392,7 @@ void cogui::themes::cursive::draw_checkbox(const checkbox &c)
     }
 }
 
-void cogui::themes::cursive::draw_scrollbar(const cogui::scrollbar &s)
+void cogui::themes::cursive::draw_scrollbar(const scrollbar &s)
 {
     control* c = s.get_parent();
     if(!c)
@@ -375,53 +403,13 @@ void cogui::themes::cursive::draw_scrollbar(const cogui::scrollbar &s)
     // do we have a vertical scrollbar?
     if(s.get_orientation() == scrollbar::orientation::so_vertical)
     {
-        int x = c->getX();
-        int w = c->getWidth();
-        int y = c->getY() + c->first_available_row(); // no need to draw scrollbar on menu
-        int h = c->getHeight() - c->first_available_row() - 1;
-
-        cogui::graphics()->draw_text(x + w + 1, y, SCROLL_UP_ARROW, cogui::textflags::normal);
-        cogui::graphics()->draw_text(x + w + 1, y + h, SCROLL_DOWN_ARROW, cogui::textflags::normal);
-
-        int handle_counter = 0;
-        for(int i=y + 1; i<y+h; i++)
-        {
-            cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_BODY, cogui::textflags::normal);
-            if(handle_counter == s.get_handle_position())
-            {
-                cogui::graphics()->set_bg_color(graphics_engine::color::white);
-                cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE, cogui::textflags::normal);
-                cogui::graphics()->set_bg_color(graphics_engine::color::black);
-            }
-            handle_counter ++;
-        }
-
+        draw_verticall_scrollbar(c, const_cast<scrollbar&>(s));
     }
 
     // do we have a horizontal scrollbar?
     if(s.get_orientation() == scrollbar::orientation::so_horizontal)
     {
-        int x = c->getX();
-        int h = c->getHeight();
-        int w = c->getWidth();
-        int y = c->getY();
-
-        cogui::graphics()->draw_text(x + 1, y + h, SCROLL_LEFT_ARROW, cogui::textflags::normal);
-        cogui::graphics()->draw_text(x +  w, y + h, SCROLL_RIGHT_ARROW, cogui::textflags::normal);
-        int handle_counter = 0;
-        for(int i =x + 2; i<= x + w - 1; i++)
-        {
-            cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_BODY, cogui::textflags::normal);
-            if(handle_counter == s.get_handle_position())
-            {
-                cogui::graphics()->set_bg_color(graphics_engine::color::white);
-                cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE, cogui::textflags::normal);
-                cogui::graphics()->set_bg_color(graphics_engine::color::black);
-            }
-            handle_counter ++;
-        }
-
-
+        draw_horizontal_scrollbar(c, const_cast<scrollbar&>(s));
     }
 
 }
@@ -469,4 +457,59 @@ int cogui::themes::cursive::first_available_row(const cogui::window &w)
 std::string cogui::themes::cursive::name()
 {
     return "cursive";
+}
+
+void cogui::themes::cursive::draw_horizontal_scrollbar(cogui::control *c, cogui::scrollbar &s)
+{
+    int x = c->getX();
+    int h = c->getHeight();
+    int w = c->getWidth();
+    int y = c->getY();
+    cogui::graphics()->set_bg_color(graphics_engine::color::white);
+
+    cogui::graphics()->draw_text(x + 1, y + h, SCROLL_LEFT_ARROW, cogui::textflags::normal);
+    s.set_dec_arrow_screen_position({x + 1, y + h, 1, 1});
+
+    cogui::graphics()->draw_text(x + w, y + h, SCROLL_RIGHT_ARROW, cogui::textflags::normal);
+    s.set_inc_arrow_screen_position({x + w, y + h, 1, 1});
+
+    int handle_counter = 0;
+
+    for(int i =x + 2; i<= x + w - 1; i++)
+    {
+        cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_BODY, cogui::textflags::normal);
+        if(handle_counter == s.get_handle_position())
+        {
+            cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE, cogui::textflags::normal);
+        }
+        handle_counter ++;
+    }
+    cogui::graphics()->set_bg_color(graphics_engine::color::black);
+}
+
+void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::scrollbar &s)
+{
+    int x = c->getX();
+    int w = c->getWidth();
+    int y = c->getY() + c->first_available_row(); // no need to draw scrollbar on menu
+    int h = c->getHeight() - c->first_available_row() - 1;
+    cogui::graphics()->set_bg_color(graphics_engine::color::white);
+
+    cogui::graphics()->draw_text(x + w + 1, y, SCROLL_UP_ARROW, cogui::textflags::normal);
+    s.set_dec_arrow_screen_position({x + w + 1, y, 1 ,1});
+
+    cogui::graphics()->draw_text(x + w + 1, y + h, SCROLL_DOWN_ARROW, cogui::textflags::normal);
+    s.set_inc_arrow_screen_position({x + w + 1, y + h, 1, 1});
+
+    int handle_counter = 0;
+    for(int i=y + 1; i<y+h; i++)
+    {
+        cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_BODY, cogui::textflags::normal);
+        if(handle_counter == s.get_handle_position())
+        {
+            cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE, cogui::textflags::normal);
+        }
+        handle_counter ++;
+    }
+    cogui::graphics()->set_bg_color(graphics_engine::color::black);
 }

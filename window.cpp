@@ -209,10 +209,10 @@ void cogui::window::mouse_move(int x, int y)
             {
                 for(auto& [m, p] : m_menu_positions)
                 {
-                    log_info() << "Trying move menu:" << m->caption() << "at (" <<p.first.first<<","<<p.first.second << ") - (" <<p.second.first<<","<<p.second.second << ") has (" << x << "," << y << ")";
+//                    log_info() << "Trying move menu:" << m->caption() << "at (" <<p.first.first<<","<<p.first.second << ") - (" <<p.second.first<<","<<p.second.second << ") has (" << x << "," << y << ")";
                     if(p.first.first <=x && p.second.first > x && p.first.second <= y && p.second.second >= y && m!=m_current_menu)
                     {
-                        log_info() << "Found move:" << m->caption();
+//                        log_info() << "Found move:" << m->caption();
                         m_current_menu->close();
                         m_current_menu = m;
                         m_current_menu->open(p.first.first, p.second.second + 1);
@@ -235,7 +235,7 @@ void cogui::window::mouse_move(int x, int y)
                 {
                     m_pressed = m_prev_pressed;
                     (*m_pressed)->press();
-                    log_debug ()<< "got under element: " << under->getTitle() << "pressing and redrawing";
+//                    log_debug ()<< "got under element: " << under->getTitle() << "pressing and redrawing";
 
                     return draw();
                 }
@@ -243,7 +243,7 @@ void cogui::window::mouse_move(int x, int y)
             }
             else
             {
-                log_debug ()<< "got under element: " << under->getTitle() << "focusing and redrawing";
+//                log_debug ()<< "got under element: " << under->getTitle() << "focusing and redrawing";
 
                 focus_element(under);
                 return draw();
@@ -262,7 +262,7 @@ void cogui::window::mouse_move(int x, int y)
             m_pressed = m_tab_order.end();
             m_focused = m_tab_order.end();
 
-            log_debug ()<< "NO under element, but pressed != tab_order.end : " << (*m_prev_pressed)->getTitle() << "and redrawing";
+//            log_debug ()<< "NO under element, but pressed != tab_order.end : " << (*m_prev_pressed)->getTitle() << "and redrawing";
 
             return draw();
         }
@@ -271,7 +271,7 @@ void cogui::window::mouse_move(int x, int y)
     // now if there was a control we have focused on, unfocus it since we moved outside of it
     if(m_focused != m_tab_order.end() && !m_tab_order.empty())
     {
-        log_debug ()<< "NO under element, but focused != tab_order.end : " << (*m_focused)->getTitle() << "and redrawing";
+//        log_debug ()<< "NO under element, but focused != tab_order.end : " << (*m_focused)->getTitle() << "and redrawing";
         (*m_focused)->unfocus();
         m_focused = m_tab_order.end();
         return draw();
@@ -340,14 +340,9 @@ void cogui::window::closeCurrentMenu()
     m_current_menu = nullptr;
 }
 
-cogui::menubar &cogui::window::getMainMenu()
+cogui::menubar &cogui::window::get_main_menu()
 {
     return m_mainmenu;
-}
-
-cogui::scrollbar &cogui::window::get_scrollbar()
-{
-    return m_scrollbar;
 }
 
 const cogui::scrollbar &cogui::window::get_scrollbar() const
@@ -390,6 +385,21 @@ bool cogui::window::activate_next_menu()
 void cogui::window::left_mouse_down(int x, int y)
 {
     log_debug() << "MOUSE DOWN: y=" << y << " topy=" << this->getY();
+
+    std::shared_ptr<scrollbar> decreasing_scrollbar = mouse_down_on_scrollbar_decrease(x, y);
+    if(decreasing_scrollbar)
+    {
+        decreasing_scrollbar->step_down();
+        return;
+    }
+
+    std::shared_ptr<scrollbar> incsing_scrollbar = mouse_down_on_scrollbar_increase(x, y);
+    if(incsing_scrollbar)
+    {
+        incsing_scrollbar->step_up();
+        return;
+    }
+
     if( y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
         if(m_current_menu)
@@ -402,7 +412,7 @@ void cogui::window::left_mouse_down(int x, int y)
         m_draw_state = draw_state::moving;
         m_mouse_down_x = x - this->getX();
         m_mouse_down_y = y - this->getY();
-        return draw();
+        return /*draw()*/;
     }
 
     if(x == getWidth() + 1 + this->getX() && y == getHeight() + this->getY()) // in the lower right corner
@@ -419,7 +429,7 @@ void cogui::window::left_mouse_down(int x, int y)
         m_prev_w = getWidth();
         m_prev_h = getHeight();
 
-        return draw();
+        return /*draw()*/;
     }
 
     // see if we have pressed the mouse on a control

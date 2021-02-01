@@ -232,6 +232,11 @@ std::wstring cogui::menu::caption() const
     return m_caption;
 }
 
+int cogui::menu::get_action_count() const
+{
+    return m_actions.size();
+}
+
 void cogui::menu::register_action_activators()
 {
     for(size_t i = 0; i < m_actions.size(); i++)

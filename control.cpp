@@ -46,6 +46,42 @@ bool cogui::control::inside(int x, int y) const
     return x >= this->getX() && x < this->getX() + m_width && y >= this->getY() && y < this->getY() + m_height;
 }
 
+std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_decrease(int x, int y)
+{
+    if(x >= m_horizontal_scrollbar->m_dec_arrow_screen_position.x && y >=  m_horizontal_scrollbar->m_dec_arrow_screen_position.y &&
+            x < m_horizontal_scrollbar->m_dec_arrow_screen_position.x + m_horizontal_scrollbar->m_dec_arrow_screen_position.width &&
+            y < m_horizontal_scrollbar->m_dec_arrow_screen_position.y + m_horizontal_scrollbar->m_dec_arrow_screen_position.height)
+    {
+        return m_horizontal_scrollbar;
+    }
+    if(x >= m_vertical_scrollbar->m_dec_arrow_screen_position.x && y >=  m_vertical_scrollbar->m_dec_arrow_screen_position.y &&
+            x < m_vertical_scrollbar->m_dec_arrow_screen_position.x + m_vertical_scrollbar->m_dec_arrow_screen_position.width &&
+            y < m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height)
+    {
+        return m_vertical_scrollbar;
+    }
+
+    return nullptr;
+}
+
+std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_increase(int x, int y)
+{
+    if(x >= m_horizontal_scrollbar->m_inc_arrow_screen_position.x && y >=  m_horizontal_scrollbar->m_inc_arrow_screen_position.y &&
+            x < m_horizontal_scrollbar->m_inc_arrow_screen_position.x + m_horizontal_scrollbar->m_inc_arrow_screen_position.width &&
+            y < m_horizontal_scrollbar->m_inc_arrow_screen_position.y + m_horizontal_scrollbar->m_inc_arrow_screen_position.height)
+    {
+        return m_horizontal_scrollbar;
+    }
+    if(x >= m_vertical_scrollbar->m_inc_arrow_screen_position.x && y >=  m_vertical_scrollbar->m_inc_arrow_screen_position.y &&
+            x < m_vertical_scrollbar->m_inc_arrow_screen_position.x + m_vertical_scrollbar->m_inc_arrow_screen_position.width &&
+            y < m_vertical_scrollbar->m_inc_arrow_screen_position.y + m_vertical_scrollbar->m_inc_arrow_screen_position.height)
+    {
+        return m_vertical_scrollbar;
+    }
+
+    return nullptr;
+}
+
 void cogui::control::clear() const
 {
     cogui::desktop::get().getTheme()->clear(*this);

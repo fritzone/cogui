@@ -22,32 +22,6 @@ namespace themes {
  */
 class cursive final : public ::cogui::theme
 {
-public:
-
-    cursive() {}
-    virtual ~cursive() {}
-
-    void clear(const control& c) override;
-
-    void draw_window(const window& w) override;
-    void draw_button(const button& b) override;
-    void draw_menu(const menu &m) override;
-    void draw_checkbox(const checkbox& c) override;
-    void draw_scrollbar(const scrollbar& s) override;
-
-    int minimum_checkbox_width(const checkbox& c) override;
-    int minimum_checkbox_height(const checkbox& c) override;
-
-    int minimum_button_width(const button& b) override;
-    int minimum_button_height(const button& b) override;
-
-    int minimum_window_width(const window& w) override;
-    int minimum_window_height(const window& w) override;
-
-    int first_available_row(const window& w) override;
-
-    std::string name() override;
-
     /******************************************************************************************************************/
     /*                                                      WINDOW                                                    */
     /******************************************************************************************************************/
@@ -155,7 +129,7 @@ public:
     std::wstring MNU_SYSMENU_TOP =  L"\x2502 \x2514";
     std::wstring MNU_LEFT_SEPARATOR = L"\x251c";
     std::wstring MNU_RIGHT_SEPARATOR = L"\x2524";
-
+    std::wstring MNU_EMPTY_CHAR = L"\x2800";
     /******************************************************************************************************************/
     /*                                                    CHECKBOX                                                    */
     /******************************************************************************************************************/
@@ -168,12 +142,44 @@ public:
     /******************************************************************************************************************/
     std::wstring SCROLL_UP_ARROW = L"\x2353";
     std::wstring SCROLL_DOWN_ARROW = L"\x234c";
-    std::wstring SCROLL_VERTICAL_BODY = L"\x2395";
+    std::wstring SCROLL_VERTICAL_BODY = L"\x2502";
     std::wstring SCROLL_VERTICAL_HANDLE = L"\x233c";
     std::wstring SCROLL_LEFT_ARROW = L"\x2343";
     std::wstring SCROLL_RIGHT_ARROW = L"\x2344";
-    std::wstring SCROLL_HORIZONTAL_BODY = L"\x2337";
+    std::wstring SCROLL_HORIZONTAL_BODY = L"\x2500";
     std::wstring SCROLL_HORIZONTAL_HANDLE = L"\x233c";
+
+
+public:
+
+    cursive() {}
+    virtual ~cursive() {}
+
+    void clear(const control& c) override;
+
+    void draw_window(const window& w) override;
+    void draw_button(const button& b) override;
+    void draw_menu(const menu &m) override;
+    void draw_checkbox(const checkbox& c) override;
+    void draw_scrollbar(const scrollbar &s) override;
+
+    int minimum_checkbox_width(const checkbox& c) override;
+    int minimum_checkbox_height(const checkbox& c) override;
+
+    int minimum_button_width(const button& b) override;
+    int minimum_button_height(const button& b) override;
+
+    int minimum_window_width(const window& w) override;
+    int minimum_window_height(const window& w) override;
+
+    int first_available_row(const window& w) override;
+
+    std::string name() override;
+
+private:
+
+    void draw_horizontal_scrollbar(control* c, scrollbar& s);
+    void draw_verticall_scrollbar(control* c, scrollbar& s);
 
 };
 }

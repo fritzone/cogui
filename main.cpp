@@ -39,7 +39,7 @@ int main( int argc, char* argv[] )
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
                            window::on_mouse_up = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") up:" << x << ", " << y; },
                            window::sysmenu = menu{
-                               {L"&Select", action::selectable, action::on_trigger = [](action*){log_info() << "Clicked Select";}},
+                               {L"&Select", action::selectable = true, action::on_trigger = [](action*){log_info() << "Clicked Select";}},
                                {L"No select", action::on_trigger = [](action*){log_info() << "Clicked No select";}}
                            },
                            window::mainmenu = menubar {
@@ -47,9 +47,9 @@ int main( int argc, char* argv[] )
                                 menu {
                                         L"&File",
                                         {
-                                            {L"&New", action::selectable, action::on_trigger = [](action*){log_info() << "New Clicked";}},
-                                            {L"&Open", action::selectable, action::on_trigger = [](action*){log_info() << "Open Clicked";}},
-                                            {L"&Save", action::selectable, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
+                                            {L"&New",  action::on_trigger = [](action*){log_info() << "New Clicked";}},
+                                            {L"&Open", action::on_trigger = [](action*){log_info() << "Open Clicked";}},
+                                            {L"&Save", action::selectable = true, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
                                             menu::separator_item,
                                             {L"&Exit", action::on_trigger = [&](action*){app.exit(1);}}
                                         }
@@ -65,13 +65,13 @@ int main( int argc, char* argv[] )
                                 menu {
                                         L"&Help",
                                         {
-                                            {L"&About", action::selectable, action::on_trigger = [](action*){log_info() << "About Clicked";}},
+                                            {L"&About",  action::on_trigger = [](action*){log_info() << "About Clicked";}},
                                         }
                                 },
                                 menu {
                                         L"&Purchase",
                                         {
-                                            {L"&About", action::selectable, action::on_trigger = [](action*){log_info() << "About Clicked";}},
+                                            {L"&About", action::on_trigger = [](action*){log_info() << "About Clicked";}},
                                         }
                                 }
 

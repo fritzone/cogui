@@ -70,6 +70,8 @@ namespace cogui
 
         static cogui::action separator_item;
 
+        int get_action_count() const;
+
     private:
         std::vector<action> m_actions;
         int m_x = 0;
