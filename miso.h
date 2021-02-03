@@ -53,7 +53,7 @@ void connect_i(void* sig_addr, void* obj, T &&f, std::vector<common_slot_base *>
 
     if (!already_in && active && !really_remove)
     {
-        sh.slots.emplace_back(fb);
+        sh.slots.push_back(fb);
     }
 
     if(already_in && really_remove)

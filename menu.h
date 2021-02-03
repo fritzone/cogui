@@ -26,6 +26,8 @@ namespace cogui
 
 
         menu() = default;
+        menu(const menu&) = default;
+
         menu(std::initializer_list<action> l);
         menu(const std::wstring& caption, std::initializer_list<action> l);
         menu(const wchar_t * const caption, std::initializer_list<action> l);

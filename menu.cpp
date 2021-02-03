@@ -53,13 +53,13 @@ void cogui::menu::open(int x, int y)
     bool any_selectable = false;
     for(size_t i=0; i<m_actions.size(); i++)
     {
-        if(m_actions[i].getTitle() != cogui::menu::separator_item.getTitle()
-                && max_len < static_cast<int>(m_actions[i].getTitle().length()))
+        if(m_actions[i].get_title() != cogui::menu::separator_item.get_title()
+                && max_len < static_cast<int>(m_actions[i].get_title().length()))
         {
-            max_len = m_actions[i].getTitle().length();
+            max_len = m_actions[i].get_title().length();
         }
 
-        if(m_actions[i].isSelectable())
+        if(m_actions[i].is_checkable())
         {
             any_selectable = true;
         }
@@ -159,7 +159,7 @@ void cogui::menu::activate_next_action()
         m_lastSelectedIndex = 0;
     }
 
-    while(m_actions[m_lastSelectedIndex].getTitle() == separator_item.getTitle())
+    while(m_actions[m_lastSelectedIndex].get_title() == separator_item.get_title())
     {
         m_lastSelectedIndex ++;
         if(m_lastSelectedIndex == static_cast<int>(m_actions.size()))
@@ -181,7 +181,7 @@ void cogui::menu::activate_previous_action()
     }
 
     // do not select separators while drawing the menu
-    while(m_actions[m_lastSelectedIndex].getTitle() == separator_item.getTitle())
+    while(m_actions[m_lastSelectedIndex].get_title() == separator_item.get_title())
     {
         m_lastSelectedIndex --;
         if(m_lastSelectedIndex == -1)
@@ -242,7 +242,7 @@ void cogui::menu::register_action_activators()
     for(size_t i = 0; i < m_actions.size(); i++)
     {
         auto& a = const_cast<cogui::action&>(m_actions[i]);
-        std::wstring caption = a.getTitle();
+        std::wstring caption = a.get_title();
         auto andp = caption.find(L"&");
         if(andp != std::string::npos && andp < caption.length() - 1)
         {

@@ -82,6 +82,78 @@ std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_increa
     return nullptr;
 }
 
+std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_midportion(int x, int y)
+{
+
+    if(x >= m_horizontal_scrollbar->m_dec_arrow_screen_position.x + m_horizontal_scrollbar->m_dec_arrow_screen_position.width )
+    {
+        if(x < m_horizontal_scrollbar->m_inc_arrow_screen_position.x)
+        {
+            if(y >=  m_horizontal_scrollbar->m_inc_arrow_screen_position.y )
+            {
+                if(y < m_horizontal_scrollbar->m_inc_arrow_screen_position.y + m_horizontal_scrollbar->m_inc_arrow_screen_position.height)
+                {
+                    if( (x < m_horizontal_scrollbar->m_handle_screen_position.x || x > m_horizontal_scrollbar->m_handle_screen_position.x + m_horizontal_scrollbar->m_handle_screen_position.width))
+                    {
+                        return m_horizontal_scrollbar;
+
+                    }
+                }
+            }
+        }
+    }
+
+    if(y >= m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height )
+    {
+        if(y < m_vertical_scrollbar->m_inc_arrow_screen_position.y)
+        {
+            if(x >=  m_vertical_scrollbar->m_inc_arrow_screen_position.x )
+            {
+                if(x < m_vertical_scrollbar->m_inc_arrow_screen_position.x + m_vertical_scrollbar->m_inc_arrow_screen_position.width)
+                {
+                    if( (y < m_vertical_scrollbar->m_handle_screen_position.y || y > m_vertical_scrollbar->m_handle_screen_position.y + m_vertical_scrollbar->m_handle_screen_position.height))
+                    {
+                        return m_vertical_scrollbar;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+    return nullptr;
+
+}
+
+bool cogui::control::deal_with_scrollbar_mouse_down(int x, int y)
+{
+    auto decreasing_scrollbar = mouse_down_on_scrollbar_decrease(x, y);
+    if(decreasing_scrollbar)
+    {
+        decreasing_scrollbar->step_down();
+        return true;
+    }
+
+    auto incsing_scrollbar = mouse_down_on_scrollbar_increase(x, y);
+    if(incsing_scrollbar)
+    {
+        incsing_scrollbar->step_up();
+        return true;
+    }
+
+    auto midclicked_scrollbar = mouse_down_on_scrollbar_midportion(x, y);
+    if(midclicked_scrollbar)
+    {
+        midclicked_scrollbar->step_to_location(x, y);
+        return true;
+    }
+
+    return false;
+
+}
+
 void cogui::control::clear() const
 {
     cogui::desktop::get().getTheme()->clear(*this);

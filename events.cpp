@@ -78,8 +78,57 @@ cogui::event cogui::to_event(int c)
 */
 
 cogui::events::keypress::keypress(cogui::events::key_class type, bool alt, bool shift, bool ctrl, const std::wstring &chardata) : m_type(type),
-    m_alt(alt), m_shift(shift), m_ctrl(ctrl), m_chardata(chardata)
+    m_alt(alt), m_shift(shift), m_ctrl(ctrl), m_chardata(chardata), m_key(chardata)
 {
+/*
+    if(    type == key_class::key_f1 ||
+           type == key_class::key_f2 ||
+           type == key_class::key_f3 ||
+           type == key_class::key_f4 ||
+           type == key_class::key_f5 ||
+           type == key_class::key_f6 ||
+           type == key_class::key_f7 ||
+           type == key_class::key_f8 ||
+           type == key_class::key_f9 ||
+           type == key_class::key_f10 ||
+           type == key_class::key_f11 ||
+           type == key_class::key_f12)
+    {
+        m_key[0] = towlower(m_key[0]);
+        m_chardata[0] = towlower(m_chardata[0]);
+    } */
+
+    static const std::wstring Ctrl = L"Ctrl-";
+    static const std::wstring Alt = L"Alt-";
+    static const std::wstring Shift = L"Shift-";
+
+    // do not change the order
+    if(m_shift)
+    {
+        std::size_t shift_pos =m_chardata.find(Shift);
+        if(shift_pos == std::string::npos) m_chardata = Shift + m_chardata;
+    }
+
+    if(m_alt)
+    {
+        if(keymap.count(m_key) != 0)
+        {
+            m_type = keymap[m_key];
+        }
+
+        std::size_t alt_pos =m_chardata.find(Alt);
+        if(alt_pos == std::string::npos) m_chardata = Alt + m_chardata;
+    }
+
+    if(m_ctrl)
+    {
+        if(keymap.count(m_key) != 0)
+        {
+            m_type = keymap[m_key];
+        }
+        std::size_t ctrl_pos =m_chardata.find(Ctrl);
+        if(ctrl_pos == std::string::npos) m_chardata = Ctrl + m_chardata;
+    }
 
 }
 

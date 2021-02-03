@@ -32,7 +32,7 @@ bool cogui::xterm_input::init()
 
 bool cogui::xterm_input::shutdown()
 {
-
+    return true;
 }
 
 std::vector<std::shared_ptr<cogui::events::event>> cogui::xterm_input::get_next_event()

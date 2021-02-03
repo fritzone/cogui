@@ -14,6 +14,8 @@ class menubar
 {
 public:
     menubar() = default;
+    menubar(const menubar&) = default;
+
     menubar(std::initializer_list<menu> entries);
 
     menubar& operator = (std::initializer_list<menu> m);

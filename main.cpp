@@ -39,7 +39,7 @@ int main( int argc, char* argv[] )
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
                            window::on_mouse_up = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") up:" << x << ", " << y; },
                            window::sysmenu = menu{
-                               {L"&Select", action::selectable = true, action::on_trigger = [](action*){log_info() << "Clicked Select";}},
+                               {L"&Select", action::checkable = true, action::on_trigger = [](action*){log_info() << "Clicked Select";}},
                                {L"No select", action::on_trigger = [](action*){log_info() << "Clicked No select";}}
                            },
                            window::mainmenu = menubar {
@@ -49,7 +49,7 @@ int main( int argc, char* argv[] )
                                         {
                                             {L"&New",  action::on_trigger = [](action*){log_info() << "New Clicked";}},
                                             {L"&Open", action::on_trigger = [](action*){log_info() << "Open Clicked";}},
-                                            {L"&Save", action::selectable = true, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
+                                            {L"&Save", action::checkable = true, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
                                             menu::separator_item,
                                             {L"&Exit", action::on_trigger = [&](action*){app.exit(1);}}
                                         }
@@ -80,7 +80,10 @@ int main( int argc, char* argv[] )
                            window::hotkeys = hotkey_associations {
                                on<&key::F2>::press = [&](window*){log_info() << "pressed the F2 key";},
                                on<&key::F3>::press = [&](window*){log_info() << "pressed the F3 key";},
-                               on< &key::F4 >::press = [&](window* w){log_info() << "pressed the F4 key"; w->setTitle(L"F4 pressed");}
+                               on<&key::F4>::press = [&](window* w){log_info() << "pressed the F4 key"; w->setTitle(L"F4 pressed");},
+                               on<&key::Ctrl_F5>::press = [&](window* w){log_info() << "pressed the Ctrl+F5 key"; w->setTitle(L"Ctrl+F5 press");},
+                               on<&key::Ctrl_A>::press = [&](window* w){log_info() << "pressed the Ctrl-A key"; w->setTitle(L"Ctrl+A press");},
+                               on<&key::Ctrl_Q>::press = [&](window*){app.exit();}
                            },
                            window::scrollbars = scrollbar::both
                            /*  */

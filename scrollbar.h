@@ -52,6 +52,8 @@ public:
     void step_up();
     void step_down();
 
+    void step_to_location(int locationx, int locationy);
+
 private:
 
     scrollbar(orientation o);

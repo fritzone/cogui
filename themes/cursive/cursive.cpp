@@ -277,7 +277,7 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
     // see if there is a menu action which is selectable or not
     for(int i=0; i<m.get_action_count(); i++)
     {
-        if(m[i].isSelectable())
+        if(m[i].is_checkable())
         {
             one_is_selectable = true;
             break;
@@ -315,18 +315,18 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
         cogui::graphics()->draw_text(drawX + drawWidth, y, MNU_VERTICAL);
         log_debug() << "menu LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
 
-        std::wstring titleToDraw = m[mc].getTitle();
+        std::wstring titleToDraw = m[mc].get_title();
 
-        if(m[mc].isSelectable())
+        if(m[mc].is_checkable())
         {
-            titleToDraw = CHK_UNCHECKED + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + titleToDraw;
+            titleToDraw = (m[mc].is_checked() ? CHK_CHECKED : CHK_UNCHECKED) + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + titleToDraw;
         }
-        else if (titleToDraw != cogui::menu::separator_item.getTitle() && one_is_selectable)
+        else if (titleToDraw != cogui::menu::separator_item.get_title() && one_is_selectable)
         {
             titleToDraw = MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR +titleToDraw;
         }
 
-        if(titleToDraw == cogui::menu::separator_item.getTitle())
+        if(titleToDraw == cogui::menu::separator_item.get_title())
         {
             cogui::graphics()->draw_text(drawX, y, MNU_LEFT_SEPARATOR + cogui::utils::repeated(drawWidth - 1, MNU_HORIZONTAL)  + MNU_RIGHT_SEPARATOR);
         }
@@ -481,6 +481,7 @@ void cogui::themes::cursive::draw_horizontal_scrollbar(cogui::control *c, cogui:
         if(handle_counter == s.get_handle_position())
         {
             cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE, cogui::textflags::normal);
+            s.set_handle_screen_position({i, y+h, 1, 1});
         }
         handle_counter ++;
     }
@@ -508,6 +509,7 @@ void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::
         if(handle_counter == s.get_handle_position())
         {
             cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE, cogui::textflags::normal);
+            s.set_handle_screen_position({x + w + 1, i, 1, 1});
         }
         handle_counter ++;
     }

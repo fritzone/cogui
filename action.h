@@ -39,11 +39,9 @@ public:
         resolve_named_parameters(std::forward<Args>(args)...);
     }
 
-
-
     void trigger();
-    std::wstring getTitle() const;
-    void setTitle(const std::wstring &getTitle);
+    std::wstring get_title() const;
+    void set_title(const std::wstring &getTitle);
 
     // triggering signal
     using OnTrigger = fluent::NamedType<std::function<void(action*)>, struct OnTriggerHelper>;
@@ -51,17 +49,22 @@ public:
     miso::signal<action*> sig_on_trigger {"on_trigger"};
 
     // whether it is selectable or not
-    using Selectable = fluent::NamedType<bool, struct OnSelectableHelper>;
-    static Selectable::argument selectable;
+    using Checkable = fluent::NamedType<bool, struct OnCheckableHelper>;
+    static Checkable::argument checkable;
 
-    bool isSelectable() const;
+    // and if it's whether it's selected or not
+    using Checked = fluent::NamedType<bool, struct OnSelectableHelper>;
+    static Checked::argument checked;
+
+    bool is_checkable() const;
+    bool is_checked() const;
 
     template<typename ... Args>
     void resolve_named_parameters(Args... args)
     {
         auto connector = overload_unref(
-            [&,this](OnTrigger c) { m_conn = c; miso::connect(this, sig_on_trigger, c.get()); },
-            [&,this](Selectable s) {m_selectable = s.get(); log_debug() << (m_selectable ? "SSSSSSSSSSSSSSSS" : "XXXXXXXXXXXXXxxx");}
+            [&,this](OnTrigger c) {m_conn = c; miso::connect(this, sig_on_trigger, c.get()); },
+            [&,this](Checkable s) {m_checkable = s.get(); }
         );
 
         auto tup = std::make_tuple(std::forward<Args>(args)...);
@@ -75,8 +78,8 @@ public:
 private:
     std::wstring m_title;
     OnTrigger m_conn;
-    bool m_selectable = false;
-    bool m_selected = false;
+    bool m_checkable = false;
+    bool m_checked = false;
 };
 
 }

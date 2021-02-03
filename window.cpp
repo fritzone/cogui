@@ -386,17 +386,8 @@ void cogui::window::left_mouse_down(int x, int y)
 {
     log_debug() << "MOUSE DOWN: y=" << y << " topy=" << this->getY();
 
-    std::shared_ptr<scrollbar> decreasing_scrollbar = mouse_down_on_scrollbar_decrease(x, y);
-    if(decreasing_scrollbar)
+    if(deal_with_scrollbar_mouse_down(x, y))
     {
-        decreasing_scrollbar->step_down();
-        return;
-    }
-
-    std::shared_ptr<scrollbar> incsing_scrollbar = mouse_down_on_scrollbar_increase(x, y);
-    if(incsing_scrollbar)
-    {
-        incsing_scrollbar->step_up();
         return;
     }
 

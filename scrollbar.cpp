@@ -95,6 +95,36 @@ void cogui::scrollbar::step_down()
 
 }
 
+void cogui::scrollbar::step_to_location(int locationx, int locationy)
+{
+    if(m_orientation == orientation::so_horizontal)
+    {
+        // use locationx
+        m_current_value = m_max_value - static_cast<int>((static_cast<float>( (m_inc_arrow_screen_position.x - m_inc_arrow_screen_position.width - locationx)  * (m_max_value - m_min_value) ) /
+                static_cast<float>( m_inc_arrow_screen_position.x - m_inc_arrow_screen_position.width - m_dec_arrow_screen_position.x - m_dec_arrow_screen_position.width)));
+
+        if(m_current_value > m_max_value) m_current_value = m_max_value;
+        if(m_current_value < m_min_value) m_current_value = m_min_value;
+
+        set_handle_position(m_current_value / m_step);
+        debug_me();
+    }
+
+    if(m_orientation == orientation::so_vertical)
+    {
+        // use locationy
+        m_current_value = m_max_value - static_cast<int>((static_cast<float>( (m_inc_arrow_screen_position.y - m_inc_arrow_screen_position.height - locationy)  * (m_max_value - m_min_value) ) /
+                static_cast<float>( m_inc_arrow_screen_position.y - m_inc_arrow_screen_position.height - m_dec_arrow_screen_position.y - m_dec_arrow_screen_position.height)));
+
+        if(m_current_value > m_max_value) m_current_value = m_max_value;
+        if(m_current_value < m_min_value) m_current_value = m_min_value;
+
+        set_handle_position(m_current_value / m_step);
+        debug_me();
+    }
+
+}
+
 void cogui::scrollbar::set_handle_position(int h)
 {
     if(h < m_dist)

@@ -1,8 +1,10 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-#include <memory>
 #include "utils.h"
+
+#include <memory>
+#include <map>
 
 namespace cogui
 {
@@ -29,6 +31,33 @@ enum class event_type
 
 enum class key_class
 {
+    key_a,
+    key_b,
+    key_c,
+    key_d,
+    key_e,
+    key_f,
+    key_g,
+    key_h,
+    key_i,
+    key_j,
+    key_k,
+    key_l,
+    key_m,
+    key_n,
+    key_o,
+    key_p,
+    key_q,
+    key_r,
+    key_s,
+    key_t,
+    key_u,
+    key_v,
+    key_w,
+    key_x,
+    key_y,
+    key_z,
+
     // the generic key for any character related key
     key_textinput,
 
@@ -93,6 +122,34 @@ enum class key_class
     key_none
 };
 
+static std::map<std::wstring, key_class> keymap = {
+    {L"a", key_class::key_a},
+    {L"b", key_class::key_b},
+    {L"c", key_class::key_c},
+    {L"d", key_class::key_d},
+    {L"e", key_class::key_e},
+    {L"f", key_class::key_f},
+    {L"g", key_class::key_g},
+    {L"h", key_class::key_h},
+    {L"i", key_class::key_i},
+    {L"j", key_class::key_j},
+    {L"k", key_class::key_k},
+    {L"l", key_class::key_l},
+    {L"m", key_class::key_m},
+    {L"n", key_class::key_n},
+    {L"o", key_class::key_o},
+    {L"p", key_class::key_p},
+    {L"q", key_class::key_q},
+    {L"r", key_class::key_r},
+    {L"s", key_class::key_s},
+    {L"t", key_class::key_t},
+    {L"u", key_class::key_u},
+    {L"v", key_class::key_v},
+    {L"w", key_class::key_w},
+    {L"x", key_class::key_x},
+    {L"y", key_class::key_y},
+    {L"z", key_class::key_z},
+};
 
 /**
  * @brief The event class the pure abstract of representing an event (keyboard / mouse) that nees to
@@ -252,6 +309,7 @@ private:
     bool m_ctrl = false;
     std::wstring m_chardata = L"";
     bool m_hotkey = false;
+    std::wstring m_key = L"";
 };
 
 }

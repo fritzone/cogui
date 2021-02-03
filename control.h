@@ -167,9 +167,8 @@ public:
     virtual bool inside(int x, int y) const;
     virtual void click() = 0;
 
-    std::shared_ptr<scrollbar> mouse_down_on_scrollbar_decrease(int x, int y);
+    virtual bool deal_with_scrollbar_mouse_down(int x, int y);
 
-    std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_increase(int x, int y);
 protected:
 
     int m_x = 0;
@@ -195,6 +194,9 @@ protected:
 
 private:
     void initInitialPosition();
+    std::shared_ptr<scrollbar> mouse_down_on_scrollbar_decrease(int x, int y); // returns the scrollbar which captures the mouse on the decrease button if any
+    std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_increase(int x, int y); // returns the scrollbar which captures the mouse on the increase button if any
+    std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_midportion(int x, int y); // returns the scrollbar which captures the mouse somewhere, not on the handle
 };
 
 }

@@ -1,7 +1,8 @@
 #include "action.h"
 
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
-cogui::action::Selectable::argument cogui::action::selectable;
+cogui::action::Checkable::argument cogui::action::checkable;
+cogui::action::Checked::argument cogui::action::checked;
 
 cogui::action::~action()
 {
@@ -11,10 +12,6 @@ cogui::action::~action()
 cogui::action::action(const cogui::action &o)
 {
     *this = o;
-    /*m_title = o.m_title;
-    m_conn = o.m_conn;
-    m_selectable = o.m_selectable;
-    miso::connect(this, sig_on_trigger, m_conn.get());*/
 }
 
 cogui::action &cogui::action::operator=(const cogui::action &o)
@@ -23,7 +20,7 @@ cogui::action &cogui::action::operator=(const cogui::action &o)
     sig_on_trigger.disconnect(this, m_conn.get());
     sig_on_trigger = o.sig_on_trigger;
     m_conn = o.m_conn;
-    m_selectable = o.m_selectable;
+    m_checkable = o.m_checkable;
     miso::connect(this, sig_on_trigger, m_conn.get());
 
     return *this;
@@ -31,20 +28,30 @@ cogui::action &cogui::action::operator=(const cogui::action &o)
 
 void cogui::action::trigger()
 {
+    if(is_checkable())
+    {
+        m_checked = !m_checked;
+    }
+
     emit sig_on_trigger(this);
 }
 
-std::wstring cogui::action::getTitle() const
+std::wstring cogui::action::get_title() const
 {
     return m_title;
 }
 
-void cogui::action::setTitle(const std::wstring &title)
+void cogui::action::set_title(const std::wstring &title)
 {
     m_title = title;
 }
 
-bool cogui::action::isSelectable() const
+bool cogui::action::is_checkable() const
 {
-    return m_selectable;
+    return m_checkable;
+}
+
+bool cogui::action::is_checked() const
+{
+    return m_checked;
 }

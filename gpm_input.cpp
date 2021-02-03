@@ -224,7 +224,7 @@ bool cogui::termkey_input::init()
     {
         prev_curs = 1;
     }
-
+    return true;
 }
 
 std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_next_event()
@@ -349,6 +349,8 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
         else
         if(key.type == TERMKEY_TYPE_FUNCTION)
         {
+
+            //codepoint = F<<codepoint>>
             log_info() << "Got a function key" << buffer;
 
             static const std::map<std::string,cogui::events::key_class> function_keys{
@@ -366,11 +368,29 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
                 {"F12", cogui::events::key_class::key_f12}
             };
 
+
+            log_debug() << (alt_press ? "AltPress" : "")  << (ctrl_press ? "CtrlPress" : "") <<  (shift_press ? "ShiftPress" : "");
+
             if(function_keys.find(buffer) != function_keys.end())
             {
                 result.push_back(cogui::events::event::create<cogui::events::keypress>(function_keys.at(buffer),
                                                                                   alt_press, shift_press, ctrl_press,
                                                                                   cogui::utils::std2ws(buffer)));
+            }
+            else // function key + modifier
+            {
+                std::string F = "F" + std::to_string(key.code.codepoint);
+                if(function_keys.find(F) != function_keys.end())
+                {
+                    if(strchr(buffer, '-') && *(strchr(buffer, '-') + 1) == 'F')
+                    {
+                        *(strchr(buffer, '-') + 1) = 'f';
+                    }
+                    result.push_back(cogui::events::event::create<cogui::events::keypress>(function_keys.at(F),
+                                                                                      alt_press, shift_press, ctrl_press,
+                                                                                      cogui::utils::std2ws(buffer)));
+                }
+
             }
         }
     }
