@@ -274,8 +274,12 @@ void desktop::redraw()
     clear();
     for(const auto& w : m_windows)
     {
-        w->draw();
+        if(&w != &m_captured_window)
+        {
+            w->draw();
+        }
     }
+    m_captured_window->draw();
 }
 
 void desktop::init(const std::string &theme_name)

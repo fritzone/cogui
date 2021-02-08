@@ -21,6 +21,11 @@
 namespace cogui
 {
 
+/**
+ * @brief The window class represents a window component the user can place on the screen and interact with.
+ *
+ * Each application needs at least one window, that can hold several controls.
+ */
 class window : public container
 {
 public:
@@ -33,6 +38,7 @@ public:
         moving
     };
 
+    // whether the window is in a normal state or maximized
     enum class window_state
     {
         normal,
@@ -47,7 +53,7 @@ public:
     template<typename S>
     window(int x, int y, int width, int height, const S& title) : container(x, y, width, height, title)
     {
-        init();
+        desktop::get().add_window(this);
     }
 
     template<typename S, typename ... Args>
@@ -101,10 +107,12 @@ public:
     const menu &getSystemMenu() const;
     void closeCurrentMenu();
 
+    void close();
+
     // returns the main menubar of this window
     bool hasMenubar() const
     {
-        bool b = (&m_mainmenu == &cogui::menubar::no_mainmenu);
+        bool b = (m_mainmenu == cogui::menubar::no_mainmenu);
         return !b;
     }
     menubar &get_main_menu();

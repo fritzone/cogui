@@ -48,15 +48,15 @@ bool cogui::control::inside(int x, int y) const
 
 std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_decrease(int x, int y)
 {
-    if(x >= m_horizontal_scrollbar->m_dec_arrow_screen_position.x && y >=  m_horizontal_scrollbar->m_dec_arrow_screen_position.y &&
+    if(m_horizontal_scrollbar && (x >= m_horizontal_scrollbar->m_dec_arrow_screen_position.x && y >=  m_horizontal_scrollbar->m_dec_arrow_screen_position.y &&
             x < m_horizontal_scrollbar->m_dec_arrow_screen_position.x + m_horizontal_scrollbar->m_dec_arrow_screen_position.width &&
-            y < m_horizontal_scrollbar->m_dec_arrow_screen_position.y + m_horizontal_scrollbar->m_dec_arrow_screen_position.height)
+            y < m_horizontal_scrollbar->m_dec_arrow_screen_position.y + m_horizontal_scrollbar->m_dec_arrow_screen_position.height))
     {
         return m_horizontal_scrollbar;
     }
-    if(x >= m_vertical_scrollbar->m_dec_arrow_screen_position.x && y >=  m_vertical_scrollbar->m_dec_arrow_screen_position.y &&
+    if(m_vertical_scrollbar && (x >= m_vertical_scrollbar->m_dec_arrow_screen_position.x && y >=  m_vertical_scrollbar->m_dec_arrow_screen_position.y &&
             x < m_vertical_scrollbar->m_dec_arrow_screen_position.x + m_vertical_scrollbar->m_dec_arrow_screen_position.width &&
-            y < m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height)
+            y < m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height))
     {
         return m_vertical_scrollbar;
     }
@@ -66,15 +66,15 @@ std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_decrea
 
 std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_increase(int x, int y)
 {
-    if(x >= m_horizontal_scrollbar->m_inc_arrow_screen_position.x && y >=  m_horizontal_scrollbar->m_inc_arrow_screen_position.y &&
+    if(m_horizontal_scrollbar && (x >= m_horizontal_scrollbar->m_inc_arrow_screen_position.x && y >=  m_horizontal_scrollbar->m_inc_arrow_screen_position.y &&
             x < m_horizontal_scrollbar->m_inc_arrow_screen_position.x + m_horizontal_scrollbar->m_inc_arrow_screen_position.width &&
-            y < m_horizontal_scrollbar->m_inc_arrow_screen_position.y + m_horizontal_scrollbar->m_inc_arrow_screen_position.height)
+            y < m_horizontal_scrollbar->m_inc_arrow_screen_position.y + m_horizontal_scrollbar->m_inc_arrow_screen_position.height))
     {
         return m_horizontal_scrollbar;
     }
-    if(x >= m_vertical_scrollbar->m_inc_arrow_screen_position.x && y >=  m_vertical_scrollbar->m_inc_arrow_screen_position.y &&
+    if(m_vertical_scrollbar && (x >= m_vertical_scrollbar->m_inc_arrow_screen_position.x && y >=  m_vertical_scrollbar->m_inc_arrow_screen_position.y &&
             x < m_vertical_scrollbar->m_inc_arrow_screen_position.x + m_vertical_scrollbar->m_inc_arrow_screen_position.width &&
-            y < m_vertical_scrollbar->m_inc_arrow_screen_position.y + m_vertical_scrollbar->m_inc_arrow_screen_position.height)
+            y < m_vertical_scrollbar->m_inc_arrow_screen_position.y + m_vertical_scrollbar->m_inc_arrow_screen_position.height))
     {
         return m_vertical_scrollbar;
     }
@@ -85,42 +85,47 @@ std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_increa
 std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_midportion(int x, int y)
 {
 
-    if(x >= m_horizontal_scrollbar->m_dec_arrow_screen_position.x + m_horizontal_scrollbar->m_dec_arrow_screen_position.width )
+    if(m_horizontal_scrollbar)
     {
-        if(x < m_horizontal_scrollbar->m_inc_arrow_screen_position.x)
+        if(x >= m_horizontal_scrollbar->m_dec_arrow_screen_position.x + m_horizontal_scrollbar->m_dec_arrow_screen_position.width )
         {
-            if(y >=  m_horizontal_scrollbar->m_inc_arrow_screen_position.y )
+            if(x < m_horizontal_scrollbar->m_inc_arrow_screen_position.x)
             {
-                if(y < m_horizontal_scrollbar->m_inc_arrow_screen_position.y + m_horizontal_scrollbar->m_inc_arrow_screen_position.height)
+                if(y >=  m_horizontal_scrollbar->m_inc_arrow_screen_position.y )
                 {
-                    if( (x < m_horizontal_scrollbar->m_handle_screen_position.x || x > m_horizontal_scrollbar->m_handle_screen_position.x + m_horizontal_scrollbar->m_handle_screen_position.width))
+                    if(y < m_horizontal_scrollbar->m_inc_arrow_screen_position.y + m_horizontal_scrollbar->m_inc_arrow_screen_position.height)
                     {
-                        return m_horizontal_scrollbar;
+                        if( (x < m_horizontal_scrollbar->m_handle_screen_position.x || x > m_horizontal_scrollbar->m_handle_screen_position.x + m_horizontal_scrollbar->m_handle_screen_position.width))
+                        {
+                            return m_horizontal_scrollbar;
 
+                        }
                     }
                 }
             }
         }
     }
 
-    if(y >= m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height )
+    if(m_horizontal_scrollbar)
     {
-        if(y < m_vertical_scrollbar->m_inc_arrow_screen_position.y)
+        if(y >= m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height )
         {
-            if(x >=  m_vertical_scrollbar->m_inc_arrow_screen_position.x )
+            if(y < m_vertical_scrollbar->m_inc_arrow_screen_position.y)
             {
-                if(x < m_vertical_scrollbar->m_inc_arrow_screen_position.x + m_vertical_scrollbar->m_inc_arrow_screen_position.width)
+                if(x >=  m_vertical_scrollbar->m_inc_arrow_screen_position.x )
                 {
-                    if( (y < m_vertical_scrollbar->m_handle_screen_position.y || y > m_vertical_scrollbar->m_handle_screen_position.y + m_vertical_scrollbar->m_handle_screen_position.height))
+                    if(x < m_vertical_scrollbar->m_inc_arrow_screen_position.x + m_vertical_scrollbar->m_inc_arrow_screen_position.width)
                     {
-                        return m_vertical_scrollbar;
+                        if( (y < m_vertical_scrollbar->m_handle_screen_position.y || y > m_vertical_scrollbar->m_handle_screen_position.y + m_vertical_scrollbar->m_handle_screen_position.height))
+                        {
+                            return m_vertical_scrollbar;
+                        }
                     }
                 }
             }
         }
+
     }
-
-
 
 
     return nullptr;

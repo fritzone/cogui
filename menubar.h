@@ -16,6 +16,8 @@ public:
     menubar() = default;
     menubar(const menubar&) = default;
 
+    bool operator == (const menubar& oth) const ;
+
     menubar(std::initializer_list<menu> entries);
 
     menubar& operator = (std::initializer_list<menu> m);

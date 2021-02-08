@@ -8,13 +8,12 @@
 
 namespace cogui
 {
-
-
-
 namespace events
 {
 
-
+/**
+ * @brief The event_type enum All kind of events that can be handled in the application
+ */
 enum class event_type
 {
     key_press,
@@ -28,7 +27,9 @@ enum class event_type
     unknown
 };
 
-
+/**
+ * @brief The key_class enum contains the types of keys that can be pressed by the various input handling backends
+ */
 enum class key_class
 {
     key_a,
@@ -122,6 +123,9 @@ enum class key_class
     key_none
 };
 
+/*
+ * A simple map that assigns to each key the corresponding key class
+ */
 static std::map<std::wstring, key_class> keymap = {
     {L"a", key_class::key_a},
     {L"b", key_class::key_b},
@@ -152,49 +156,106 @@ static std::map<std::wstring, key_class> keymap = {
 };
 
 /**
- * @brief The event class the pure abstract of representing an event (keyboard / mouse) that nees to
- * be handled by the framework
+ * @brief The event class the pure abstract form of representing an event (keyboard / mouse) that needs to
+ * be handled by the framework.
  */
 class event
 {
 public:
 
+    /**
+     * Creates an event
+     */
     template<class T, class... Args>
     static std::shared_ptr<T> create(Args... args)
     {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief handle All the events that will do something will need to handle it.
+     * @return true, if it was handled, false otherwise
+     */
     virtual bool handle() = 0;
 };
 
+/**
+ * @brief The mouse_event class is an abstract class serving as a base for the mouse events that can happen in the gui
+ *
+ * This is the class that holds the screen position of where the event happened
+ */
 class mouse_event : public event
 {
 public:
-    mouse_event(int x, int y);
-    virtual bool handle() = 0;
 
-    int x() const;
-    int y() const;
+    /**
+     * @brief mouse_event creates a mouse event at the given coordinates
+     * @param x the X coordinate of where the event occured
+     * @param y the Y coordinate of where the event occured
+     */
+    mouse_event(int x, int y);
+
+    /**
+     * @brief get_x return the X coordinate of the event
+     * @return the X coordinate of the event
+     */
+    int get_x() const;
+
+    /**
+     * @brief get_y return the Y coordinate of the event
+     * @return the Y coordinate of the event
+     */
+    int get_y() const;
 
 private:
 
-    int m_x;
-    int m_y;
+    int m_x = -1;
+    int m_y = -1;
 
 };
 
+/**
+ * @brief The mouse_move class represents an event correspoding to a ouse movement
+ */
 class mouse_move : public mouse_event
 {
 public:
+
+    /**
+     * @brief mouse_move creates a new mouse movement event
+     *
+     * @param x the X coordinate of where the event occured
+     * @param y the Y coordinate of where the event occured
+     */
     mouse_move(int x, int y);
+
+    /**
+     * @brief handle handles the mouse movement event, ie. it calls the underlying GUI components' handler
+     * @return if the GUI component handled the event true, otherwise false
+     */
     bool handle() override;
+
 };
 
+/**
+ * @brief The mouse_right_up class represents a release of the right mouse button
+ */
 class mouse_right_up : public mouse_event
 {
 public:
+
+    /**
+     * @brief mouse_right_up creates a new mouse right button up event
+     *
+     * @param x the X coordinate of where the event occured
+     * @param y the Y coordinate of where the event occured
+     */
     mouse_right_up(int x, int y);
+
+    /**
+     * @brief handle handles the mouse right button up event, ie. it calls the underlying GUI components' handler
+     * @return if the GUI component handled the event true, otherwise false
+     */
     bool handle() override;
 };
 

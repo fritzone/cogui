@@ -154,7 +154,7 @@ cogui::events::mouse_move::mouse_move(int x, int y) : mouse_event(x, y) {}
 
 bool cogui::events::mouse_move::handle()
 {
-    return cogui::desktop::get().handle_mouse_move(x(),y());
+    return cogui::desktop::get().handle_mouse_move(get_x(),get_y());
 }
 
 cogui::events::mouse_event::mouse_event(int x, int y) : m_x(x), m_y(y)
@@ -162,12 +162,12 @@ cogui::events::mouse_event::mouse_event(int x, int y) : m_x(x), m_y(y)
 
 }
 
-int cogui::events::mouse_event::x() const
+int cogui::events::mouse_event::get_x() const
 {
     return m_x;
 }
 
-int cogui::events::mouse_event::y() const
+int cogui::events::mouse_event::get_y() const
 {
     return m_y;
 }
@@ -179,7 +179,7 @@ cogui::events::mouse_right_up::mouse_right_up(int x, int y) : mouse_event(x, y)
 
 bool cogui::events::mouse_right_up::handle()
 {
-    return cogui::desktop::get().handle_mouse_right_up(x(), y());
+    return cogui::desktop::get().handle_mouse_right_up(get_x(), get_y());
 }
 
 cogui::events::mouse_left_up::mouse_left_up(int x, int y) : mouse_event(x, y)
@@ -189,7 +189,7 @@ cogui::events::mouse_left_up::mouse_left_up(int x, int y) : mouse_event(x, y)
 
 bool cogui::events::mouse_left_up::handle()
 {
-    return cogui::desktop::get().handle_mouse_left_up(x(), y());
+    return cogui::desktop::get().handle_mouse_left_up(get_x(), get_y());
 
 }
 
@@ -200,7 +200,7 @@ cogui::events::mouse_left_click::mouse_left_click(int x, int y) : mouse_event(x,
 
 bool cogui::events::mouse_left_click::handle()
 {
-    return cogui::desktop::get().handle_mouse_left_click(x(), y());
+    return cogui::desktop::get().handle_mouse_left_click(get_x(), get_y());
 }
 
 cogui::events::mouse_left_down::mouse_left_down(int x, int y) : mouse_event(x, y)
@@ -210,7 +210,7 @@ cogui::events::mouse_left_down::mouse_left_down(int x, int y) : mouse_event(x, y
 
 bool cogui::events::mouse_left_down::handle()
 {
-    return cogui::desktop::get().handle_mouse_left_down(x(), y());
+    return cogui::desktop::get().handle_mouse_left_down(get_x(), get_y());
 }
 
 cogui::events::mouse_right_down::mouse_right_down(int x, int y) : mouse_event(x, y)
@@ -220,5 +220,5 @@ cogui::events::mouse_right_down::mouse_right_down(int x, int y) : mouse_event(x,
 
 bool cogui::events::mouse_right_down::handle()
 {
-    return cogui::desktop::get().handle_mouse_right_down(x(), y());
+    return cogui::desktop::get().handle_mouse_right_down(get_x(), get_y());
 }

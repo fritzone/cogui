@@ -3,6 +3,11 @@
 cogui::menubar cogui::menubar::no_mainmenu;
 cogui::menu cogui::menubar::align_right_after(L"::align_right_after", {});
 
+bool cogui::menubar::operator ==(const cogui::menubar &oth) const
+{
+    return m_menus == oth.m_menus;
+}
+
 cogui::menubar::menubar(std::initializer_list<cogui::menu> entries) : m_menus(entries)
 {
 }

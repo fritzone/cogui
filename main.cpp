@@ -119,10 +119,14 @@ int main( int argc, char* argv[] )
                            button::on_click = [&e](button*){log_info() << "Thanks";
                                 e.setChecked( !e.checked() );
     });
-    auto& h = a.add_button(35,5, 5, 2, L"E");
+
 
     miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
     miso::connect(&c, c.sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
+
+    auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
+
+    auto& h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
     //a.setLayout<cogui::layout::grid>(3, 3);
 

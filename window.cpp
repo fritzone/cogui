@@ -134,7 +134,7 @@ void cogui::window::mouse_move(int x, int y)
 
             update_container();
 
-            return draw();
+            redraw();
         }
         else
         {
@@ -170,7 +170,7 @@ void cogui::window::mouse_move(int x, int y)
                     // return only if the new layout size is smaller than the current size
                     if(temptative_width < getWidth() && temptative_height < getHeight())
                     {
-                        return draw();
+                        redraw();
                     }
                 }
             }
@@ -183,7 +183,7 @@ void cogui::window::mouse_move(int x, int y)
 
             emit sig_on_resize(this, m_prev_w + dx, m_prev_h + dy);
 
-            return draw();
+            redraw();
         }
     }
     else
@@ -340,6 +340,12 @@ void cogui::window::closeCurrentMenu()
     m_current_menu = nullptr;
 }
 
+void cogui::window::close()
+{
+    emit sig_on_close(this);
+    desktop::get().remove_window(this);
+}
+
 cogui::menubar &cogui::window::get_main_menu()
 {
     return m_mainmenu;
@@ -403,7 +409,7 @@ void cogui::window::left_mouse_down(int x, int y)
         m_draw_state = draw_state::moving;
         m_mouse_down_x = x - this->getX();
         m_mouse_down_y = y - this->getY();
-        return /*draw()*/;
+        return draw();
     }
 
     if(x == getWidth() + 1 + this->getX() && y == getHeight() + this->getY()) // in the lower right corner
@@ -420,7 +426,7 @@ void cogui::window::left_mouse_down(int x, int y)
         m_prev_w = getWidth();
         m_prev_h = getHeight();
 
-        return /*draw()*/;
+        return draw();
     }
 
     // see if we have pressed the mouse on a control
