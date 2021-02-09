@@ -73,6 +73,9 @@ private:
 
     static std::string m_s_theme_name;
     static std::string m_s_graphics_engine_name;
+
+    static bool renderer();
+
 };
 
 }

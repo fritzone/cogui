@@ -26,7 +26,7 @@ void cogui::window::draw() const
 {
     auto t = cogui::desktop::get().getTheme();
     t->draw_window(*this);
-    draw_content();
+    container::draw();
     if(m_current_menu)
     {
         t->draw_menu(*m_current_menu);
@@ -45,7 +45,6 @@ void cogui::window::click(int x, int y)
         {
             auto tempm = m_current_menu;
             m_current_menu = nullptr;
-            redraw();
             tempm->click(x, y);
         }
         else
@@ -53,14 +52,14 @@ void cogui::window::click(int x, int y)
             // clicked outside the menu, close it
             m_current_menu->close();
             m_current_menu = nullptr;
-            redraw();
         }
-        return draw();
+        return redraw();
     }
 
     if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
     {
         m_draw_state = draw_state::normal;
+        return redraw();
     }
 
     if(y == this->getY() && x == m_close_btn_pos)
@@ -68,7 +67,7 @@ void cogui::window::click(int x, int y)
         // close click:
         // debug() << "click on close button";
         emit sig_on_close(this);
-        return;
+        return redraw();
     }
 
     if(y == this->getY() && x == m_maximize_btn_pos)
@@ -76,7 +75,7 @@ void cogui::window::click(int x, int y)
         // close click:
         // debug() << "click on close button";
         maximize();
-        return;
+        return redraw();
     }
 
     // click on sysmenu?
@@ -85,7 +84,7 @@ void cogui::window::click(int x, int y)
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
         m_current_menu->open(x - 1, y + 1);
-        return draw();
+        return redraw();
     }
 
     // click on a menu from menubar
@@ -99,7 +98,7 @@ void cogui::window::click(int x, int y)
                 log_info() << "Found click:" << m->caption();
                 m_current_menu = m;
                 m_current_menu->open(p.first.first, p.second.second + 1);
-                return draw();
+                return redraw();
             }
         }
     }
@@ -127,18 +126,10 @@ void cogui::window::mouse_move(int x, int y)
 
         if(new_x >= 0 && new_y >= 0 && new_x + this->getWidth() < desktop::get().getWidth() - 1 && new_y + this->getHeight() < desktop::get().getHeight())
         {
-            // debug() << "window moving at" <<x<<", "<<y;
-            clear(); // clear is usually followed by a draw that why there is no refresh
             setX(new_x);
             setY(new_y);
 
-            update_container();
-
-            redraw();
-        }
-        else
-        {
-            // debug() << "window not moving at all at " <<x<<", "<<y;
+            return redraw();
         }
     }
     else
@@ -157,9 +148,6 @@ void cogui::window::mouse_move(int x, int y)
 
         if(getWidth() +  dx >= 5 && getHeight() + dy >= 5)
         {
-            clear(); // clear is usually followed by a draw that why there is no refresh
-            // log_info() << "w = " << getWidth() << " nw=" << getWidth() + dx;
-
             int temptative_width = m_prev_w + dx;
             int temptative_height = m_prev_h + dy;
 
@@ -170,7 +158,7 @@ void cogui::window::mouse_move(int x, int y)
                     // return only if the new layout size is smaller than the current size
                     if(temptative_width < getWidth() && temptative_height < getHeight())
                     {
-                        redraw();
+                        return redraw();
                     }
                 }
             }
@@ -183,7 +171,7 @@ void cogui::window::mouse_move(int x, int y)
 
             emit sig_on_resize(this, m_prev_w + dx, m_prev_h + dy);
 
-            redraw();
+            return redraw();
         }
     }
     else
@@ -191,17 +179,11 @@ void cogui::window::mouse_move(int x, int y)
         // do we have an opened menu? That takes priority over controls
         if(m_current_menu)
         {
-            log_debug() << "opened menu at" <<x<<","<<y;
-
             if(m_current_menu->inside(x, y))
             {
-                log_debug() << "opened menu handles at" <<x<<","<<y;
-
                 if(m_current_menu->mouse_move(x, y))
                 {
-                    log_debug() << "opened menu handled at" <<x<<","<<y << ", redrawing";
-
-                    return draw();
+                    return redraw();
                 }
             }
             // do we have a menubar, if yes see if we are moving on in and open/close accordingly
@@ -209,10 +191,8 @@ void cogui::window::mouse_move(int x, int y)
             {
                 for(auto& [m, p] : m_menu_positions)
                 {
-//                    log_info() << "Trying move menu:" << m->caption() << "at (" <<p.first.first<<","<<p.first.second << ") - (" <<p.second.first<<","<<p.second.second << ") has (" << x << "," << y << ")";
                     if(p.first.first <=x && p.second.first > x && p.first.second <= y && p.second.second >= y && m!=m_current_menu)
                     {
-//                        log_info() << "Found move:" << m->caption();
                         m_current_menu->close();
                         m_current_menu = m;
                         m_current_menu->open(p.first.first, p.second.second + 1);
@@ -220,14 +200,13 @@ void cogui::window::mouse_move(int x, int y)
                     }
                 }
             }
-            return;
+            return redraw();
         }
+
         // now go to the controls, see if the mouse is over of one of them or not
         std::shared_ptr<control> under = element_under(x, y);
         if(under)
         {
-
-            log_debug ()<< "got under element: " << under->getTitle();
 
             if(m_prev_pressed != m_tab_order.end() && !m_tab_order.empty())
             {
@@ -235,18 +214,14 @@ void cogui::window::mouse_move(int x, int y)
                 {
                     m_pressed = m_prev_pressed;
                     (*m_pressed)->press();
-//                    log_debug ()<< "got under element: " << under->getTitle() << "pressing and redrawing";
-
-                    return draw();
+                    return redraw();
                 }
 
             }
             else
             {
-//                log_debug ()<< "got under element: " << under->getTitle() << "focusing and redrawing";
-
                 focus_element(under);
-                return draw();
+                return redraw();
             }
         }
 
@@ -262,20 +237,19 @@ void cogui::window::mouse_move(int x, int y)
             m_pressed = m_tab_order.end();
             m_focused = m_tab_order.end();
 
-//            log_debug ()<< "NO under element, but pressed != tab_order.end : " << (*m_prev_pressed)->getTitle() << "and redrawing";
-
-            return draw();
+            return redraw();
         }
     }
 
     // now if there was a control we have focused on, unfocus it since we moved outside of it
     if(m_focused != m_tab_order.end() && !m_tab_order.empty())
     {
-//        log_debug ()<< "NO under element, but focused != tab_order.end : " << (*m_focused)->getTitle() << "and redrawing";
         (*m_focused)->unfocus();
         m_focused = m_tab_order.end();
-        return draw();
+        return redraw();
     }
+
+    redraw();
 }
 
 bool cogui::window::inside(int x, int y) const
@@ -409,7 +383,7 @@ void cogui::window::left_mouse_down(int x, int y)
         m_draw_state = draw_state::moving;
         m_mouse_down_x = x - this->getX();
         m_mouse_down_y = y - this->getY();
-        return draw();
+        return redraw();
     }
 
     if(x == getWidth() + 1 + this->getX() && y == getHeight() + this->getY()) // in the lower right corner
@@ -426,7 +400,7 @@ void cogui::window::left_mouse_down(int x, int y)
         m_prev_w = getWidth();
         m_prev_h = getHeight();
 
-        return draw();
+        return redraw();
     }
 
     // see if we have pressed the mouse on a control
@@ -434,7 +408,7 @@ void cogui::window::left_mouse_down(int x, int y)
     if(under && !m_current_menu)
     {
         press_element(under);
-        return draw();
+        return redraw();
     }
 
     // now if there was a control we have pressed the button on, release it since we clicked outside of it
@@ -442,12 +416,12 @@ void cogui::window::left_mouse_down(int x, int y)
     {
         auto to_unpress_it = m_prev_pressed != m_tab_order.end() ? m_prev_pressed : m_pressed;
         release_control(*to_unpress_it);
-        return draw();
+        return redraw();
     }
 
     // noone else captured this event, emit as a generic signal
     emit sig_on_mouse_down(this, cogui::mouse::button::left, x - this->getX(), y - this->getY());
-    draw();
+    redraw();
 }
 
 void cogui::window::left_mouse_up(int x, int y)
@@ -466,7 +440,7 @@ void cogui::window::left_mouse_up(int x, int y)
             // call the click
             under->click();
         }
-        return draw();
+        return redraw();
     }
 
     // now if there was a control we have pressed the button on, release it
@@ -474,12 +448,12 @@ void cogui::window::left_mouse_up(int x, int y)
     {
         auto to_unpress_it = m_prev_pressed != m_tab_order.end() ? m_prev_pressed : m_pressed;
         release_control(*to_unpress_it);
-        return draw();
+        return redraw();
     }
 
     // nothing captured the left up, emit as signal
     emit sig_on_mouse_up(this, cogui::mouse::button::left, x - this->getX(), y - this->getY());
-    draw();
+    redraw();
 
 }
 
@@ -527,7 +501,7 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
                 m_current_menu = m;
                 m_current_menu->open(p.first.first, p.second.second + 1);
                 m_current_menu->activate_action(0);
-                draw();
+                redraw();
                 return true;
             }
         }
@@ -539,7 +513,7 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
         // this will handle hotkeys for the menu and up/down
         if(m_current_menu->keypress(k))
         {
-            draw();
+            redraw();
             return true;
         }
 

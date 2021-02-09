@@ -16,21 +16,40 @@ int cogui::application::run()
 {
     m_running = true;
 
-    // firstly let's draw all the windows
-    const auto& ws = desktop::get().windows();
-    for(const auto&w : ws)
-    {
-        w->draw();
-    }
+    // firstly let's get a clear desktop
+    desktop::get().redraw();
+
+    desktop::get().getGraphics()->present_scene();
+    desktop::get().getGraphics()->swapBuffers();
+
+    desktop::get().getGraphics()->refresh_screen();
+    desktop::get().getGraphics()->erase_screen();
 
     // then enter the loop
     while( running() )
     {
+        desktop::get().getGraphics()->present_scene();
+        desktop::get().getGraphics()->swapBuffers();
+
         auto events = desktop::get().getInput()->get_next_event();
-        log_debug() << "Got:" << events.size() << " events";
+        bool handled = false;
         for(auto c : events)
         {
-            c->handle();
+            if(c->handle())
+            {
+                handled = true;
+                desktop::get().getGraphics()->refresh_screen();
+                desktop::get().getGraphics()->erase_screen();
+
+                desktop::get().getGraphics()->present_scene();
+                desktop::get().getGraphics()->swapBuffers();
+            }
+        }
+
+        if(!handled)
+        {
+            desktop::get().getGraphics()->refresh_screen();
+            desktop::get().getGraphics()->erase_screen();
         }
     }
     return 1;

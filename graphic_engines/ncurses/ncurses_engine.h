@@ -2,12 +2,34 @@
 #define NCURSES_ENGINE_H
 
 #include <graphics_engine.h>
+#include <string.h>
+#include <string>
 
 typedef struct _win_st WINDOW;
 
 namespace cogui {
 
 namespace graphic_engines {
+
+struct frame final
+{
+    frame(int w, int h);
+    ~frame();
+
+    void clear();
+
+    void set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag);
+
+    void print();
+
+    int width;
+    int height;
+    std::wstring* data;
+    uint8_t* fg_colors;
+    uint8_t* bg_colors;
+    int* attrs;
+
+};
 
 class ncurses : public graphics_engine
 {
@@ -32,6 +54,12 @@ public:
     std::string name() const override;
     void clear_area(int x, int y, int width, int height) override;
 
+    void swapBuffers() override;
+    void present_scene() override;
+    void setRenderCB(bool(*rendercb)()) override {
+        renderCallback = rendercb;
+    }
+    void erase_screen() override;
 private:
     WINDOW *stdscr = nullptr;
     int m_width = -1;
@@ -39,9 +67,13 @@ private:
     bool m_colours = false;
     color m_currentFgColor = color::white;
     color m_currentBgColor = color::black;
+    frame* pframe = nullptr;
+    frame* rframe = nullptr;
+    frame* buffers[2];
+    int currentFrame = 0;
+    bool(*renderCallback)();
 
-    void turnoff_current_color();
-    void turnon_current_color();
+
 };
 }
 }

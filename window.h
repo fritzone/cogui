@@ -275,7 +275,7 @@ private:
 
             m_current_menu->open(p.first.first, p.second.second + 1);
             m_current_menu->activate_action(0);
-            draw();
+            redraw();
         }
         else
         {

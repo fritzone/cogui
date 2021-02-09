@@ -47,7 +47,7 @@ public:
         return *add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
 
-    void draw_content() const;
+    void draw() const;
     void focus_next_element();
     void focus_element(std::shared_ptr<control> c);
     void press_element(std::shared_ptr<control> c);
@@ -83,7 +83,6 @@ public:
 
 protected:
 
-    void update_container();
     /*will just release a control that was pressed, helper function */
     void release_control(std::shared_ptr<control>);
 private:

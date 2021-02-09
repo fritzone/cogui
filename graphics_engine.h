@@ -40,7 +40,7 @@ public:
     static const char* type;
     static const char* path;
 
-    enum class color
+    enum class color : uint8_t
     {
         black = 1,
         red = 2,
@@ -63,6 +63,9 @@ public:
 
     virtual bool initialize() = 0;
     virtual void shutdown() = 0;
+    virtual void swapBuffers() = 0;
+    virtual void present_scene() = 0;
+    virtual void setRenderCB(bool(*rendercb)()) = 0;
 
     virtual void draw_text(int x, int y, wchar_t c, int flags) = 0;
     virtual void draw_text(int x, int y, const wchar_t* s, int flags) = 0;
@@ -73,6 +76,7 @@ public:
 
     virtual void refresh_screen() = 0;
     virtual void clear_screen() = 0;
+    virtual void erase_screen() = 0;
 
     virtual void clear_area(int x, int y, int width, int height) = 0;
 

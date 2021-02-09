@@ -33,7 +33,7 @@ int main( int argc, char* argv[] )
 
     log_info() << "bb called:" << bb;
 
-    auto a = cogui::window(5, 5, 70, 15, L"Raise your \U0001F450",
+    auto a = cogui::window(5, 5, 70, 15, L"A not so special window",
                            window::on_resize = [](window*, int w, int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
                            window::on_close  = [&](window*){log_info() << "Closing this window"; app.exit(1);},
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },

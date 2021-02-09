@@ -71,7 +71,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     if(w.hasCloseButton())
     {
         available_width -= close_char.length();
-        log_debug() << "adjusting width due to close button:" << drawWidth << " avail:" << available_width;
+//        log_debug() << "adjusting width due to close button:" << drawWidth << " avail:" << available_width;
         cogui::graphics()->draw_text(drawX + available_width, drawY, close_char);
         close_pos = drawX + available_width + 1;
 
@@ -81,7 +81,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     if(w.hasMaximizeButton())
     {
         available_width -= maximize_char.length() - 1;
-        log_debug() << "adjusting width due to maximize button:" <<drawWidth << " avail:" << available_width;
+//        log_debug() << "adjusting width due to maximize button:" <<drawWidth << " avail:" << available_width;
 
         cogui::graphics()->draw_text(drawX + available_width , drawY, maximize_char);
         maximize_pos = drawX + available_width + 1;
@@ -96,7 +96,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     if(w.hasSysmenuButton())
     {
         available_width -= sysmenu_char.length();
-        log_debug() << "adjusting width due to sysmenu button:" <<drawWidth << " avail:" << available_width;
+//        log_debug() << "adjusting width due to sysmenu button:" <<drawWidth << " avail:" << available_width;
 
         cogui::graphics()->draw_text(drawX + 1, drawY, w.getSystemMenu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char);
         sysmenu_pos = drawX + 1 + 1 ;
@@ -239,7 +239,7 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
         title_x = drawX + 1;
     }
 
-    log_debug() << "Btn:" << title_to_draw << "TTL.length:" << title_to_draw.length() << "B.widh:" << drawWidth;
+//    log_debug() << "Btn:" << title_to_draw << "TTL.length:" << title_to_draw.length() << "B.widh:" << drawWidth;
     if(static_cast<int>(title_to_draw.length()) >= drawWidth)
     {
         if(drawWidth <= 5)
@@ -254,7 +254,7 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
         {
             title_to_draw = title_to_draw.substr(0, drawWidth - 4) + L"...";
         }
-        log_debug() << "Overriding Btn:" << title_to_draw << "TTL.length:" << title_to_draw.length() << "B.widh:" << drawWidth;
+//        log_debug() << "Overriding Btn:" << title_to_draw << "TTL.length:" << title_to_draw.length() << "B.widh:" << drawWidth;
     }
 
     if(drawHeight >= 2)
@@ -263,7 +263,7 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
         cogui::graphics()->draw_text(drawX + 1, title_y, cogui::utils::repeated(drawWidth - 2, L" "));
         if(b.get_focus_state() == cogui::control::focus_state::focused)
         {
-            log_debug()<<"button is focused, drawing underlined";
+//            log_debug()<<"button is focused, drawing underlined";
             cogui::graphics()->draw_title(title_x, title_y, title_to_draw, cogui::textflags::underline & cogui::textflags::bold);
         }
         else
@@ -291,7 +291,7 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
         }
     }
 
-    log_debug() << (one_is_selectable ? "ONE_IS_SELECTABLE" : "NO SELECTABLES");
+//    log_debug() << (one_is_selectable ? "ONE_IS_SELECTABLE" : "NO SELECTABLES");
 
     cogui::graphics()->clear_area(drawX, drawY, drawWidth, drawHeight);
 
@@ -320,7 +320,7 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
     {
         cogui::graphics()->draw_text(drawX, y, MNU_VERTICAL);
         cogui::graphics()->draw_text(drawX + drawWidth, y, MNU_VERTICAL);
-        log_debug() << "menu LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
+//        log_debug() << "menu LASTSEL:" << m.getLastSelectedIndex() << " mc=" << mc;
 
         std::wstring titleToDraw = m[mc].get_title();
 
@@ -356,7 +356,7 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
         mc ++;
         if(mc >= m.get_action_count())
         {
-            log_warning() << "an action counter passed over the menu";
+//            log_warning() << "an action counter passed over the menu";
             break;
         }
     }
@@ -499,7 +499,7 @@ void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::
 {
     int x = c->getX();
     int w = c->getWidth();
-    int y = c->getY() + c->first_available_row(); // no need to draw scrollbar on menu
+    int y = c->getY() + c->first_available_row(); // no need to put the scrollbar on menu
     int h = c->getHeight() - c->first_available_row() - 1;
     cogui::graphics()->set_bg_color(graphics_engine::color::white);
 

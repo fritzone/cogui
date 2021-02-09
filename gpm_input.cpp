@@ -235,7 +235,11 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
     TermKeyKey key;
     memset(&key, 0, sizeof (TermKeyKey));
     ret = termkey_waitkey(tk, &key);
-    if(ret != TERMKEY_RES_KEY) return result;
+    if(ret != TERMKEY_RES_KEY)
+    {
+        log_info() << "Nothing here, move along";
+        return result;
+    }
     bool handled = false;
 
     if(key.type == TERMKEY_TYPE_MOUSE)
@@ -244,7 +248,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::termkey_input::get_nex
         int button;
         int line, col;
         termkey_interpret_mouse(tk, &key, &ev, &button, &line, &col);
-        log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
+//        log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
 
         cogui::mouse::get().setX(col - 1);
         cogui::mouse::get().setY(line - 1);

@@ -11,9 +11,10 @@
 #include "desktop.h"
 
 #include <wchar.h>
-
 #include <ncursesw/ncurses.h>
+
 #include <sstream>
+#include <thread>
 
 #include "log.h"
 
@@ -96,6 +97,8 @@ const std::map<int, std::tuple<int, int, int>> colorpairs =
 cogui::graphic_engines::ncurses::~ncurses()
 {
     log_info() << "Shutting down ncurses";
+    delete buffers[0];
+    delete buffers[1];
     shutdown();
 }
 
@@ -104,6 +107,8 @@ bool cogui::graphic_engines::ncurses::initialize()
     setenv("TERM", "linux", 1);
     std::setlocale(LC_ALL, "");
     stdscr = initscr();
+
+    raw();
 
     if(stdscr == nullptr)
     {
@@ -127,7 +132,9 @@ bool cogui::graphic_engines::ncurses::initialize()
     // screen size
     getmaxyx(stdscr, m_height, m_width);
 
-    turnon_current_color();
+    buffers[0] = new frame(m_width, m_height);
+    buffers[1] = new frame(m_width, m_height);
+    swapBuffers();
 
     return true;
 }
@@ -145,8 +152,12 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
     {
         for(auto sc = 0; sc + x < m_width ; sc++)
         {
-            wchar_t c[2] = {s[sc] | flags, 0};
-            mvwaddwstr(stdscr, y, sc + x, c);
+            std::wstring b;
+            b+=s[sc];
+            //wchar_t c[2] = {s[sc] | flags, 0};
+            rframe->set(sc+x, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
+                        static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+            //mvwaddwstr(stdscr, y, sc + x, c);
         }
 
         return;
@@ -158,38 +169,50 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
 
         std::wstring sw(s);
         std::wstring subs = sw.substr(std::abs(x) + 1);
-        mvwaddwstr(stdscr, y, 0, subs.c_str());
+        for(int i=0; i<subs.length(); i++)
+        {
+            std::wstring b;
+            b += s[i];
+            rframe->set(i, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
+                        static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+        }
+        //mvwaddwstr(stdscr, y, 0, subs.c_str());
         return;
     }
 
-    mvwaddwstr(stdscr, y, x, s);
+    for(int i=0; i< ws.length(); i++)
+    {
+        std::wstring b;
+        b += ws[i];
+        rframe->set(x + i, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
+                    static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+    }
+    //mvwaddwstr(stdscr, y, x, s);
 }
 
 void cogui::graphic_engines::ncurses::draw_text(int x, int y, wchar_t c, int flags)
 {
-    mvwaddch(stdscr, y, x, c | flags);
+    std::wstring b;
+    b += c;
+    rframe->set(x, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
+                static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+    //mvwaddch(stdscr, y, x, c | flags);
 }
 
 void cogui::graphic_engines::ncurses::set_fg_color(cogui::graphic_engines::ncurses::foreground_color c)
 {
-    turnoff_current_color();
     m_currentFgColor = c;
-    turnon_current_color();
 }
 
 void cogui::graphic_engines::ncurses::set_bg_color(background_color c)
 {
-    turnoff_current_color();
     m_currentBgColor = c;
-    turnon_current_color();
 }
 
 void cogui::graphic_engines::ncurses::set_colors(cogui::graphic_engines::ncurses::foreground_color fg, cogui::graphic_engines::ncurses::background_color bg)
 {
-    turnoff_current_color();
     m_currentBgColor = bg;
     m_currentFgColor = fg;
-    turnon_current_color();
 }
 
 std::string cogui::graphic_engines::ncurses::name() const
@@ -205,18 +228,24 @@ void cogui::graphic_engines::ncurses::clear_area(int x, int y, int width, int he
     }
 }
 
-void cogui::graphic_engines::ncurses::turnoff_current_color()
-{
-    int a = (static_cast<int>(m_currentFgColor) - 1) << 8 | (static_cast<int>(m_currentBgColor) - 1);
-    attroff(COLOR_PAIR(a));
+void cogui::graphic_engines::ncurses::swapBuffers(){
+    currentFrame ^= 1;
+    rframe = buffers[currentFrame ^ 1];
+    pframe = buffers[currentFrame];
 }
 
-void cogui::graphic_engines::ncurses::turnon_current_color()
+void cogui::graphic_engines::ncurses::present_scene()
 {
-    int fgc = static_cast<int>(m_currentFgColor);
-    int bgc = static_cast<int>(m_currentBgColor);
-    int a = (fgc - 1) << 8 | (bgc - 1);
-    attron(COLOR_PAIR(a));
+    if(renderCallback != nullptr){
+        std::thread renderThread(renderCallback);
+        pframe->print();
+        renderThread.join();
+    }
+}
+
+void cogui::graphic_engines::ncurses::erase_screen()
+{
+    ::erase();
 }
 
 void cogui::graphic_engines::ncurses::refresh_screen()
@@ -226,8 +255,7 @@ void cogui::graphic_engines::ncurses::refresh_screen()
 
 void cogui::graphic_engines::ncurses::clear_screen()
 {
-    ::wclear(stdscr);
-    ::wrefresh(stdscr);
+    rframe->clear();
 }
 
 void cogui::graphic_engines::ncurses::shutdown()
@@ -266,7 +294,7 @@ void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstrin
     desktop::get().getGraphics()->draw_text(x, y, final_title.c_str(), flags);
     if(highlight_char != L'\0')
     {
-        // draw an extra space at the end, because we took away an & sign
+        // ad an extra space at the end, because we took away an & sign
         desktop::get().getGraphics()->draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
 
         desktop::get().getGraphics()->draw_text(x + highlight_pos, y, highlight_char,
@@ -289,3 +317,60 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const std::wstring
 int cogui::graphic_engines::ncurses::get_screen_width() const {return m_width;}
 
 int cogui::graphic_engines::ncurses::get_screen_height() const {return m_height;}
+
+cogui::graphic_engines::frame::frame(int w, int h)
+{
+    this->width = w;
+    this->height = h;
+
+    fg_colors = new uint8_t[width * height];
+    bg_colors = new uint8_t[width * height];
+    attrs = new int[width * height];
+
+    data = new std::wstring[width * height];
+
+    clear();
+}
+
+cogui::graphic_engines::frame::~frame()
+{
+    delete [] bg_colors;
+    delete [] fg_colors;
+    delete [] attrs;
+//    delete []data;
+}
+
+void cogui::graphic_engines::frame::clear()
+{
+    memset(fg_colors, COLOR_WHITE, sizeof(uint8_t) * width * height);
+    memset(bg_colors, COLOR_BLACK, sizeof(uint8_t) * width * height);
+    memset(attrs, 0, sizeof(int) * width * height);
+
+    memset(data, 0, sizeof(std::wstring) * width * height);
+}
+
+void cogui::graphic_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
+{
+    int index = (y * width) + x;
+    fg_colors[index] = fgc;
+    bg_colors[index] = bgc;
+    attrs[index] = flag;
+    data[index] = v;
+}
+
+void cogui::graphic_engines::frame::print()
+{
+    for(int i = 0; i < width; i++)
+    {
+        for(int j = 0; j < height; j++)
+        {
+            int index = (width * j) + i;
+            int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
+            attron(attrs[index] | COLOR_PAIR(a));
+
+            mvaddwstr(j, i, data[index].c_str());
+
+            attroff(attrs[index] | COLOR_PAIR(a));
+        }
+    }
+}

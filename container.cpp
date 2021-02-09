@@ -19,16 +19,7 @@ cogui::checkbox &cogui::container::add_checkbox(int x, int y, int width, int hei
     return *add_control<checkbox>(x, y, width, height, this, title);
 }
 
-void cogui::container::draw_content() const
-{
-    const auto& cvs = m_container_stores[this];
-    for(const auto& c : cvs)
-    {
-        c->draw();
-    }
-}
-
-void cogui::container::update_container()
+void cogui::container::draw() const
 {
     const auto& cvs = m_container_stores[this];
     for(const auto& c : cvs)

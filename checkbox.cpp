@@ -17,9 +17,10 @@ void cogui::checkbox::draw() const
 void cogui::checkbox::click()
 {
     m_checked = ! m_checked;
-    draw();
     emit sig_on_click(this);
     emit sig_on_state_change(this, m_checked);
+
+    cogui::desktop::get().redraw();
 }
 
 int cogui::checkbox::minimumDrawableWidth() const

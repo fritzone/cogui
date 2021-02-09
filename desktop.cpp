@@ -47,8 +47,15 @@ bool desktop::initialize()
     if(b)
     {
         m_graphics->refresh_screen();
+        m_graphics->setRenderCB(renderer);
     }
     return b;
+}
+
+bool desktop::renderer()
+{
+    get().redraw();
+    return true;
 }
 
 std::vector<window *> desktop::windows() const
@@ -61,7 +68,6 @@ bool desktop::handle_mouse_move(int x, int y)
     bool handled = false;
     if(m_captured_window)
     {
-        log_debug() << "Captured window handles";
         m_captured_window->mouse_move(x, y);
         handled = true;
     }
@@ -193,8 +199,7 @@ void desktop::handle_tab()
     if(m_captured_window)
     {
         m_captured_window->focus_next_element();
-        m_captured_window->draw();
-        refresh();
+        redraw();
     }
 }
 
@@ -280,6 +285,7 @@ void desktop::redraw()
         }
     }
     m_captured_window->draw();
+
 }
 
 void desktop::init(const std::string &theme_name)
