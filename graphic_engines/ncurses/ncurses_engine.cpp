@@ -134,13 +134,20 @@ bool cogui::graphic_engines::ncurses::initialize()
 
     buffers[0] = new frame(m_width, m_height);
     buffers[1] = new frame(m_width, m_height);
-    swapBuffers();
+    swap_buffers();
 
     return true;
 }
 
 void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, int flags)
 {
+
+    if(flags & textflags::v_title)
+    {
+        draw_title(x, y, s, flags & ~textflags::v_title);
+        return;
+    }
+
     auto sl = wcslen(s);
 
     std::wstring ws(s);
@@ -155,8 +162,8 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
             std::wstring b;
             b+=s[sc];
             //wchar_t c[2] = {s[sc] | flags, 0};
-            rframe->set(sc+x, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
-                        static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+            rframe->set(sc+x, y, b, m_currentFgColor,
+                        m_currentBgColor, flags);
             //mvwaddwstr(stdscr, y, sc + x, c);
         }
 
@@ -173,8 +180,8 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
         {
             std::wstring b;
             b += s[i];
-            rframe->set(i, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
-                        static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+            rframe->set(i, y, b, m_currentFgColor,
+                        m_currentBgColor, flags);
         }
         //mvwaddwstr(stdscr, y, 0, subs.c_str());
         return;
@@ -184,8 +191,8 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
     {
         std::wstring b;
         b += ws[i];
-        rframe->set(x + i, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
-                    static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+        rframe->set(x + i, y, b, m_currentFgColor,
+                    m_currentBgColor, flags);
     }
     //mvwaddwstr(stdscr, y, x, s);
 }
@@ -194,22 +201,22 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, wchar_t c, int fla
 {
     std::wstring b;
     b += c;
-    rframe->set(x, y, b, static_cast<std::underlying_type<color>::type>(m_currentFgColor),
-                static_cast<std::underlying_type<color>::type>(m_currentBgColor), flags);
+    rframe->set(x, y, b, m_currentFgColor,
+                m_currentBgColor, flags);
     //mvwaddch(stdscr, y, x, c | flags);
 }
 
-void cogui::graphic_engines::ncurses::set_fg_color(cogui::graphic_engines::ncurses::foreground_color c)
+void cogui::graphic_engines::ncurses::set_fg_color(const color &c)
 {
     m_currentFgColor = c;
 }
 
-void cogui::graphic_engines::ncurses::set_bg_color(background_color c)
+void cogui::graphic_engines::ncurses::set_bg_color(const color &c)
 {
     m_currentBgColor = c;
 }
 
-void cogui::graphic_engines::ncurses::set_colors(cogui::graphic_engines::ncurses::foreground_color fg, cogui::graphic_engines::ncurses::background_color bg)
+void cogui::graphic_engines::ncurses::set_colors(const color &fg, const color &bg)
 {
     m_currentBgColor = bg;
     m_currentFgColor = fg;
@@ -228,7 +235,15 @@ void cogui::graphic_engines::ncurses::clear_area(int x, int y, int width, int he
     }
 }
 
-void cogui::graphic_engines::ncurses::swapBuffers(){
+bool cogui::graphic_engines::ncurses::start_rendering()
+{
+    present_scene();
+    swap_buffers();
+
+    return true;
+}
+
+void cogui::graphic_engines::ncurses::swap_buffers(){
     currentFrame ^= 1;
     rframe = buffers[currentFrame ^ 1];
     pframe = buffers[currentFrame];
@@ -236,11 +251,16 @@ void cogui::graphic_engines::ncurses::swapBuffers(){
 
 void cogui::graphic_engines::ncurses::present_scene()
 {
-    if(renderCallback != nullptr){
-        std::thread renderThread(renderCallback);
+    if(m_renderCallback != nullptr){
+        std::thread renderThread(m_renderCallback);
         pframe->print();
         renderThread.join();
     }
+}
+
+void cogui::graphic_engines::ncurses::set_rendering_function(std::function<bool ()> rendercb)
+{
+    m_renderCallback = rendercb;
 }
 
 void cogui::graphic_engines::ncurses::erase_screen()
@@ -329,6 +349,8 @@ cogui::graphic_engines::frame::frame(int w, int h)
 
     data = new std::wstring[width * height];
 
+    log_info() << "created data:" << width * height << " bytes";
+
     clear();
 }
 
@@ -337,7 +359,7 @@ cogui::graphic_engines::frame::~frame()
     delete [] bg_colors;
     delete [] fg_colors;
     delete [] attrs;
-//    delete []data;
+    delete []data;
 }
 
 void cogui::graphic_engines::frame::clear()
@@ -351,11 +373,14 @@ void cogui::graphic_engines::frame::clear()
 
 void cogui::graphic_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
 {
-    int index = (y * width) + x;
-    fg_colors[index] = fgc;
-    bg_colors[index] = bgc;
-    attrs[index] = flag;
-    data[index] = v;
+    if(x < width && y < height && x >= 0 && y >= 0)
+    {
+        int index = (y * width) + x;
+        fg_colors[index] = fgc;
+        bg_colors[index] = bgc;
+        attrs[index] = flag;
+        data[index] = v;
+    }
 }
 
 void cogui::graphic_engines::frame::print()
@@ -367,9 +392,7 @@ void cogui::graphic_engines::frame::print()
             int index = (width * j) + i;
             int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
             attron(attrs[index] | COLOR_PAIR(a));
-
             mvaddwstr(j, i, data[index].c_str());
-
             attroff(attrs[index] | COLOR_PAIR(a));
         }
     }

@@ -152,8 +152,8 @@ class cursive final : public ::cogui::theme
 
 public:
 
-    cursive() {}
-    virtual ~cursive() {}
+    cursive() = default;
+    ~cursive() override = default;
 
     void clear(const control& c) override;
 

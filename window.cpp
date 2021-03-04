@@ -36,7 +36,7 @@ void cogui::window::draw() const
 
 void cogui::window::click(int x, int y)
 {
-    log_info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->getY();
+    log_info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->get_y();
 
     //firstly: see if there is an open menu
     if(m_current_menu)
@@ -62,7 +62,7 @@ void cogui::window::click(int x, int y)
         return redraw();
     }
 
-    if(y == this->getY() && x == m_close_btn_pos)
+    if(y == this->get_y() && x == m_close_btn_pos)
     {
         // close click:
         // debug() << "click on close button";
@@ -70,7 +70,7 @@ void cogui::window::click(int x, int y)
         return redraw();
     }
 
-    if(y == this->getY() && x == m_maximize_btn_pos)
+    if(y == this->get_y() && x == m_maximize_btn_pos)
     {
         // close click:
         // debug() << "click on close button";
@@ -79,7 +79,7 @@ void cogui::window::click(int x, int y)
     }
 
     // click on sysmenu?
-    if(y == this->getY() && x == m_sysmenu_btn_pos)
+    if(y == this->get_y() && x == m_sysmenu_btn_pos)
     {
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
@@ -88,7 +88,7 @@ void cogui::window::click(int x, int y)
     }
 
     // click on a menu from menubar
-    if(hasMenubar())
+    if(has_menubar())
     {
         for(auto& [m, p] : m_menu_positions)
         {
@@ -115,7 +115,7 @@ void cogui::window::click(int x, int y)
 
 }
 
-void cogui::window::mouse_move(int x, int y)
+bool cogui::window::mouse_move(int x, int y)
 {
     if(m_draw_state == draw_state::moving)
     {
@@ -124,12 +124,13 @@ void cogui::window::mouse_move(int x, int y)
         int new_x = x - m_mouse_down_x;
         int new_y = y - m_mouse_down_y;
 
-        if(new_x >= 0 && new_y >= 0 && new_x + this->getWidth() < desktop::get().getWidth() - 1 && new_y + this->getHeight() < desktop::get().getHeight())
+        if(new_x >= 0 && new_y >= 0 && new_x + this->get_width() < desktop::get().getWidth() - 1 && new_y + this->get_height() < desktop::get().getHeight())
         {
-            setX(new_x);
-            setY(new_y);
+            set_x(new_x);
+            set_y(new_y);
 
-            return redraw();
+            redraw();
+            return true;
         }
     }
     else
@@ -137,16 +138,16 @@ void cogui::window::mouse_move(int x, int y)
     {
         log_debug() << "mouse resizing at" <<x<<","<<y;
 
-        int dx = x - m_mouse_down_x - this->getX();
-        int dy = y - m_mouse_down_y - this->getY();
+        int dx = x - m_mouse_down_x - this->get_x();
+        int dy = y - m_mouse_down_y - this->get_y();
 
         int attempted_new_width = m_prev_w + dx;
-        if(attempted_new_width <= minimumDrawableWidth())
+        if(attempted_new_width <= minimum_drawable_width())
         {
-            return;
+            return false;
         }
 
-        if(getWidth() +  dx >= 5 && getHeight() + dy >= 5)
+        if(get_width() +  dx >= 5 && get_height() + dy >= 5)
         {
             int temptative_width = m_prev_w + dx;
             int temptative_height = m_prev_h + dy;
@@ -156,22 +157,24 @@ void cogui::window::mouse_move(int x, int y)
                 if(!m_layout->accept_new_size(m_tab_order, temptative_width, temptative_height))
                 {
                     // return only if the new layout size is smaller than the current size
-                    if(temptative_width < getWidth() && temptative_height < getHeight())
+                    if(temptative_width < get_width() && temptative_height < get_height())
                     {
-                        return redraw();
+                        redraw();
+                        return true;
                     }
                 }
             }
 
-            setWidth( m_prev_w + dx);
-            setHeight( m_prev_h + dy);
+            set_width( m_prev_w + dx);
+            set_height( m_prev_h + dy);
 
             // if there is a layout attached
-            reLayout(getWidth(), getHeight(), true);
+            reLayout(get_width(), get_height(), true);
 
             emit sig_on_resize(this, m_prev_w + dx, m_prev_h + dy);
 
-            return redraw();
+            redraw();
+            return true;
         }
     }
     else
@@ -183,11 +186,12 @@ void cogui::window::mouse_move(int x, int y)
             {
                 if(m_current_menu->mouse_move(x, y))
                 {
-                    return redraw();
+                    redraw();
+                    return true;
                 }
             }
             // do we have a menubar, if yes see if we are moving on in and open/close accordingly
-            if(hasMenubar() && m_current_menu != &m_sysmenu)
+            if(has_menubar() && m_current_menu != &m_sysmenu)
             {
                 for(auto& [m, p] : m_menu_positions)
                 {
@@ -196,11 +200,13 @@ void cogui::window::mouse_move(int x, int y)
                         m_current_menu->close();
                         m_current_menu = m;
                         m_current_menu->open(p.first.first, p.second.second + 1);
-                        return redraw();
+                        redraw();
+                        return true;
                     }
                 }
             }
-            return redraw();
+            redraw();
+            return true;
         }
 
         // now go to the controls, see if the mouse is over of one of them or not
@@ -214,14 +220,16 @@ void cogui::window::mouse_move(int x, int y)
                 {
                     m_pressed = m_prev_pressed;
                     (*m_pressed)->press();
-                    return redraw();
+                    redraw();
+                    return true;
                 }
 
             }
             else
             {
                 focus_element(under);
-                return redraw();
+                redraw();
+                return true;
             }
         }
 
@@ -237,7 +245,8 @@ void cogui::window::mouse_move(int x, int y)
             m_pressed = m_tab_order.end();
             m_focused = m_tab_order.end();
 
-            return redraw();
+            redraw();
+            return true;
         }
     }
 
@@ -246,18 +255,20 @@ void cogui::window::mouse_move(int x, int y)
     {
         (*m_focused)->unfocus();
         m_focused = m_tab_order.end();
-        return redraw();
+         redraw();
+         return true;
     }
 
     redraw();
+    return false;
 }
 
 bool cogui::window::inside(int x, int y) const
 {
-    return x >= this->getX()
-            && x <= this->getX() + getWidth() + 1
-            && y >= this->getY()
-            && y <= this->getY() + getHeight()
+    return x >= this->get_x()
+            && x <= this->get_x() + get_width() + 1
+            && y >= this->get_y()
+            && y <= this->get_y() + get_height()
             ;
 }
 
@@ -266,12 +277,12 @@ void cogui::window::click()
     log_info() << "This window was clicked:" << this;
 }
 
-int cogui::window::minimumDrawableWidth() const
+int cogui::window::minimum_drawable_width() const
 {
     return desktop::get().getTheme()->minimum_window_width(*this);
 }
 
-int cogui::window::minimumDrawableHeight() const
+int cogui::window::minimum_drawable_height() const
 {
     return desktop::get().getTheme()->minimum_window_height(*this);
 }
@@ -284,6 +295,12 @@ void cogui::window::redraw()
 int cogui::window::first_available_row() const
 {
     return desktop::get().getTheme()->first_available_row(*this);
+}
+
+bool cogui::window::has_menubar() const
+{
+    bool b = (m_mainmenu == cogui::menubar::no_mainmenu);
+    return !b;
 }
 
 void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const
@@ -364,14 +381,14 @@ bool cogui::window::activate_next_menu()
 
 void cogui::window::left_mouse_down(int x, int y)
 {
-    log_debug() << "MOUSE DOWN: y=" << y << " topy=" << this->getY();
+    log_debug() << "MOUSE DOWN: y=" << y << " topy=" << this->get_y();
 
     if(deal_with_scrollbar_mouse_down(x, y))
     {
         return;
     }
 
-    if( y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
+    if( y == this->get_y() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
         if(m_current_menu)
         {
@@ -381,12 +398,12 @@ void cogui::window::left_mouse_down(int x, int y)
 
         // see: outside of sysmenu, maximize, close
         m_draw_state = draw_state::moving;
-        m_mouse_down_x = x - this->getX();
-        m_mouse_down_y = y - this->getY();
+        m_mouse_down_x = x - this->get_x();
+        m_mouse_down_y = y - this->get_y();
         return redraw();
     }
 
-    if(x == getWidth() + 1 + this->getX() && y == getHeight() + this->getY()) // in the lower right corner
+    if(x == get_width() + 1 + this->get_x() && y == get_height() + this->get_y()) // in the lower right corner
     {
         if(m_current_menu)
         {
@@ -395,10 +412,10 @@ void cogui::window::left_mouse_down(int x, int y)
         }
 
         m_draw_state = draw_state::resizing;
-        m_mouse_down_x = x - this->getX();
-        m_mouse_down_y = y - this->getY();
-        m_prev_w = getWidth();
-        m_prev_h = getHeight();
+        m_mouse_down_x = x - this->get_x();
+        m_mouse_down_y = y - this->get_y();
+        m_prev_w = get_width();
+        m_prev_h = get_height();
 
         return redraw();
     }
@@ -420,7 +437,7 @@ void cogui::window::left_mouse_down(int x, int y)
     }
 
     // noone else captured this event, emit as a generic signal
-    emit sig_on_mouse_down(this, cogui::mouse::button::left, x - this->getX(), y - this->getY());
+    emit sig_on_mouse_down(this, cogui::mouse::button::left, x - this->get_x(), y - this->get_y());
     redraw();
 }
 
@@ -452,24 +469,24 @@ void cogui::window::left_mouse_up(int x, int y)
     }
 
     // nothing captured the left up, emit as signal
-    emit sig_on_mouse_up(this, cogui::mouse::button::left, x - this->getX(), y - this->getY());
+    emit sig_on_mouse_up(this, cogui::mouse::button::left, x - this->get_x(), y - this->get_y());
     redraw();
 
 }
 
 void cogui::window::right_mouse_down(int x, int y)
 {
-    emit sig_on_mouse_down(this, cogui::mouse::button::right, x - this->getX(), y - this->getY());
+    emit sig_on_mouse_down(this, cogui::mouse::button::right, x - this->get_x(), y - this->get_y());
 }
 
 void cogui::window::right_mouse_up(int x, int y)
 {
-    emit sig_on_mouse_up(this, cogui::mouse::button::right, x - this->getX(), y - this->getY());
+    emit sig_on_mouse_up(this, cogui::mouse::button::right, x - this->get_x(), y - this->get_y());
 }
 
 void cogui::window::doubleclick(int x, int y)
 {
-    if(y == this->getY() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
+    if(y == this->get_y() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
     {
         maximize();
         return;
@@ -570,17 +587,17 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
     return false;
 }
 
-bool cogui::window::hasSysmenuButton() const
+bool cogui::window::has_sysmenu_button() const
 {
     return m_hasSysmenuButton;
 }
 
-void cogui::window::setHasSysmenuButton(bool hasSysmenuButton)
+void cogui::window::set_has_sysmenu_button(bool hasSysmenuButton)
 {
     m_hasSysmenuButton = hasSysmenuButton;
 }
 
-cogui::window::draw_state cogui::window::getDrawState() const
+cogui::window::draw_state cogui::window::get_draw_state() const
 {
     return m_draw_state;
 }
@@ -590,15 +607,15 @@ void cogui::window::maximize()
 
     if(m_window_state == window_state::normal)
     {
-        m_initial_x = getX();
-        m_initial_y = getY();
-        m_initial_width = getWidth();
-        m_initial_height = getHeight();
+        m_initial_x = get_x();
+        m_initial_y = get_y();
+        m_initial_width = get_width();
+        m_initial_height = get_height();
 
-        setX(0);
-        setY(0);
-        setWidth(desktop::get().getWidth() - 2);
-        setHeight(desktop::get().getHeight() - 1);
+        set_x(0);
+        set_y(0);
+        set_width(desktop::get().getWidth() - 2);
+        set_height(desktop::get().getHeight() - 1);
 
         m_window_state = window_state::maximized;
 
@@ -608,10 +625,10 @@ void cogui::window::maximize()
     {
         desktop::get().clear();
 
-        setX(m_initial_x);
-        setY(m_initial_y);
-        setWidth(m_initial_width);
-        setHeight(m_initial_height);
+        set_x(m_initial_x);
+        set_y(m_initial_y);
+        set_width(m_initial_width);
+        set_height(m_initial_height);
 
         m_window_state = window_state::normal;
 
@@ -621,32 +638,32 @@ void cogui::window::maximize()
     redraw();
 }
 
-bool cogui::window::hasMaximizeButton() const
+bool cogui::window::has_maximize_button() const
 {
     return m_hasMaximizeButton;
 }
 
-void cogui::window::setHasMaximizeButton(bool hasMaximizeButton)
+void cogui::window::set_has_maximize_button(bool hasMaximizeButton)
 {
     m_hasMaximizeButton = hasMaximizeButton;
 }
 
-bool cogui::window::hasCloseButton() const
+bool cogui::window::has_close_button() const
 {
     return m_hasCloseButton;
 }
 
-void cogui::window::setHasCloseButton(bool hasCloseButton)
+void cogui::window::set_has_close_button(bool hasCloseButton)
 {
     m_hasCloseButton = hasCloseButton;
 }
 
-bool cogui::window::resizeable() const
+bool cogui::window::is_resizeable() const
 {
     return m_resizeable;
 }
 
-void cogui::window::setResizeable(bool resizeable)
+void cogui::window::set_resizeable(bool resizeable)
 {
     m_resizeable = resizeable;
 }

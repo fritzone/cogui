@@ -5,19 +5,14 @@
 
 #include <string>
 
-void cogui::control::initInitialPosition()
-{
-    m_initial_x = m_x;
-    m_initial_y = m_y;
-    m_initial_width = m_width;
-    m_initial_height = m_height;
-}
-
 cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_width(w), m_height(h)
 {
     log_info() << "Created a control at:" << x << ", " << y;
-    initInitialPosition();
-}
+
+    m_initial_x = m_x;
+    m_initial_y = m_y;
+    m_initial_width = m_width;
+    m_initial_height = m_height;}
 
 cogui::control::control(int x, int y, int width, int height, const std::wstring &title):
     cogui::control::control(x, y, width, height)
@@ -31,19 +26,19 @@ cogui::control::control(int x, int y, int width, int height, const std::string &
     m_title = cogui::utils::std2ws(title);
 }
 
-int cogui::control::getHeight() const
+int cogui::control::get_height() const
 {
     return m_height;
 }
 
-void cogui::control::setHeight(int h)
+void cogui::control::set_height(int h)
 {
     m_height = h;
 }
 
 bool cogui::control::inside(int x, int y) const
 {
-    return x >= this->getX() && x < this->getX() + m_width && y >= this->getY() && y < this->getY() + m_height;
+    return x >= this->get_x() && x < this->get_x() + m_width && y >= this->get_y() && y < this->get_y() + m_height;
 }
 
 std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_decrease(int x, int y)
@@ -106,7 +101,7 @@ std::shared_ptr<cogui::scrollbar> cogui::control::mouse_down_on_scrollbar_midpor
         }
     }
 
-    if(m_horizontal_scrollbar)
+    if(m_vertical_scrollbar)
     {
         if(y >= m_vertical_scrollbar->m_dec_arrow_screen_position.y + m_vertical_scrollbar->m_dec_arrow_screen_position.height )
         {
@@ -164,12 +159,12 @@ void cogui::control::clear() const
     cogui::desktop::get().getTheme()->clear(*this);
 }
 
-cogui::control *cogui::control::getParent() const
+cogui::control *cogui::control::get_parent() const
 {
     return m_parent;
 }
 
-void cogui::control::setParent(cogui::control *value)
+void cogui::control::set_parent(cogui::control *value)
 {
     m_parent = value;
 }
@@ -260,51 +255,51 @@ void cogui::control::doubleclick(int, int)
     log_info() << "Double click, ignored for this control";
 }
 
-int cogui::control::getWidth() const
+int cogui::control::get_width() const
 {
     return m_width;
 }
 
-void cogui::control::setWidth(int w)
+void cogui::control::set_width(int w)
 {
     m_width = w;
 }
 
-int cogui::control::getY() const
+int cogui::control::get_y() const
 {
-    return m_parent ? m_parent->getY() + m_y : m_y;
+    return m_parent ? m_parent->get_y() + m_y : m_y;
 }
 
-void cogui::control::setY(int y)
+void cogui::control::set_y(int y)
 {
     log_debug() << "set y=" << y << " to" << (char*)m_title.c_str();
     m_y = y;
 }
 
-void cogui::control::setBounds(int x, int y, int w, int h)
+void cogui::control::set_bounds(int x, int y, int w, int h)
 {
-    setX(x);
-    setY(y);
-    setWidth(w);
-    setHeight(h);
+    set_x(x);
+    set_y(y);
+    set_width(w);
+    set_height(h);
 }
 
-int cogui::control::getX() const
+int cogui::control::get_x() const
 {
-    return m_parent ? m_parent->getX() + m_x : m_x;
+    return m_parent ? m_parent->get_x() + m_x : m_x;
 }
 
-void cogui::control::setX(int x)
+void cogui::control::set_x(int x)
 {
     m_x = x;
 }
 
-std::wstring cogui::control::getTitle() const
+std::wstring cogui::control::get_title() const
 {
     return m_title;
 }
 
-void cogui::control::setTitle(const std::wstring &title)
+void cogui::control::set_title(const std::wstring &title)
 {
     m_title = title;
     redraw();

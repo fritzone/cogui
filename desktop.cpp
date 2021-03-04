@@ -47,7 +47,7 @@ bool desktop::initialize()
     if(b)
     {
         m_graphics->refresh_screen();
-        m_graphics->setRenderCB(renderer);
+        m_graphics->set_rendering_function(renderer);
     }
     return b;
 }
@@ -68,8 +68,7 @@ bool desktop::handle_mouse_move(int x, int y)
     bool handled = false;
     if(m_captured_window)
     {
-        m_captured_window->mouse_move(x, y);
-        handled = true;
+        handled = m_captured_window->mouse_move(x, y);
     }
     return handled;
 }
@@ -91,7 +90,7 @@ bool desktop::handle_mouse_left_click(int x, int y)
     {
         return true;
     }
-    if(m_captured_window && m_captured_window->hasSysmenuButton() && m_captured_window->getSystemMenu().isOpened())
+    if(m_captured_window && m_captured_window->has_sysmenu_button() && m_captured_window->getSystemMenu().isOpened())
     {
         m_captured_window->closeCurrentMenu();
         handled = true;
@@ -101,7 +100,7 @@ bool desktop::handle_mouse_left_click(int x, int y)
     {
         for(auto& w : m_windows)
         {
-            if(w->hasSysmenuButton())
+            if(w->has_sysmenu_button())
             {
                 w->getSystemMenu().close();
                 handled = true;
@@ -122,7 +121,7 @@ bool desktop::handle_mouse_left_down(int x, int y)
             log_info() << "captured a window";
 
             w->left_mouse_down(x, y);
-            if(w->getDrawState() != window::draw_state::normal)
+            if(w->get_draw_state() != window::draw_state::normal)
             {
                 log_info() << "captured a window";
                 m_captured_window = w;

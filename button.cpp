@@ -24,12 +24,12 @@ void cogui::button::click()
     emit sig_on_click(this);
 }
 
-int cogui::button::minimumDrawableWidth() const
+int cogui::button::minimum_drawable_width() const
 {
     return desktop::get().getTheme()->minimum_button_width(*this);
 }
 
-int cogui::button::minimumDrawableHeight() const
+int cogui::button::minimum_drawable_height() const
 {
     return desktop::get().getTheme()->minimum_button_height(*this);
 }

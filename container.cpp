@@ -107,7 +107,7 @@ void cogui::container::reLayout(int temptative_width, int temptative_height, boo
 
 void cogui::container::reLayout()
 {
-    reLayout(getWidth(), getHeight(), true);
+    reLayout(get_width(), get_height(), true);
 }
 
 std::shared_ptr<cogui::control> cogui::container::element_under(int x, int y)

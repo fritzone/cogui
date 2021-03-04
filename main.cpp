@@ -80,12 +80,12 @@ int main( int argc, char* argv[] )
                            window::hotkeys = hotkey_associations {
                                on<&key::F2>::press = [&](window*){log_info() << "pressed the F2 key";},
                                on<&key::F3>::press = [&](window*){log_info() << "pressed the F3 key";},
-                               on<&key::F4>::press = [&](window* w){log_info() << "pressed the F4 key"; w->setTitle(L"F4 pressed");},
-                               on<&key::Ctrl_F5>::press = [&](window* w){log_info() << "pressed the Ctrl+F5 key"; w->setTitle(L"Ctrl+F5 press");},
-                               on<&key::Ctrl_A>::press = [&](window* w){log_info() << "pressed the Ctrl-A key"; w->setTitle(L"Ctrl+A press");},
+                               on<&key::F4>::press = [&](window* w){log_info() << "pressed the F4 key"; w->set_title(L"F4 pressed");},
+                               on<&key::Ctrl_F5>::press = [&](window* w){log_info() << "pressed the Ctrl+F5 key"; w->set_title(L"Ctrl+F5 press");},
+                               on<&key::Ctrl_A>::press = [&](window* w){log_info() << "pressed the Ctrl-A key"; w->set_title(L"Ctrl+A press");},
                                on<&key::Ctrl_Q>::press = [&](window*){app.exit();}
                            },
-                           window::scrollbars = scrollbar::both
+                           window::scrollbars = scrollbar::horizontal
                            /*  */
     );
 
@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
 
     auto& e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!", false,
                              checkbox::on_state_change = [&f](checkbox*, bool checked) {
-                                f.setTitle(checked ? L"Checked" : L"Unchecked");
+                                f.set_title(checked ? L"Checked" : L"Unchecked");
                              }
     );
     auto& g = a.add_button(55,5, 5, 2, "Da button",

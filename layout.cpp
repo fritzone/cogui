@@ -5,7 +5,7 @@
 void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cogui::control> >& controls,
                                                  cogui::container * cont)
 {
-    int width = cont->getWidth();
+    int width = cont->get_width();
     int recommended_width = width / controls.size() - spacing() * controls.size();
     int cx = 1;
     bool expandable = (m_expanded_column != -1);
@@ -19,14 +19,14 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
         int accumulated_width = 0;
         for(auto i = m_expanded_column; i<controls.size(); i++)
         {
-            accumulated_width += controls[i]->minimumDrawableWidth() + 1; // +1 since the next control start +1
+            accumulated_width += controls[i]->minimum_drawable_width() + 1; // +1 since the next control start +1
         }
 
         for(auto i=0; i<controls.size(); i++)
         {
             if(i == m_expanded_column)
             {
-                cx = cont->getWidth() - accumulated_width;
+                cx = cont->get_width() - accumulated_width;
                 if(cx < 0 || cx < last_x)
                 {
                     hiding = true;
@@ -42,7 +42,7 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
             if(!hiding)
             {
                 c->show();
-                c->setBounds(cx, cont->first_available_row(), c->minimumDrawableWidth(), cont->getHeight() - cont->first_available_row() - spacing());
+                c->set_bounds(cx, cont->first_available_row(), c->minimum_drawable_width(), cont->get_height() - cont->first_available_row() - spacing());
             }
             else
             {
@@ -50,12 +50,12 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
                 if(cx > last_x_before_split)
                 {
                     c->show();
-                    c->setBounds(cx, cont->first_available_row(), c->minimumDrawableWidth(), cont->getHeight() - cont->first_available_row() - spacing());
+                    c->set_bounds(cx, cont->first_available_row(), c->minimum_drawable_width(), cont->get_height() - cont->first_available_row() - spacing());
                     hiding = false;
                 }
             }
 
-            cx += c->minimumDrawableWidth() + 1;
+            cx += c->minimum_drawable_width() + 1;
             last_x = cx;
 
         }
@@ -65,7 +65,7 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
         for (auto& c : controls)
         {
             c->show();
-            c->setBounds(cx, cont->first_available_row(), recommended_width - spacing(), cont->getHeight() - cont->first_available_row() - spacing());
+            c->set_bounds(cx, cont->first_available_row(), recommended_width - spacing(), cont->get_height() - cont->first_available_row() - spacing());
             cx += recommended_width + spacing();
         }
     }
@@ -83,7 +83,7 @@ bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_pt
         int accumulated_width = 0;
         for(int i = m_expanded_column; i<controls.size(); i++)
         {
-            accumulated_width += controls[i]->minimumDrawableWidth() + 1; // +1 since the next control start +1
+            accumulated_width += controls[i]->minimum_drawable_width() + 1; // +1 since the next control start +1
         }
 
         for(int i=0; i<controls.size(); i++)
@@ -98,8 +98,8 @@ bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_pt
             }
 
             auto c = controls[i];
-            last_used_x = cx + c->minimumDrawableWidth() + 1;
-            cx += c->minimumDrawableWidth() + 1;
+            last_used_x = cx + c->minimum_drawable_width() + 1;
+            cx += c->minimum_drawable_width() + 1;
 
         }
     }
@@ -114,7 +114,7 @@ void cogui::layout::horizontal::expand(int c)
     if(m_container)
     {
         log_debug() << "Relayouting";
-        m_container->reLayout(m_container->getWidth(), m_container->getHeight(), true);
+        m_container->reLayout(m_container->get_width(), m_container->get_height(), true);
     }
 }
 
@@ -123,7 +123,7 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
                                                  cogui::container * cont)
 {
 
-    int height = cont->getHeight() - cont->first_available_row() - 1;
+    int height = cont->get_height() - cont->first_available_row() - 1;
     int recommended_height = height / controls.size() - spacing() * controls.size();
     int cy = cont->first_available_row() ;
     bool expandable = (m_expanded_row != -1);
@@ -136,14 +136,14 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
         int accumulated_height = 0;
         for(int i = m_expanded_row; i<controls.size(); i++)
         {
-            accumulated_height += controls[i]->minimumDrawableHeight() + 1; // +1 since the next control start +1
+            accumulated_height += controls[i]->minimum_drawable_height() + 1; // +1 since the next control start +1
         }
 
         for(int i=0; i<controls.size(); i++)
         {
             if(i == m_expanded_row)
             {
-                cy = cont->getHeight() - accumulated_height;
+                cy = cont->get_height() - accumulated_height;
                 if(cy < 0 || cy < last_y)
                 {
                     hiding = true;
@@ -159,11 +159,11 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
             if(!hiding)
             {
                 c->show();
-                c->setY(cy);
-                c->setX(1);
-                c->setWidth(cont->getWidth() - 1);
+                c->set_y(cy);
+                c->set_x(1);
+                c->set_width(cont->get_width() - 1);
 
-                c->setHeight(c->minimumDrawableHeight());
+                c->set_height(c->minimum_drawable_height());
             }
             else
             {
@@ -172,14 +172,14 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
                 {
                     hiding = false;
                     c->show();
-                    c->setY(cy);
-                    c->setX(1);
-                    c->setWidth(cont->getWidth() - 1);
+                    c->set_y(cy);
+                    c->set_x(1);
+                    c->set_width(cont->get_width() - 1);
 
-                    c->setHeight(c->minimumDrawableHeight());
+                    c->set_height(c->minimum_drawable_height());
                 }
             }
-            cy += c->minimumDrawableHeight() + 1;
+            cy += c->minimum_drawable_height() + 1;
             last_y = cy;
         }
     }
@@ -189,10 +189,10 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
         {
             c->show();
 
-            c->setX(1);
-            c->setY(cy);
-            c->setHeight(recommended_height - 1);
-            c->setWidth(cont->getWidth() - 1);
+            c->set_x(1);
+            c->set_y(cy);
+            c->set_height(recommended_height - 1);
+            c->set_width(cont->get_width() - 1);
 
             cy += recommended_height + 1;
         }
@@ -209,7 +209,7 @@ bool cogui::layout::vertical::accept_new_size(const std::vector<std::shared_ptr<
         int accumulated_height = 0;
         for(int i = m_expanded_row; i<controls.size(); i++)
         {
-            accumulated_height += controls[i]->minimumDrawableHeight() + 1; // +1 since the next control start +1
+            accumulated_height += controls[i]->minimum_drawable_height() + 1; // +1 since the next control start +1
         }
 
         for(int i=0; i<controls.size(); i++)
@@ -225,8 +225,8 @@ bool cogui::layout::vertical::accept_new_size(const std::vector<std::shared_ptr<
             }
 
             auto c = controls[i];
-            last_used_y = cy + c->minimumDrawableHeight() + 1;
-            cy += c->minimumDrawableHeight() + 1;
+            last_used_y = cy + c->minimum_drawable_height() + 1;
+            cy += c->minimum_drawable_height() + 1;
         }
     }
     return true;
@@ -239,16 +239,16 @@ void cogui::layout::vertical::expand(int c)
     if(m_container)
     {
         log_debug() << "Relayouting";
-        m_container->reLayout(m_container->getWidth(), m_container->getHeight(), true);
+        m_container->reLayout(m_container->get_width(), m_container->get_height(), true);
     }
 }
 
 void cogui::layout::grid::arrange_controls(std::vector<std::shared_ptr<cogui::control> > &controls, cogui::container *cont)
 {
-    int width = cont->getWidth();
+    int width = cont->get_width();
     int recommended_width = width / m_cols - 1;
     int cx = 1;
-    int height = cont->getHeight();
+    int height = cont->get_height();
     int recommended_height = height / m_rows - 1;
     int cy = 1;
     int rc = 0;
@@ -258,10 +258,10 @@ void cogui::layout::grid::arrange_controls(std::vector<std::shared_ptr<cogui::co
     {
         if(setting)
         {
-            c->setX(cx);
-            c->setY(cy);
-            c->setHeight(recommended_height - 1);
-            c->setWidth(recommended_width - 1);
+            c->set_x(cx);
+            c->set_y(cy);
+            c->set_height(recommended_height - 1);
+            c->set_width(recommended_width - 1);
             c->show();
 
             cx += recommended_width + 1;

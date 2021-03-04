@@ -47,8 +47,10 @@ public:
 
     /**
      * Will create a window on the current screen.
+     *
      * @param x,y - the start position of the windows
      * @param w,h - the width and height of the windows
+     * @param title - the text that will be shown on the titlebar of the window.
      */
     template<typename S>
     window(int x, int y, int width, int height, const S& title) : container(x, y, width, height, title)
@@ -56,19 +58,30 @@ public:
         desktop::get().add_window(this);
     }
 
+    /**
+     * Will create a window on the current screen.
+     *
+     * @param x,y - the start position of the windows
+     * @param w,h - the width and height of the windows
+     * @param title - the text that will be shown on the titlebar of the window
+     * @param args - the signals this window will respond to, and the handler of the signals.
+     *
+     * @see the signals section
+     */
     template<typename S, typename ... Args>
     window(int x, int y, int width, int height, const S& title, Args... args): container(x, y, width, height, title)
     {
         init(std::forward<Args>(args)...);
     }
 
+    /**
+     * Destructor.
+     */
     ~window() override;
-
-    void draw() const override;
 
     /* mouse related */
     void click(int x, int y);
-    void mouse_move(int x, int y);
+    bool mouse_move(int x, int y);
     void left_mouse_down(int x, int y);
     void left_mouse_up(int x, int y);
     void right_mouse_down(int x, int y);
@@ -78,27 +91,20 @@ public:
     /* keyboard press event */
     bool keypress(std::shared_ptr<cogui::events::keypress> k);
 
-    bool resizeable() const;
-    void setResizeable(bool resizeable);
+    bool is_resizeable() const;
+    void set_resizeable(bool resizeable);
 
-    bool hasCloseButton() const;
-    void setHasCloseButton(bool hasCloseButton);
+    bool has_close_button() const;
+    void set_has_close_button(bool hasCloseButton);
 
-    bool hasMaximizeButton() const;
-    void setHasMaximizeButton(bool hasMaximizeButton);
+    bool has_maximize_button() const;
+    void set_has_maximize_button(bool hasMaximizeButton);
 
-    bool hasSysmenuButton() const;
-    void setHasSysmenuButton(bool hasSysmenuButton);
+    bool has_sysmenu_button() const;
+    void set_has_sysmenu_button(bool hasSysmenuButton);
 
-    draw_state getDrawState() const;
+    draw_state get_draw_state() const;
     void maximize();
-
-    bool inside(int x, int y) const override;
-    void click() override;
-    int minimumDrawableWidth() const override;
-    int minimumDrawableHeight() const override;
-    void redraw() override;
-    int first_available_row() const override;
 
     void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
     void update_menubar_positions(menu*, std::pair<int, int>, std::pair<int, int>);
@@ -109,12 +115,16 @@ public:
 
     void close();
 
+    void draw() const override;
+    bool inside(int x, int y) const override;
+    void click() override;
+    int minimum_drawable_width() const override;
+    int minimum_drawable_height() const override;
+    void redraw() override;
+    int first_available_row() const override;
+
     // returns the main menubar of this window
-    bool hasMenubar() const
-    {
-        bool b = (m_mainmenu == cogui::menubar::no_mainmenu);
-        return !b;
-    }
+    bool has_menubar() const;
     menubar &get_main_menu();
     const scrollbar& get_scrollbar() const;
 
@@ -218,7 +228,7 @@ private:
         }
 
         // see if we have mainmenu
-        if(hasMenubar())
+        if(has_menubar())
         {
             register_menubar_hotkeys();
         }
@@ -296,3 +306,4 @@ private:
 }
 
 #endif // WINDOW_H
+

@@ -35,6 +35,7 @@ using namespace cogui;
 cogui::textflags cogui::textflags::normal(textflags::v_normal);
 cogui::textflags cogui::textflags::bold(textflags::v_bold);
 cogui::textflags cogui::textflags::underline(textflags::v_underline);
+cogui::textflags cogui::textflags::title(textflags::v_title);
 
 void do_resize(int)
 {
@@ -42,8 +43,6 @@ void do_resize(int)
 
      desktop::get().resize();
 }
-
-
 
 void handler(int sig)
 {
@@ -77,6 +76,8 @@ cogui::textflags::operator int() const
     case v_normal: return A_NORMAL;
     case v_underline: return A_UNDERLINE;
     case v_bold: return A_BOLD;
+    case v_title: return static_cast<int>(v_title);
+    default: if(m_value) return static_cast<int>(m_value);
     }
     return A_NORMAL;
 }

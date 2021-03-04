@@ -35,18 +35,19 @@ public:
     void draw() const override;
     void click() override;
 
-    int minimumDrawableWidth() const override;
-    int minimumDrawableHeight() const override;
+    int minimum_drawable_width() const override;
+    int minimum_drawable_height() const override;
 
     // on click signal
     using OnClick = fluent::NamedType<std::function<void(checkbox*)>, struct OnClickHelper>;
     static OnClick::argument on_click;
-    miso::signal<checkbox*> sig_on_click;
 
     // state change signal
     using OnStateChange= fluent::NamedType<std::function<void(checkbox*,bool)>, struct OnStateChangeHelper>;
     static OnStateChange::argument on_state_change;
-    miso::signal<checkbox*,bool> sig_on_state_change;
+
+    miso::signal<checkbox*> sig_on_click{"on_click"};
+    miso::signal<checkbox*,bool> sig_on_state_change{"on_state_change"};
 
     void setChecked(bool);
     bool checked() const;

@@ -58,7 +58,7 @@ public:
 
         m_layout = std::make_shared<T>(std::forward<Args>(args)...);
         m_layout->setContainer(this);
-        reLayout(getWidth(), getHeight(), false);
+        reLayout(get_width(), get_height(), false);
 
         return *(dynamic_cast<T*>(m_layout.get()));
     }
@@ -147,7 +147,7 @@ private:
     std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc, const std::wstring& title = L"")
     {
         static store<C> cc(pc);
-        cc.m_controls.emplace_back(std::make_shared<C>(x, y, width, height, title))->setParent(pc);
+        cc.m_controls.emplace_back(std::make_shared<C>(x, y, width, height, title))->set_parent(pc);
 
         auto shp = cc.m_controls.back();
         m_tab_order.push_back(shp);
@@ -169,7 +169,7 @@ private:
     {
         static store<C> cc(pc);
         cc.m_controls.emplace_back(std::make_shared<C>(x, y, width, height, title,
-                                                       args...))->setParent(pc);
+                                                       args...))->set_parent(pc);
 
         auto shp = cc.m_controls.back();
         m_tab_order.push_back(shp);

@@ -65,7 +65,7 @@ public:
     control(int x, int y, int width, int height, const std::string& title);
 
     /**
-     * @brief copying, moving, assigneing is deleted
+     * @brief copying, moving, assigning is prohibited
      */
     control(const control&) = delete;
     control(control&&) = delete;
@@ -81,25 +81,25 @@ public:
      * @brief getX returns the X coordinate of the control
      * @return the X coordinate of the control
      */
-    int getX() const;
+    int get_x() const;
 
     /**
      * @brief setX sets the X coordinate of the control
      * @param x the X coordinate to set
      */
-    void setX(int x);
+    void set_x(int x);
 
     /**
      * @brief getY returns the Y coordinate of the control
      * @return the Y coordinate of the control
      */
-    int getY() const;
+    int get_y() const;
 
     /**
      * @brief setY sets the Y coordinate of the control
      * @param y the Y coordinate to set
      */
-    void setY(int y);
+    void set_y(int y);
 
     /**
      * @brief setBounds Will relocate the control to the given position, given size
@@ -109,7 +109,7 @@ public:
      * @param w the width
      * @param h the height
      */
-    void setBounds(int x, int y, int w, int h);
+    void set_bounds(int x, int y, int w, int h);
 
     /**
      * @brief first_available_row will return the first row which is available to the content of the containeir to
@@ -119,19 +119,19 @@ public:
      */
     virtual int first_available_row() const { return 1; };
 
-    int getWidth() const;
-    void setWidth(int width);
+    int get_width() const;
+    void set_width(int width);
 
-    int getHeight() const;
-    void setHeight(int height);
+    int get_height() const;
+    void set_height(int height);
 
-    std::wstring getTitle() const;
-    void setTitle(const std::wstring &title);
+    std::wstring get_title() const;
+    void set_title(const std::wstring &title);
 
     void clear() const;
 
-    control *getParent() const;
-    void setParent(control *value);
+    control *get_parent() const;
+    void set_parent(control *value);
 
     void focus();
     void unfocus();
@@ -159,8 +159,8 @@ public:
      */
     virtual void redraw();
 
-    virtual int minimumDrawableWidth() const = 0;
-    virtual int minimumDrawableHeight() const = 0;
+    virtual int minimum_drawable_width() const = 0;
+    virtual int minimum_drawable_height() const = 0;
     virtual void doubleclick(int,int);
     virtual void draw() const = 0;
 
@@ -193,7 +193,6 @@ protected:
     std::shared_ptr<scrollbar> m_vertical_scrollbar = nullptr;
 
 private:
-    void initInitialPosition();
     std::shared_ptr<scrollbar> mouse_down_on_scrollbar_decrease(int x, int y); // returns the scrollbar which captures the mouse on the decrease button if any
     std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_increase(int x, int y); // returns the scrollbar which captures the mouse on the increase button if any
     std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_midportion(int x, int y); // returns the scrollbar which captures the mouse somewhere, not on the handle

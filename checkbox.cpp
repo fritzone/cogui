@@ -23,12 +23,12 @@ void cogui::checkbox::click()
     cogui::desktop::get().redraw();
 }
 
-int cogui::checkbox::minimumDrawableWidth() const
+int cogui::checkbox::minimum_drawable_width() const
 {
     return desktop::get().getTheme()->minimum_checkbox_width(*this);
 }
 
-int cogui::checkbox::minimumDrawableHeight() const
+int cogui::checkbox::minimum_drawable_height() const
 {
     return desktop::get().getTheme()->minimum_checkbox_height(*this);
 }
