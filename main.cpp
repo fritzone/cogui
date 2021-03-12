@@ -104,7 +104,7 @@ int main( int argc, char* argv[] )
     );
     auto& d = a.add_button(35,5, 5, 2, L"G&rid layout",
                            button::on_click = [&a](button*){log_info() << "Thanks";
-                                a.setLayout<cogui::layout::grid>(2, 2);
+                                a.setLayout<cogui::layout::grid>(4, 4);
                                 a.redraw();
                            }
     );

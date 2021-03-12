@@ -249,8 +249,8 @@ void cogui::layout::grid::arrange_controls(std::vector<std::shared_ptr<cogui::co
     int recommended_width = width / m_cols - 1;
     int cx = 1;
     int height = cont->get_height();
-    int recommended_height = height / m_rows - 1;
-    int cy = 1;
+    int cy = cont->first_available_row() ;
+    int recommended_height = (height - cy) / m_rows - 1;
     int rc = 0;
     int cc = 0;
     bool setting = true;
