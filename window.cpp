@@ -92,12 +92,12 @@ void cogui::window::click(int x, int y)
     {
         for(auto& [m, p] : m_menu_positions)
         {
-            log_info() << "Trying menu:" << m->caption() << "at (" <<p.first.first<<","<<p.first.second << ") - (" <<p.second.first<<","<<p.second.second << ") has (" << x << "," << y << ")";
-            if(p.first.first <=x && p.second.first >= x && p.first.second <= y && p.second.second >= y)
+            log_info() << "Trying menu:" << m->caption() << "at (" <<p.x<<","<<p.y << ") - (" <<p.x + p.width<<","<<p.y + p.height<< ") has (" << x << "," << y << ")";
+            if(p.x <=x && p.x + p.width>= x && p.y <= y && p.y + p.height >= y)
             {
                 log_info() << "Found click:" << m->caption();
                 m_current_menu = m;
-                m_current_menu->open(p.first.first, p.second.second + 1);
+                m_current_menu->open(p.x, p.y + p.height + 1);
                 return redraw();
             }
         }
@@ -195,11 +195,11 @@ bool cogui::window::mouse_move(int x, int y)
             {
                 for(auto& [m, p] : m_menu_positions)
                 {
-                    if(p.first.first <=x && p.second.first > x && p.first.second <= y && p.second.second >= y && m!=m_current_menu)
+                    if(p.x <=x && p.x + p.width > x && p.y <= y && p.y + p.height >= y && m!=m_current_menu)
                     {
                         m_current_menu->close();
                         m_current_menu = m;
-                        m_current_menu->open(p.first.first, p.second.second + 1);
+                        m_current_menu->open(p.x, p.y + p.height + 1);
                         redraw();
                         return true;
                     }
@@ -312,23 +312,38 @@ void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos
 
 void cogui::window::update_menubar_positions(menu * m, std::pair<int, int> ul, std::pair<int, int> lr)
 {
-    m_menu_positions[m] = {ul, lr};
+    m_menu_positions[m] = {ul.first, ul.second, lr.first - ul.first, lr.second - ul.second};
 }
 
-cogui::menu &cogui::window::getSystemMenu()
+cogui::menu &cogui::window::get_system_menu()
 {
     return m_sysmenu;
 }
 
-const cogui::menu &cogui::window::getSystemMenu() const
+const cogui::menu &cogui::window::get_system_menu() const
 {
     return m_sysmenu;
 }
 
-void cogui::window::closeCurrentMenu()
+void cogui::window::close_current_menu()
 {
     m_current_menu->close();
     m_current_menu = nullptr;
+}
+
+bool cogui::window::is_active() const
+{
+    return m_is_active;
+}
+
+void cogui::window::activate()
+{
+    m_is_active = true;
+}
+
+void cogui::window::deactivate()
+{
+    m_is_active = false;
 }
 
 void cogui::window::close()
@@ -516,7 +531,7 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
 
                 auto p = m_menu_positions[m];
                 m_current_menu = m;
-                m_current_menu->open(p.first.first, p.second.second + 1);
+                m_current_menu->open(p.x, p.y + p.height + 1);
                 m_current_menu->activate_action(0);
                 redraw();
                 return true;

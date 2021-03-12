@@ -109,10 +109,13 @@ public:
     void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
     void update_menubar_positions(menu*, std::pair<int, int>, std::pair<int, int>);
 
-    menu &getSystemMenu();
-    const menu &getSystemMenu() const;
-    void closeCurrentMenu();
+    menu &get_system_menu();
+    const menu &get_system_menu() const;
+    void close_current_menu();
 
+    bool is_active() const;
+    void activate();
+    void deactivate();
     void close();
 
     void draw() const override;
@@ -191,10 +194,11 @@ private:
 
     // this will hold the positions where the menu was drawn
     // key is the menu, followed by two coordinates on the screen, upper left, lower right corner
-    mutable std::map<menu*, std::pair<std::pair<int, int>, std::pair<int, int>>> m_menu_positions;
+    mutable std::map<menu*, rect> m_menu_positions;
 
     // this will hold the hotkey and the associated menubar item
     std::map<std::shared_ptr<cogui::events::keypress>, menu*> m_menubar_openers;
+    bool m_is_active = false;
 
 private:
 
@@ -283,7 +287,7 @@ private:
         {
             auto p = m_menu_positions[m_current_menu];
 
-            m_current_menu->open(p.first.first, p.second.second + 1);
+            m_current_menu->open(p.x, p.y + p.height + 1);
             m_current_menu->activate_action(0);
             redraw();
         }

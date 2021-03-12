@@ -83,6 +83,10 @@ bool desktop::handle_mouse_left_click(int x, int y)
         {
             w->click( x, y);
             handled = true;
+            m_captured_window->deactivate();
+            m_captured_window = w;
+            m_captured_window->activate();
+            break;
         }
     }
 
@@ -90,9 +94,9 @@ bool desktop::handle_mouse_left_click(int x, int y)
     {
         return true;
     }
-    if(m_captured_window && m_captured_window->has_sysmenu_button() && m_captured_window->getSystemMenu().isOpened())
+    if(m_captured_window && m_captured_window->has_sysmenu_button() && m_captured_window->get_system_menu().isOpened())
     {
-        m_captured_window->closeCurrentMenu();
+        m_captured_window->close_current_menu();
         handled = true;
         redraw();
     }
@@ -102,7 +106,7 @@ bool desktop::handle_mouse_left_click(int x, int y)
         {
             if(w->has_sysmenu_button())
             {
-                w->getSystemMenu().close();
+                w->get_system_menu().close();
                 handled = true;
             }
         }
@@ -230,10 +234,13 @@ std::shared_ptr<input> desktop::getInput() const
 void desktop::add_window(window *w)
 {
     m_windows.push_back(w);
-    if(m_captured_window == nullptr)
+    if(m_captured_window != nullptr)
     {
-        m_captured_window = w;
+        m_captured_window->deactivate();
     }
+
+    m_captured_window = w;
+    m_captured_window->activate();
 }
 
 void desktop::remove_window(window *w)

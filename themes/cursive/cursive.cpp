@@ -21,7 +21,9 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
         return;
     }
 
-    bool rs = w.get_draw_state() == window::draw_state::normal; // resizing the window?
+    bool normal_state = w.get_draw_state() == window::draw_state::normal; // resizing the window?
+    bool active_state = w.is_active();
+
     int drawY = w.get_y();
     int drawX = w.get_x();
     int drawHeight = w.get_height();
@@ -35,17 +37,17 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     }
 
     // depending whether this window is in resize mode or not we pick different border characters
-    auto line_char = rs ? WND_HORZ_LINE : HORZ_LINE_RESIZE;
-    auto vert_line_char = rs ? WND_VERT_LINE : VERT_LINE_RESIZE;
-    auto ul_corner_char = rs ? WND_UL_CORNER : UL_CORNER_RESIZE;
-    auto ur_corner_char = rs ? WND_UR_CORNER : UR_CORNER_RESIZE;
-    auto ll_corner_char = rs ? WND_LL_CORNER : LL_CORNER_RESIZE;
-    auto lr_corner_char = rs ? WND_LR_CORNER : LR_CORNER_RESIZE;
-    auto sysmenu_char = rs ? WND_SYSMENU : WND_SYSMENU_RESIZE;
-    auto title_delim_left_char = rs ? WND_TITLE_DELIM_LEFT : WND_TITLE_DELIM_LEFT_RESIZE;
-    auto title_delim_right_char = rs ? WND_TITLE_DELIM_RIGHT : WND_TITLE_DELIM_RIGHT_RESIZE;
-    auto close_char = rs ? WND_CLOSE : WND_CLOSE_RESIZE;
-    auto maximize_char = rs ? WND_MAXIMIZE : WND_MAXIMIZE_RESIZE;
+    auto line_char = normal_state ? active_state ? WND_HORZ_LINE : HORZ_LINE_RESIZE : HORZ_LINE_RESIZE;
+    auto vert_line_char = normal_state ? active_state ? WND_VERT_LINE : VERT_LINE_RESIZE : VERT_LINE_RESIZE;
+    auto ul_corner_char = normal_state ? active_state ? WND_UL_CORNER : UL_CORNER_RESIZE : UL_CORNER_RESIZE;
+    auto ur_corner_char = normal_state ? active_state ? WND_UR_CORNER : UR_CORNER_RESIZE : UR_CORNER_RESIZE;
+    auto ll_corner_char = normal_state ? active_state ? WND_LL_CORNER : LL_CORNER_RESIZE : LL_CORNER_RESIZE;
+    auto lr_corner_char = normal_state ? active_state ? WND_LR_CORNER : LR_CORNER_RESIZE : LR_CORNER_RESIZE;
+    auto sysmenu_char = normal_state ? active_state ? WND_SYSMENU : WND_SYSMENU_RESIZE : WND_SYSMENU_RESIZE;
+    auto title_delim_left_char = normal_state ? active_state ? WND_TITLE_DELIM_LEFT : WND_TITLE_DELIM_LEFT_RESIZE : WND_TITLE_DELIM_LEFT_RESIZE;
+    auto title_delim_right_char = normal_state ? active_state ? WND_TITLE_DELIM_RIGHT : WND_TITLE_DELIM_RIGHT_RESIZE : WND_TITLE_DELIM_RIGHT_RESIZE;
+    auto close_char = normal_state ? active_state ? WND_CLOSE : WND_CLOSE_RESIZE : WND_CLOSE_RESIZE;
+    auto maximize_char = normal_state ? active_state ? WND_MAXIMIZE : WND_MAXIMIZE_RESIZE : WND_MAXIMIZE_RESIZE;
 
     // top line
     cogui::graphics()->draw_text(drawX, drawY, std::wstring(ul_corner_char + cogui::utils::repeated(drawWidth, line_char) + ur_corner_char).c_str() );
@@ -98,7 +100,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
         available_width -= sysmenu_char.length();
 //        log_debug() << "adjusting width due to sysmenu button:" <<drawWidth << " avail:" << available_width;
 
-        cogui::graphics()->draw_text(drawX + 1, drawY, (w.getSystemMenu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char).c_str());
+        cogui::graphics()->draw_text(drawX + 1, drawY, (w.get_system_menu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char).c_str());
         sysmenu_pos = drawX + 1 + 1 ;
     }
 
@@ -120,9 +122,9 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     // do we have a menubar
     if(w.has_menubar())
     {
-        cogui::graphics()->draw_text(drawX, drawY + 2, ((rs ? WND_VERT_MENULINE_START_RESIZE : WND_VERT_MENULINE_START)
+        cogui::graphics()->draw_text(drawX, drawY + 2, ((normal_state ? active_state ? WND_VERT_MENULINE_START_RESIZE : WND_VERT_MENULINE_START:WND_VERT_MENULINE_START )
                                               + cogui::utils::repeated(drawWidth, WND_HORZ_MENULINE)
-                                              + (rs ? WND_VERT_MENULINE_END_RESIZE : WND_VERT_MENULINE_END)).c_str()
+                                              + (normal_state ? active_state ?WND_VERT_MENULINE_END_RESIZE : WND_VERT_MENULINE_END: WND_VERT_MENULINE_END)).c_str()
                     );
         auto& m = const_cast<cogui::menubar&>(const_cast<cogui::window&>(w).get_main_menu());
         auto& items = m.items();
