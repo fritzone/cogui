@@ -30,6 +30,8 @@ public:
         pressed
     };
 
+    control() = default;
+
     /**
      * @brief control creates a control at the given position and size
      *
@@ -63,14 +65,6 @@ public:
      * @param title - the title of the control
      */
     control(int x, int y, int width, int height, const std::string& title);
-
-    /**
-     * @brief copying, moving, assigning is prohibited
-     */
-    control(const control&) = delete;
-    control(control&&) = delete;
-    control& operator = (const control&) = delete;
-    control& operator = (control&&) = delete;
 
     /**
      * @brief a default destructor should do it
@@ -191,6 +185,17 @@ protected:
     bool m_visible = true;
     std::shared_ptr<scrollbar> m_horizontal_scrollbar = nullptr;
     std::shared_ptr<scrollbar> m_vertical_scrollbar = nullptr;
+
+private:
+
+	/**
+	 * @brief copying, moving, assigning is prohibited
+	 */
+//	control(const control&) = default;
+//	control(control&&) = default;
+//	control& operator = (const control&) = default;
+//	control& operator = (control&&) = default;
+
 
 private:
     std::shared_ptr<scrollbar> mouse_down_on_scrollbar_decrease(int x, int y); // returns the scrollbar which captures the mouse on the decrease button if any

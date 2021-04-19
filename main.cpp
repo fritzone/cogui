@@ -33,6 +33,8 @@ int main( int argc, char* argv[] )
 
     log_info() << "bb called:" << bb;
 
+	std::shared_ptr<button> b;
+
     auto a = cogui::window(5, 5, 70, 15, L"A not so special window",
                            window::on_resize = [](window*, int w, int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
                            window::on_close  = [&](window*){log_info() << "Closing this window"; app.exit(1);},
@@ -57,7 +59,9 @@ int main( int argc, char* argv[] )
                                 menu {
                                         L"&Edit",
                                         {
-                                            {L"&Copy", action::on_trigger = [](action*){log_info() << "New Clicked";}},
+											{L"&Copy", action::on_trigger = [&b](action*){log_info() << "New Clicked";
+																						  b->set_title(L"Buu");}
+											},
                                             {L"&Paste", action::on_trigger = [](action*){log_info() << "Open Clicked";}}
                                         }
                                 },
@@ -78,55 +82,52 @@ int main( int argc, char* argv[] )
                            },
                            window::on_keypress = [&](window*, std::shared_ptr<cogui::key> k){log_info() << "pressed a key:" << k->get_character();},
                            window::hotkeys = hotkey_associations {
-                               on<&key::F2>::press = [&](window*){log_info() << "pressed the F2 key";},
-                               on<&key::F3>::press = [&](window*){log_info() << "pressed the F3 key";},
-                               on<&key::F4>::press = [&](window* w){log_info() << "pressed the F4 key"; w->set_title(L"F4 pressed");},
-                               on<&key::Ctrl_F5>::press = [&](window* w){log_info() << "pressed the Ctrl+F5 key"; w->set_title(L"Ctrl+F5 press");},
-                               on<&key::Ctrl_A>::press = [&](window* w){log_info() << "pressed the Ctrl-A key"; w->set_title(L"Ctrl+A press");},
-                               on<&key::Ctrl_Q>::press = [&](window*){app.exit();}
+                               on(F2) = [&](window*){log_info() << "pressed the F2 key";},
+                               on(F4)= [&](window* w){log_info() << "pressed the F4 key"; w->set_title(L"F4 pressed");},
+                               on_impl<&key::Ctrl_Q>::press = [&](window*){app.exit();}
                            },
                            window::scrollbars = scrollbar::horizontal
                            /*  */
     );
 
-    auto& b = a.add_button(5,5, 10, 2, L"&Vertical layout",
+    b = a.add_button(5,5, 10, 2, L"&Vertical layout",
                            button::on_click = [&a](button*){log_info() << "Thanks";
                                 a.setLayout<cogui::layout::vertical>().expand(2);
                                 a.redraw();
                            }
     );
 
-    auto& c = a.add_button(35,5, 20, 2, L"&Horizontal layout",
-                           button::on_click = [&a](button*){log_info() << "Thanks";
+	auto c = a.add_button(35,5, 20, 2, L"&Horizontal layout",
+                           button::on_click = [&a](button* btn){ btn->set_title(L"Thanks");
                                 a.setLayout<cogui::layout::horizontal>().expand(1);
                                 a.redraw();
                            }
     );
-    auto& d = a.add_button(35,5, 5, 2, L"G&rid layout",
+	auto d = a.add_button(35,5, 5, 2, L"G&rid layout",
                            button::on_click = [&a](button*){log_info() << "Thanks";
                                 a.setLayout<cogui::layout::grid>(4, 4);
                                 a.redraw();
                            }
     );
-    auto& f = a.add_button(35,5, 5, 2, L"C");
+	auto f = a.add_button(35,5, 5, 2, L"C");
 
-    auto& e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!", false,
+	auto e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!", false,
                              checkbox::on_state_change = [&f](checkbox*, bool checked) {
-                                f.set_title(checked ? L"Checked" : L"Unchecked");
+								f->set_title(checked ? L"Checked" : L"Unchecked");
                              }
     );
-    auto& g = a.add_button(55,5, 5, 2, "Da button",
+	auto g = a.add_button(55,5, 5, 2, "Da button",
                            button::on_click = [&e](button*){log_info() << "Thanks";
-                                e.setChecked( !e.checked() );
+								e->setChecked( !e->checked() );
     });
 
 
     miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
-    miso::connect(&c, c.sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
+	miso::connect(&c, c->sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
 
     auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
 
-    auto& h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
+	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
     //a.setLayout<cogui::layout::grid>(3, 3);
 

@@ -106,7 +106,6 @@ public:
     draw_state get_draw_state() const;
     void maximize();
 
-    void update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const;
     void update_menubar_positions(menu*, std::pair<int, int>, std::pair<int, int>);
 
     menu &get_system_menu();
@@ -185,9 +184,6 @@ private:
     int m_mouse_down_y = -1;
     int m_prev_w = -1;
     int m_prev_h = -1;
-    mutable int m_close_btn_pos = -1;
-    mutable int m_sysmenu_btn_pos = -1;
-    mutable int m_maximize_btn_pos = -1;
 
     // this is the current menu that is shown on the screen
     menu* m_current_menu = nullptr;

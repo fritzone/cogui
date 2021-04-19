@@ -36,8 +36,6 @@ void cogui::window::draw() const
 
 void cogui::window::click(int x, int y)
 {
-    log_info() << "window click: x=" << x << " y=" << y << " sysmenu:" << m_sysmenu_btn_pos << " y=" << this->get_y();
-
     //firstly: see if there is an open menu
     if(m_current_menu)
     {
@@ -62,24 +60,20 @@ void cogui::window::click(int x, int y)
         return redraw();
     }
 
-    if(y == this->get_y() && x == m_close_btn_pos)
+	if(desktop::get().getTheme()->close_button_pos(*this).inside_excluding_borders(x, y))
     {
-        // close click:
-        // debug() << "click on close button";
         emit sig_on_close(this);
         return redraw();
     }
 
-    if(y == this->get_y() && x == m_maximize_btn_pos)
+	if(desktop::get().getTheme()->maximize_button_pos(*this).inside_excluding_borders(x, y))
     {
-        // close click:
-        // debug() << "click on close button";
         maximize();
         return redraw();
     }
 
     // click on sysmenu?
-    if(y == this->get_y() && x == m_sysmenu_btn_pos)
+	if(desktop::get().getTheme()->sysmenu_button_pos(*this).inside_excluding_borders(x, y))
     {
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
@@ -303,13 +297,6 @@ bool cogui::window::has_menubar() const
     return !b;
 }
 
-void cogui::window::update_titlebar_btn_positions(int close_pos, int sysmenu_pos, int maximize_pos) const
-{
-    m_close_btn_pos = close_pos;
-    m_sysmenu_btn_pos = sysmenu_pos;
-    m_maximize_btn_pos = maximize_pos;
-}
-
 void cogui::window::update_menubar_positions(menu * m, std::pair<int, int> ul, std::pair<int, int> lr)
 {
     m_menu_positions[m] = {ul.first, ul.second, lr.first - ul.first, lr.second - ul.second};
@@ -403,7 +390,7 @@ void cogui::window::left_mouse_down(int x, int y)
         return;
     }
 
-    if( y == this->get_y() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
+    if(y == get_y() && !desktop::get().getTheme()->close_button_pos(*this).inside(x, y) && !desktop::get().getTheme()->sysmenu_button_pos(*this).inside(x, y)) // down on the top line, usually this means move the window
     {
         if(m_current_menu)
         {
@@ -501,7 +488,7 @@ void cogui::window::right_mouse_up(int x, int y)
 
 void cogui::window::doubleclick(int x, int y)
 {
-    if(y == this->get_y() && x != m_close_btn_pos && x != m_sysmenu_btn_pos) // down on the top line, usually this means move the window
+    if(!desktop::get().getTheme()->close_button_pos(*this).inside(x, y) && desktop::get().getTheme()->sysmenu_button_pos(*this).inside(x, y)) // down on the top line, usually this means move the window
     {
         maximize();
         return;

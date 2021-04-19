@@ -117,7 +117,9 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     }
 
     // tell the window the position of the three topbar buttons
-    w.update_titlebar_btn_positions(close_pos, sysmenu_pos, maximize_pos);
+    m_close_button_positions[&w] = rect {close_pos, drawY, 1, 1};
+    m_sysmenu_button_positions[&w] = rect {sysmenu_pos, drawY, 1, 1};
+    m_maximize_button_positions[&w] = rect {maximize_pos, drawY, 1, 1};
 
     // do we have a menubar
     if(w.has_menubar())
@@ -464,6 +466,35 @@ int cogui::themes::cursive::first_available_row(const cogui::window &w)
 {
     if(w.has_menubar()) return 3;
     return 1;
+}
+
+cogui::rect cogui::themes::cursive::close_button_pos(const cogui::window &w)
+{
+    if(m_close_button_positions.count(&w) != 0)
+    {
+        return m_close_button_positions[&w];
+    }
+    return {};
+}
+
+cogui::rect cogui::themes::cursive::sysmenu_button_pos(const cogui::window &w)
+{
+    if(m_sysmenu_button_positions.count(&w) != 0)
+    {
+        return m_sysmenu_button_positions[&w];
+    }
+    return {};
+
+}
+
+cogui::rect cogui::themes::cursive::maximize_button_pos(const cogui::window &w)
+{
+    if(m_maximize_button_positions.count(&w) != 0)
+    {
+        return m_maximize_button_positions[&w];
+    }
+    return {};
+
 }
 
 std::string cogui::themes::cursive::name()

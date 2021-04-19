@@ -14,6 +14,8 @@ class button : public control
 {
 public:
 
+    button() = default;
+
     button(int x, int y, int width, int height, const std::wstring& title);
     button(int x, int y, int width, int height, const std::string& title);
 

@@ -311,10 +311,12 @@ private:
 
 using hotkey_associations = std::vector<std::shared_ptr<abstract_hotkey_handler>>;
     
-template <const cogui::key* K> struct on
+template <const cogui::key* K> struct on_impl
 {
     static cogui::key& press;
 };
+
+#define on(k) on_impl<&key :: k>::press
 
 }
 

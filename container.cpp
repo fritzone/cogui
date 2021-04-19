@@ -9,14 +9,14 @@ cogui::container::container(int x, int y, int width, int height) : control(x, y,
 
 }
 
-cogui::button &cogui::container::add_button(int x, int y, int width, int height, const std::wstring &title)
+std::shared_ptr<cogui::button> cogui::container::add_button(int x, int y, int width, int height, const std::wstring &title)
 {
-    return *add_control<button>(x, y, width, height, this, title);
+	return add_control<cogui::button>(x, y, width, height, this, title);
 }
 
-cogui::checkbox &cogui::container::add_checkbox(int x, int y, int width, int height, const std::wstring &title)
+std::shared_ptr<cogui::checkbox> cogui::container::add_checkbox(int x, int y, int width, int height, const std::wstring &title)
 {
-    return *add_control<checkbox>(x, y, width, height, this, title);
+	return add_control<checkbox>(x, y, width, height, this, title);
 }
 
 void cogui::container::draw() const

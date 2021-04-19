@@ -34,6 +34,10 @@ public:
     virtual int minimum_window_height(const window& w) = 0;
     virtual int first_available_row(const window& w) = 0;
 
+    virtual rect close_button_pos(const window&) = 0;
+    virtual rect sysmenu_button_pos(const window&) = 0;
+    virtual rect maximize_button_pos(const window&) = 0;
+
     virtual std::string name() = 0;
 };
 
