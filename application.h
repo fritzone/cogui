@@ -37,7 +37,7 @@ public:
         {
             log_info() << "application constructing or something";
             std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments = handle_command_line(argc, argv, theme);
-            auto loop = [&gathered_arguments] (auto && input)
+			auto loop = [&gathered_arguments] (auto && input)
             {
                 for(auto&[key, value] : gathered_arguments)
                 {
@@ -91,7 +91,7 @@ private:
     template<typename ... Args>
     void print_help( Args&&... args )
     {
-        auto loop = [](auto && input)
+		auto loop = [](auto && input)
         {
             std::cout << input.help() << std::endl;
         };

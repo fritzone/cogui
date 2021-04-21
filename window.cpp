@@ -84,18 +84,14 @@ void cogui::window::click(int x, int y)
     // click on a menu from menubar
     if(has_menubar())
     {
-        for(auto& [m, p] : m_menu_positions)
-        {
-            log_info() << "Trying menu:" << m->caption() << "at (" <<p.x<<","<<p.y << ") - (" <<p.x + p.width<<","<<p.y + p.height<< ") has (" << x << "," << y << ")";
-            if(p.x <=x && p.x + p.width>= x && p.y <= y && p.y + p.height >= y)
-            {
-                log_info() << "Found click:" << m->caption();
-                m_current_menu = m;
-                m_current_menu->open(p.x, p.y + p.height + 1);
-                return redraw();
-            }
-        }
-    }
+		const auto& [m, p] = desktop::get().getTheme()->menu_at(x, y);
+		if(m)
+		{
+			m_current_menu = m;
+			m_current_menu->open(p.x, p.y + p.height + 1);
+			return redraw();
+		}
+	}
 
     // did we click on a control by any chance?
     std::shared_ptr<control> under = element_under(x, y);
@@ -187,17 +183,16 @@ bool cogui::window::mouse_move(int x, int y)
             // do we have a menubar, if yes see if we are moving on in and open/close accordingly
             if(has_menubar() && m_current_menu != &m_sysmenu)
             {
-                for(auto& [m, p] : m_menu_positions)
-                {
-                    if(p.x <=x && p.x + p.width > x && p.y <= y && p.y + p.height >= y && m!=m_current_menu)
-                    {
-                        m_current_menu->close();
-                        m_current_menu = m;
-                        m_current_menu->open(p.x, p.y + p.height + 1);
-                        redraw();
-                        return true;
-                    }
-                }
+
+				const auto& [m, p] = desktop::get().getTheme()->menu_at(x, y);
+				if(m)
+				{
+					m_current_menu->close();
+					m_current_menu = m;
+					m_current_menu->open(p.x, p.y + p.height + 1);
+					redraw();
+					return true;
+				}
             }
             redraw();
             return true;
@@ -297,10 +292,6 @@ bool cogui::window::has_menubar() const
     return !b;
 }
 
-void cogui::window::update_menubar_positions(menu * m, std::pair<int, int> ul, std::pair<int, int> lr)
-{
-    m_menu_positions[m] = {ul.first, ul.second, lr.first - ul.first, lr.second - ul.second};
-}
 
 cogui::menu &cogui::window::get_system_menu()
 {
@@ -511,12 +502,12 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
     {
         if(*hk == *k)
         {
-            if(m_menu_positions.count(m))
+			if(desktop::get().getTheme()->current_menu_position_stored(*m))
             {
                 m_current_menu = nullptr;
                 redraw();
 
-                auto p = m_menu_positions[m];
+				auto p = desktop::get().getTheme()->current_menu_position(*m);
                 m_current_menu = m;
                 m_current_menu->open(p.x, p.y + p.height + 1);
                 m_current_menu->activate_action(0);

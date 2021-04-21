@@ -2,7 +2,7 @@
 #include "desktop.h"
 #include "mouse.h"
 #include "window.h"
-#include "input.h"
+#include "input_provider.h"
 #include "events.h"
 
 #include "log.h"

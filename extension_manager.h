@@ -5,6 +5,8 @@
 #include "themes.h"
 #include "graphics_engine.h"
 #include "graphic_engines.h"
+#include "input_providers.h"
+#include "input_provider.h"
 
 #include "dynamic_library.h"
 
@@ -93,6 +95,7 @@ private:
 
 using theme_manager = extension_manager<cogui::theme>;
 using graphics_engine_manager = extension_manager<cogui::graphics_engine>;
+using input_provider_manager = extension_manager<cogui::input_provider>;
 
 }
 

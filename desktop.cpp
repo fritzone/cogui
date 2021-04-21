@@ -2,7 +2,7 @@
 
 #include "extension_manager.h"
 
-#include "input.h"
+#include "input_provider.h"
 
 #include "window.h"
 
@@ -13,15 +13,16 @@ namespace cogui
 {
 
 std::string desktop::m_s_theme_name;
+std::string desktop::m_s_input_provider_name;
 std::string desktop::m_s_graphics_engine_name;
 
 desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(m_s_theme_name)),
-                     m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_loadable() :
-                                                         graphics_engine_manager::instance().get_loadable(m_s_graphics_engine_name)),
-                     m_input(new termkey_input)
+					 m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_loadable() : graphics_engine_manager::instance().get_loadable(m_s_graphics_engine_name)),
+					 m_input( m_s_input_provider_name .empty() ? input_provider_manager::instance().current_loadable() :input_provider_manager::instance().get_loadable(m_s_input_provider_name)  )
 {
     log_info() << "Picking theme:" << m_theme->name();
     log_info() << "Picking graphics engine:" << m_graphics->name();
+	log_info() << "Picking input provider engine:" << m_input->name();
 }
 
 desktop::~desktop()
@@ -32,17 +33,9 @@ desktop::~desktop()
 bool desktop::initialize()
 {
     bool b = true;
-    gpm_input* gim = dynamic_cast<gpm_input*>(m_input.get());
-    if(gim)
-    {
-        b &= gim->init();
-    }
 
     b &= m_graphics->initialize();
-    if(!gim)
-    {
-        b &= m_input->init();
-    }
+	b &= m_input->init();
 
     if(b)
     {
@@ -226,7 +219,7 @@ std::shared_ptr<graphics_engine> desktop::getGraphics() const
     return m_graphics;
 }
 
-std::shared_ptr<input> desktop::getInput() const
+std::shared_ptr<input_provider> desktop::getInput() const
 {
     return m_input;
 }

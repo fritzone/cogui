@@ -117,9 +117,9 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     }
 
     // tell the window the position of the three topbar buttons
-    m_close_button_positions[&w] = rect {close_pos, drawY, 1, 1};
-    m_sysmenu_button_positions[&w] = rect {sysmenu_pos, drawY, 1, 1};
-    m_maximize_button_positions[&w] = rect {maximize_pos, drawY, 1, 1};
+	set_window_close_button_position(w, rect {close_pos, drawY, 1, 1});
+	set_window_sysmenu_button_position(w, rect {sysmenu_pos, drawY, 1, 1});
+	set_window_maximize_button_position(w, rect {maximize_pos, drawY, 1, 1});
 
     // do we have a menubar
     if(w.has_menubar())
@@ -147,7 +147,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
             else
             {
                 cogui::graphics()->draw_text(mdix, drawY + 1, itm.caption().c_str(), cogui::textflags::title & cogui::textflags::bold);
-                const_cast<cogui::window&>(w).update_menubar_positions(&itm, {mdix, drawY + 1}, {mdix + itm.caption().length(), drawY + 1});
+				update_menubar_positions(&itm, {mdix, drawY + 1}, {mdix + itm.caption().length(), drawY + 1});
                 mdix += (itm.caption().length());
             }
         }
@@ -468,38 +468,11 @@ int cogui::themes::cursive::first_available_row(const cogui::window &w)
     return 1;
 }
 
-cogui::rect cogui::themes::cursive::close_button_pos(const cogui::window &w)
-{
-    if(m_close_button_positions.count(&w) != 0)
-    {
-        return m_close_button_positions[&w];
-    }
-    return {};
-}
 
-cogui::rect cogui::themes::cursive::sysmenu_button_pos(const cogui::window &w)
-{
-    if(m_sysmenu_button_positions.count(&w) != 0)
-    {
-        return m_sysmenu_button_positions[&w];
-    }
-    return {};
-
-}
-
-cogui::rect cogui::themes::cursive::maximize_button_pos(const cogui::window &w)
-{
-    if(m_maximize_button_positions.count(&w) != 0)
-    {
-        return m_maximize_button_positions[&w];
-    }
-    return {};
-
-}
 
 std::string cogui::themes::cursive::name()
 {
-    return "cursive";
+	return "cursive";
 }
 
 void cogui::themes::cursive::draw_horizontal_scrollbar(cogui::control *c, cogui::scrollbar &s)
@@ -558,3 +531,4 @@ void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::
     }
     cogui::graphics()->set_bg_color(color::black);
 }
+

@@ -2,6 +2,7 @@
 #include "log.h"
 #include "desktop.h"
 #include "theme.h"
+#include "scrollbar.h"
 
 #include <string>
 

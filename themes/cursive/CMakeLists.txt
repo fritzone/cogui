@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(cursive)
 
@@ -11,7 +11,7 @@ else()
     message(FATAL_ERROR STATUS "ncurses not found!")
 endif()
 
-add_library(${PROJECT_NAME} SHARED cursive.cpp)
-# target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm)
+add_library(${PROJECT_NAME} SHARED cursive.cpp ${CMAKE_SOURCE_DIR}/theme_impl.cpp)
+target_link_libraries(${PROJECT_NAME} pthread dl)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/cogui/themes)

@@ -7,8 +7,12 @@ cogui::dynamic_lib_handle cogui::load_lib(const std::string& path)
     cogui::dynamic_lib_handle h = dlopen(path.data() , RTLD_NOW);
     if(!h)
     {
-        log_error() << "Could not load:" << path;
+		log_error() << "Could not load:" << path <<"Due to:" << dlerror();
     }
+	else
+	{
+		log_info() << "Loaded:" << path;
+	}
 
     return h;
 }

@@ -173,11 +173,8 @@ public:
     int minimum_window_height(const window& w) override;
 
     int first_available_row(const window& w) override;
-    rect close_button_pos(const window&) override;
-    rect sysmenu_button_pos(const window&) override;
-    rect maximize_button_pos(const window&) override;
-    std::string name() override;
 
+    std::string name() override;
 private:
 
     void draw_horizontal_scrollbar(control* c, scrollbar& s);
@@ -185,9 +182,6 @@ private:
 
 private:
 
-    std::map<const window*, rect> m_close_button_positions;
-    std::map<const window*, rect> m_sysmenu_button_positions;
-    std::map<const window*, rect> m_maximize_button_positions;
 
 };
 }

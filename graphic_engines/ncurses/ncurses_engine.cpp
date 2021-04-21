@@ -6,7 +6,6 @@
 #include "ncurses_engine.h"
 #include "events.h"
 #include "mouse.h"
-#include "input.h"
 #include "cogui.h"
 #include "desktop.h"
 
@@ -15,6 +14,7 @@
 
 #include <sstream>
 #include <thread>
+#include <pthread.h>
 
 #include "log.h"
 
@@ -249,12 +249,23 @@ void cogui::graphic_engines::ncurses::swap_buffers(){
     pframe = buffers[currentFrame];
 }
 
+static void* thread_met(void* o)
+{
+	((cogui::graphic_engines::ncurses*)o)->m_renderCallback();
+	return 0;
+}
+
 void cogui::graphic_engines::ncurses::present_scene()
 {
-    if(m_renderCallback != nullptr){
-        std::thread renderThread(m_renderCallback);
-        pframe->print();
-        renderThread.join();
+	int  iret1;
+	pthread_t thread1;
+
+	if(m_renderCallback != nullptr){
+		iret1 = ::pthread_create( &thread1, NULL, thread_met, (void*)this);
+
+		pframe->print();
+		pthread_join( thread1, NULL);
+
     }
 }
 

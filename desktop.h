@@ -12,7 +12,7 @@ namespace cogui {
 class graphics_engine;
 class theme;
 class window;
-class input;
+class input_provider;
 class menu;
 
 class desktop
@@ -35,7 +35,7 @@ public:
 
     std::shared_ptr<theme> getTheme() const;
     std::shared_ptr<graphics_engine> getGraphics() const;
-    std::shared_ptr<input> getInput() const;
+	std::shared_ptr<input_provider> getInput() const;
 
     void add_window(window* w);
     void remove_window(window* w);
@@ -65,7 +65,7 @@ private:
 
     std::shared_ptr<cogui::theme> m_theme;
     std::shared_ptr<cogui::graphics_engine> m_graphics;
-    std::shared_ptr<cogui::input> m_input;
+	std::shared_ptr<cogui::input_provider> m_input;
 
     std::vector<window*> m_windows;
     window* m_captured_window = nullptr;
@@ -73,6 +73,7 @@ private:
 
     static std::string m_s_theme_name;
     static std::string m_s_graphics_engine_name;
+	static std::string m_s_input_provider_name;
 
     static bool renderer();
 

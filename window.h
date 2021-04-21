@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "theme.h"
 #include "key.h"
 #include "container.h"
 #include "miso.h"
@@ -106,8 +107,6 @@ public:
     draw_state get_draw_state() const;
     void maximize();
 
-    void update_menubar_positions(menu*, std::pair<int, int>, std::pair<int, int>);
-
     menu &get_system_menu();
     const menu &get_system_menu() const;
     void close_current_menu();
@@ -187,10 +186,6 @@ private:
 
     // this is the current menu that is shown on the screen
     menu* m_current_menu = nullptr;
-
-    // this will hold the positions where the menu was drawn
-    // key is the menu, followed by two coordinates on the screen, upper left, lower right corner
-    mutable std::map<menu*, rect> m_menu_positions;
 
     // this will hold the hotkey and the associated menubar item
     std::map<std::shared_ptr<cogui::events::keypress>, menu*> m_menubar_openers;
@@ -279,10 +274,9 @@ private:
         }
 
         m_current_menu = chooser(m_current_menu);
-        if(m_menu_positions.count(m_current_menu))
+		if(desktop::get().getTheme()->current_menu_position_stored(*m_current_menu))
         {
-            auto p = m_menu_positions[m_current_menu];
-
+			auto p = desktop::get().getTheme()->current_menu_position(*m_current_menu);
             m_current_menu->open(p.x, p.y + p.height + 1);
             m_current_menu->activate_action(0);
             redraw();

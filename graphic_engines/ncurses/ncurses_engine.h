@@ -59,6 +59,8 @@ public:
     void present_scene() override;
     void set_rendering_function(std::function<bool()> rendercb) override;
     void erase_screen() override;
+	std::function<bool()> m_renderCallback;
+
 private:
     WINDOW *stdscr = nullptr;
     int m_width = -1;
@@ -70,7 +72,6 @@ private:
     frame* rframe = nullptr;
     frame* buffers[2];
     int currentFrame = 0;
-    std::function<bool()> m_renderCallback;
 
 };
 }
