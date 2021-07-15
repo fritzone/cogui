@@ -24,6 +24,8 @@ extern "C" cogui::graphics_engine* create()
     return static_cast<cogui::graphics_engine*>(new cogui::graphic_engines::ncurses);
 }
 
+
+namespace {
 // code, index, foreground, background
 const std::map<int, std::tuple<int, int, int>> colorpairs =
 {
@@ -93,6 +95,7 @@ const std::map<int, std::tuple<int, int, int>> colorpairs =
     {1799, {63, COLOR_WHITE, COLOR_WHITE}},
 };
 
+}
 
 cogui::graphic_engines::ncurses::~ncurses()
 {
@@ -155,7 +158,7 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
     std::string str(ws.begin(), ws.end());
     // Show String
 
-    if(sl + x > m_width)
+	if(static_cast<int>(sl) + x > m_width)
     {
         for(auto sc = 0; sc + x < m_width ; sc++)
         {
@@ -176,7 +179,7 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
 
         std::wstring sw(s);
         std::wstring subs = sw.substr(std::abs(x) + 1);
-        for(int i=0; i<subs.length(); i++)
+		for(std::size_t i=0; i<subs.length(); i++)
         {
             std::wstring b;
             b += s[i];
@@ -187,7 +190,7 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
         return;
     }
 
-    for(int i=0; i< ws.length(); i++)
+	for(std::size_t i=0; i< ws.length(); i++)
     {
         std::wstring b;
         b += ws[i];
@@ -257,11 +260,11 @@ static void* thread_met(void* o)
 
 void cogui::graphic_engines::ncurses::present_scene()
 {
-	int  iret1;
+	[[maybe_unused]] int iret;
 	pthread_t thread1;
 
 	if(m_renderCallback != nullptr){
-		iret1 = ::pthread_create( &thread1, NULL, thread_met, (void*)this);
+		iret = ::pthread_create( &thread1, NULL, thread_met, (void*)this);
 
 		pframe->print();
 		pthread_join( thread1, NULL);
@@ -322,13 +325,13 @@ void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstrin
             final_title += s[i];
         }
     }
-    desktop::get().getGraphics()->draw_text(x, y, final_title.c_str(), flags);
+	desktop::get().get_graphics()->draw_text(x, y, final_title.c_str(), flags);
     if(highlight_char != L'\0')
     {
         // ad an extra space at the end, because we took away an & sign
-        desktop::get().getGraphics()->draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
+		desktop::get().get_graphics()->draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
 
-        desktop::get().getGraphics()->draw_text(x + highlight_pos, y, highlight_char,
+		desktop::get().get_graphics()->draw_text(x + highlight_pos, y, highlight_char,
                                            cogui::textflags::underline & cogui::textflags::bold);
 
 

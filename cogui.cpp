@@ -92,5 +92,5 @@ int textflags::operator &(const textflags &o) const
 
 std::shared_ptr<cogui::graphics_engine> cogui::graphics()
 {
-    return desktop::get().getGraphics();
+	return desktop::get().get_graphics();
 }

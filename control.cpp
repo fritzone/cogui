@@ -5,6 +5,9 @@
 #include "scrollbar.h"
 
 #include <string>
+#include <typeindex>
+
+typedef std::unordered_map<std::type_index, std::function<int()> > mdw_map;
 
 cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_width(w), m_height(h)
 {
@@ -157,7 +160,7 @@ bool cogui::control::deal_with_scrollbar_mouse_down(int x, int y)
 
 void cogui::control::clear() const
 {
-    cogui::desktop::get().getTheme()->clear(*this);
+	cogui::desktop::get().get_theme()->clear(*this);
 }
 
 cogui::control *cogui::control::get_parent() const

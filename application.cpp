@@ -20,7 +20,7 @@ int cogui::application::run()
     desktop::get().redraw();
 
     // then start the rendering engine, which will present the very first frame o the application
-    if(!desktop::get().getGraphics()->start_rendering())
+	if(!desktop::get().get_graphics()->start_rendering())
     {
         return UNABLE_TO_INITIALIZE_GRAPHICS;
     }
@@ -28,28 +28,28 @@ int cogui::application::run()
     // then enter the loop
     while( running() )
     {
-        desktop::get().getGraphics()->present_scene();
-        desktop::get().getGraphics()->swap_buffers();
+		desktop::get().get_graphics()->present_scene();
+		desktop::get().get_graphics()->swap_buffers();
 
-        auto events = desktop::get().getInput()->get_next_event();
+		auto events = desktop::get().get_input()->get_next_event();
         bool handled = false;
         for(auto c : events)
         {
             if(c->handle())
             {
                 handled = true;
-                desktop::get().getGraphics()->refresh_screen();
-                desktop::get().getGraphics()->erase_screen();
+				desktop::get().get_graphics()->refresh_screen();
+				desktop::get().get_graphics()->erase_screen();
 
-                desktop::get().getGraphics()->present_scene();
-                desktop::get().getGraphics()->swap_buffers();
+				desktop::get().get_graphics()->present_scene();
+				desktop::get().get_graphics()->swap_buffers();
             }
         }
 
         if(!handled)
         {
-            desktop::get().getGraphics()->refresh_screen();
-            desktop::get().getGraphics()->erase_screen();
+			desktop::get().get_graphics()->refresh_screen();
+			desktop::get().get_graphics()->erase_screen();
         }
     }
     return 1;

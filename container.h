@@ -53,14 +53,14 @@ public:
     void focus_element(std::shared_ptr<control> c);
     void press_element(std::shared_ptr<control> c);
 
-    template<typename T, typename ... Args> T& setLayout(Args... args)
+	template<typename T, typename ... Args> T& set_layout(Args... args)
     {
         static_assert(std::is_base_of<cogui::layout::abstract, T>::value, "need a cogui::layout::abstract derived class");
 
         m_layout = std::make_shared<T>(std::forward<Args>(args)...);
         m_layout->setContainer(this);
-        reLayout(get_width(), get_height(), false);
-
+		relayout(get_width(), get_height(), false);
+		redraw();
         return *(dynamic_cast<T*>(m_layout.get()));
     }
 
@@ -69,8 +69,8 @@ public:
      * @param temptative_width
      * @param temptative_height
      */
-    void reLayout(int temptative_width, int temptative_height, bool force);
-    void reLayout();
+	void relayout(int temptative_width, int temptative_height, bool force);
+	void relayout();
 
     /**
      * @brief element_under Will return the control which is under the X,Y pair

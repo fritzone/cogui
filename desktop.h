@@ -33,9 +33,12 @@ public:
 
     bool handle_key(std::shared_ptr<cogui::events::keypress> k);
 
-    std::shared_ptr<theme> getTheme() const;
-    std::shared_ptr<graphics_engine> getGraphics() const;
-	std::shared_ptr<input_provider> getInput() const;
+	std::shared_ptr<theme> get_theme() const;
+	std::shared_ptr<graphics_engine> get_graphics() const;
+	std::shared_ptr<input_provider> get_input() const;
+	const std::vector<window *>& get_windows() const;
+	int get_width() const;
+	int get_height() const;
 
     void add_window(window* w);
     void remove_window(window* w);
@@ -45,17 +48,13 @@ public:
     void clear();
     void shutdown();
     void resize();
-    int getWidth() const;
-    int getHeight() const;
     void redraw();
+
 
 public:
 
     static void init(const std::string& theme_name);
-
     static desktop& get();
-
-    std::vector<window *> windows() const;
 
 private:
 

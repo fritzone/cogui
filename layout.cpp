@@ -1,6 +1,8 @@
 #include "layout.h"
 #include "container.h"
 #include "window.h"
+#include "button.h"
+#include "desktop.h"
 
 void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cogui::control> >& controls,
                                                  cogui::container * cont)
@@ -17,14 +19,14 @@ void cogui::layout::horizontal::arrange_controls(std::vector<std::shared_ptr<cog
     if(expandable)
     {
         int accumulated_width = 0;
-        for(auto i = m_expanded_column; i<controls.size(); i++)
+		for(size_t i = m_expanded_column; i<controls.size(); i++)
         {
-            accumulated_width += controls[i]->minimum_drawable_width() + 1; // +1 since the next control start +1
+			accumulated_width += controls[i]->minimum_drawable_width() + 1; // +1 since the next control start +1
         }
 
-        for(auto i=0; i<controls.size(); i++)
+		for(size_t i=0; i<controls.size(); i++)
         {
-            if(i == m_expanded_column)
+			if(i == static_cast<size_t>(m_expanded_column))
             {
                 cx = cont->get_width() - accumulated_width;
                 if(cx < 0 || cx < last_x)
@@ -81,14 +83,14 @@ bool cogui::layout::horizontal::accept_new_size(const std::vector<std::shared_pt
     if(expandable)
     {
         int accumulated_width = 0;
-        for(int i = m_expanded_column; i<controls.size(); i++)
+		for(size_t i = m_expanded_column; i<controls.size(); i++)
         {
             accumulated_width += controls[i]->minimum_drawable_width() + 1; // +1 since the next control start +1
         }
 
-        for(int i=0; i<controls.size(); i++)
+		for(size_t i=0; i<controls.size(); i++)
         {
-            if(i == m_expanded_column)
+			if(i == static_cast<size_t>(m_expanded_column))
             {
                 cx = new_width - accumulated_width;
                 if(cx < last_used_x || cx < 0)
@@ -114,7 +116,7 @@ void cogui::layout::horizontal::expand(int c)
     if(m_container)
     {
         log_debug() << "Relayouting";
-        m_container->reLayout(m_container->get_width(), m_container->get_height(), true);
+		m_container->relayout(m_container->get_width(), m_container->get_height(), true);
     }
 }
 
@@ -134,14 +136,14 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
     if(expandable)
     {
         int accumulated_height = 0;
-        for(int i = m_expanded_row; i<controls.size(); i++)
+		for(size_t i = m_expanded_row; i<controls.size(); i++)
         {
             accumulated_height += controls[i]->minimum_drawable_height() + 1; // +1 since the next control start +1
         }
 
-        for(int i=0; i<controls.size(); i++)
+		for(size_t i=0; i<controls.size(); i++)
         {
-            if(i == m_expanded_row)
+			if(i == static_cast<size_t>(m_expanded_row))
             {
                 cy = cont->get_height() - accumulated_height;
                 if(cy < 0 || cy < last_y)
@@ -199,7 +201,7 @@ void cogui::layout::vertical::arrange_controls(std::vector<std::shared_ptr<cogui
     }
 }
 
-bool cogui::layout::vertical::accept_new_size(const std::vector<std::shared_ptr<cogui::control>>& controls, int new_width, int new_height)
+bool cogui::layout::vertical::accept_new_size(const std::vector<std::shared_ptr<cogui::control>>& controls, int, int new_height)
 {
     int cy = 1, last_used_y = -1;
     bool expandable = (m_expanded_row != -1);
@@ -207,15 +209,15 @@ bool cogui::layout::vertical::accept_new_size(const std::vector<std::shared_ptr<
     if(expandable)
     {
         int accumulated_height = 0;
-        for(int i = m_expanded_row; i<controls.size(); i++)
+		for(size_t i = m_expanded_row; i<controls.size(); i++)
         {
             accumulated_height += controls[i]->minimum_drawable_height() + 1; // +1 since the next control start +1
         }
 
-        for(int i=0; i<controls.size(); i++)
+		for(size_t i=0; i<controls.size(); i++)
         {
 
-            if(i == m_expanded_row)
+			if(i == static_cast<size_t>(m_expanded_row))
             {
                 cy = new_height - accumulated_height;
                 if(cy <= last_used_y || cy < 0)
@@ -239,7 +241,7 @@ void cogui::layout::vertical::expand(int c)
     if(m_container)
     {
         log_debug() << "Relayouting";
-        m_container->reLayout(m_container->get_width(), m_container->get_height(), true);
+		m_container->relayout(m_container->get_width(), m_container->get_height(), true);
     }
 }
 

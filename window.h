@@ -25,17 +25,24 @@ namespace cogui
 /**
  * @brief The window class represents a window component the user can place on the screen and interact with.
  *
- * Each application needs at least one window, that can hold several controls.
+ * Each application needs at least one window, that can hold several controls. The windows are created
  */
 class window : public container
 {
 public:
 
-    // which state the window currently is in, used for drawing.
+	/**
+	 * @brief The draw_state enum contains the draw state of a window, when it is drawn on the screen
+	 */
     enum class draw_state
     {
+		/// The window is drawn normally
         normal,
+
+		/// The window is drawn with a resizing frame
         resizing,
+
+		/// The window is drawn with a moving frame
         moving
     };
 
@@ -129,7 +136,11 @@ public:
     menubar &get_main_menu();
     const scrollbar& get_scrollbar() const;
 
-    // signals
+	/**
+	 * \section WindowSignals The signals emitted by a window
+	 */
+	/**@{*/
+
     using OnResize = fluent::NamedType<std::function<void(window*,int,int)>, struct OnResizeHelper>;
     using OnMouseDown = fluent::NamedType<std::function<void(window*,mouse::button,int,int)>, struct OnMouseDownHelper>;
     using OnMouseUp = fluent::NamedType<std::function<void(window*,mouse::button,int,int)>, struct OnMouseUpHelper>;
@@ -142,11 +153,14 @@ public:
     static OnMouseUp::argument on_mouse_up;
     static OnKeypress::argument on_keypress;
 
+	/** This signal is emitted when the window is resized */
     miso::signal<window*, int, int> sig_on_resize {"on_resize"};
     miso::signal<window*> sig_on_close {"on_close"};
     miso::signal<window*,mouse::button,int,int> sig_on_mouse_down {"on_mouse_down"};
     miso::signal<window*,mouse::button,int,int> sig_on_mouse_up {"on_mouse_up"};
     miso::signal<window*,std::shared_ptr<cogui::key>> sig_on_keypress {"on_keypress"};
+
+	/**@}*/
     
     // hotkey map
     using HotkeyT = fluent::NamedType<hotkey_associations, struct HotkeyHelper>;
@@ -274,9 +288,9 @@ private:
         }
 
         m_current_menu = chooser(m_current_menu);
-		if(desktop::get().getTheme()->current_menu_position_stored(*m_current_menu))
+		if(desktop::get().get_theme()->current_menu_position_stored(*m_current_menu))
         {
-			auto p = desktop::get().getTheme()->current_menu_position(*m_current_menu);
+			auto p = desktop::get().get_theme()->current_menu_position(*m_current_menu);
             m_current_menu->open(p.x, p.y + p.height + 1);
             m_current_menu->activate_action(0);
             redraw();

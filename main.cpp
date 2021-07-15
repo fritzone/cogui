@@ -3,6 +3,17 @@
 
 #include <iostream>
 
+void b_handler(cogui::button* b)
+{
+	b->set_title(L"Clicked");
+}
+
+void chk_click_handler(cogui::checkbox* cb)
+{
+	cb->set_title(cb->checked() ? L"Checked" : L"Unchecked");
+}
+
+
 int main( int argc, char* argv[] )
 {
 
@@ -92,29 +103,28 @@ int main( int argc, char* argv[] )
 
     b = a.add_button(5,5, 10, 2, L"&Vertical layout",
                            button::on_click = [&a](button*){log_info() << "Thanks";
-                                a.setLayout<cogui::layout::vertical>().expand(2);
+								a.set_layout<cogui::layout::vertical>().expand(2);
                                 a.redraw();
                            }
     );
 
 	auto c = a.add_button(35,5, 20, 2, L"&Horizontal layout",
                            button::on_click = [&a](button* btn){ btn->set_title(L"Thanks");
-                                a.setLayout<cogui::layout::horizontal>().expand(1);
-                                a.redraw();
+								a.set_layout<cogui::layout::horizontal>().expand(1);
                            }
     );
 	auto d = a.add_button(35,5, 5, 2, L"G&rid layout",
                            button::on_click = [&a](button*){log_info() << "Thanks";
-                                a.setLayout<cogui::layout::grid>(4, 4);
-                                a.redraw();
+								a.set_layout<cogui::layout::grid>(4, 4);
                            }
     );
-	auto f = a.add_button(35,5, 5, 2, L"C");
+	auto f = a.add_button(35,5, 5, 2, L"C", button::on_click = b_handler);
 
-	auto e = a.add_checkbox(35,5, 5, 2, L"Check me ifyou dare!", false,
-                             checkbox::on_state_change = [&f](checkbox*, bool checked) {
-								f->set_title(checked ? L"Checked" : L"Unchecked");
-                             }
+	auto e = a.add_checkbox(35,5, 5, 2, L"Check me!", false,
+//                             checkbox::on_state_change = [&f](checkbox*, bool checked) {
+//								f->set_title(checked ? L"Checked" : L"Unchecked");
+//                             },
+							 checkbox::on_click = chk_click_handler
     );
 	auto g = a.add_button(55,5, 5, 2, "Da button",
                            button::on_click = [&e](button*){log_info() << "Thanks";
@@ -125,9 +135,9 @@ int main( int argc, char* argv[] )
     miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
 	miso::connect(&c, c->sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
 
-    auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
+//    auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
 
-	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
+//	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
     //a.setLayout<cogui::layout::grid>(3, 3);
 

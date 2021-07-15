@@ -191,18 +191,33 @@ private:
 	/**
 	 * @brief copying, moving, assigning is prohibited
 	 */
-//	control(const control&) = default;
-//	control(control&&) = default;
-//	control& operator = (const control&) = default;
-//	control& operator = (control&&) = default;
+	control(const control&) = default;
+	control(control&&) = default;
+	control& operator = (const control&) = default;
+	control& operator = (control&&) = default;
 
 
 private:
-    std::shared_ptr<scrollbar> mouse_down_on_scrollbar_decrease(int x, int y); // returns the scrollbar which captures the mouse on the decrease button if any
+	std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_decrease(int x, int y); // returns the scrollbar which captures the mouse on the decrease button if any
     std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_increase(int x, int y); // returns the scrollbar which captures the mouse on the increase button if any
     std::shared_ptr<cogui::scrollbar> mouse_down_on_scrollbar_midportion(int x, int y); // returns the scrollbar which captures the mouse somewhere, not on the handle
 };
 
 }
+
+#define CONTROL_INTEGRATION(a)                                               \
+void draw() const override                                                   \
+{                                                                            \
+	cogui::desktop::get().get_theme()->draw_##a (*this);                     \
+}                                                                            \
+int minimum_drawable_width() const override                                  \
+{                                                                            \
+	return desktop::get().get_theme()->minimum_##a##_width(*this);           \
+}                                                                            \
+int minimum_drawable_height() const override                                 \
+{                                                                            \
+	return desktop::get().get_theme()->minimum_##a##_height(*this);          \
+}
+
 
 #endif // CONTROL_H

@@ -94,7 +94,7 @@ void cogui::container::press_element(std::shared_ptr<cogui::control> c)
     m_prev_pressed = m_pressed;
 }
 
-void cogui::container::reLayout(int temptative_width, int temptative_height, bool force)
+void cogui::container::relayout(int temptative_width, int temptative_height, bool force)
 {
     if(m_layout)
     {
@@ -105,9 +105,9 @@ void cogui::container::reLayout(int temptative_width, int temptative_height, boo
     }
 }
 
-void cogui::container::reLayout()
+void cogui::container::relayout()
 {
-    reLayout(get_width(), get_height(), true);
+	relayout(get_width(), get_height(), true);
 }
 
 std::shared_ptr<cogui::control> cogui::container::element_under(int x, int y)

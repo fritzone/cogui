@@ -51,7 +51,7 @@ bool desktop::renderer()
     return true;
 }
 
-std::vector<window *> desktop::windows() const
+const std::vector<window *> &desktop::get_windows() const
 {
     return m_windows;
 }
@@ -203,23 +203,28 @@ bool desktop::handle_key(std::shared_ptr<cogui::events::keypress> k)
 {
     if(m_captured_window)
     {
+		if(k->get_chardata() == L"Tab")
+		{
+			m_captured_window->focus_next_element();
+			return true;
+		}
         return m_captured_window->keypress(k);
     }
     return false;
 }
 
 
-std::shared_ptr<theme> desktop::getTheme() const
+std::shared_ptr<theme> desktop::get_theme() const
 {
     return m_theme;
 }
 
-std::shared_ptr<graphics_engine> desktop::getGraphics() const
+std::shared_ptr<graphics_engine> desktop::get_graphics() const
 {
     return m_graphics;
 }
 
-std::shared_ptr<input_provider> desktop::getInput() const
+std::shared_ptr<input_provider> desktop::get_input() const
 {
     return m_input;
 }
@@ -248,12 +253,12 @@ void desktop::maximize_window(window *w)
 
 void desktop::refresh()
 {
-    getGraphics()->refresh_screen();
+	get_graphics()->refresh_screen();
 }
 
 void desktop::clear()
 {
-    getGraphics()->clear_screen();
+	get_graphics()->clear_screen();
 }
 
 void desktop::shutdown()
@@ -269,9 +274,9 @@ void desktop::resize()
     m_graphics->refresh_screen();
 }
 
-int desktop::getWidth() const {return m_graphics->get_screen_width();}
+int desktop::get_width() const {return m_graphics->get_screen_width();}
 
-int desktop::getHeight() const {return m_graphics->get_screen_height();}
+int desktop::get_height() const {return m_graphics->get_screen_height();}
 
 void desktop::redraw()
 {

@@ -5,14 +5,15 @@
 cogui::checkbox::OnClick::argument cogui::checkbox::on_click;
 cogui::checkbox::OnStateChange::argument cogui::checkbox::on_state_change;
 
+cogui::checkbox::checkbox(int x, int y, int width, int height, const std::string &title) : control(x, y, width, height, title)
+{
+}
+
 cogui::checkbox::checkbox(int x, int y, int width, int height, const std::wstring &title) : control(x, y, width, height, title)
 {
 }
 
-void cogui::checkbox::draw() const
-{
-    cogui::desktop::get().getTheme()->draw_checkbox(*this);
-}
+
 
 void cogui::checkbox::click()
 {
@@ -23,15 +24,9 @@ void cogui::checkbox::click()
     cogui::desktop::get().redraw();
 }
 
-int cogui::checkbox::minimum_drawable_width() const
-{
-    return desktop::get().getTheme()->minimum_checkbox_width(*this);
-}
 
-int cogui::checkbox::minimum_drawable_height() const
-{
-    return desktop::get().getTheme()->minimum_checkbox_height(*this);
-}
+
+
 
 void cogui::checkbox::setChecked(bool c)
 {

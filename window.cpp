@@ -24,7 +24,7 @@ cogui::window::~window()
 
 void cogui::window::draw() const
 {
-    auto t = cogui::desktop::get().getTheme();
+    auto t = cogui::desktop::get().get_theme();
     t->draw_window(*this);
     container::draw();
     if(m_current_menu)
@@ -60,20 +60,20 @@ void cogui::window::click(int x, int y)
         return redraw();
     }
 
-	if(desktop::get().getTheme()->close_button_pos(*this).inside_excluding_borders(x, y))
+	if(desktop::get().get_theme()->close_button_pos(*this).inside_excluding_borders(x, y))
     {
         emit sig_on_close(this);
         return redraw();
     }
 
-	if(desktop::get().getTheme()->maximize_button_pos(*this).inside_excluding_borders(x, y))
+	if(desktop::get().get_theme()->maximize_button_pos(*this).inside_excluding_borders(x, y))
     {
         maximize();
         return redraw();
     }
 
     // click on sysmenu?
-	if(desktop::get().getTheme()->sysmenu_button_pos(*this).inside_excluding_borders(x, y))
+	if(desktop::get().get_theme()->sysmenu_button_pos(*this).inside_excluding_borders(x, y))
     {
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
@@ -84,7 +84,7 @@ void cogui::window::click(int x, int y)
     // click on a menu from menubar
     if(has_menubar())
     {
-		const auto& [m, p] = desktop::get().getTheme()->menu_at(x, y);
+		const auto& [m, p] = desktop::get().get_theme()->menu_at(x, y);
 		if(m)
 		{
 			m_current_menu = m;
@@ -114,7 +114,7 @@ bool cogui::window::mouse_move(int x, int y)
         int new_x = x - m_mouse_down_x;
         int new_y = y - m_mouse_down_y;
 
-        if(new_x >= 0 && new_y >= 0 && new_x + this->get_width() < desktop::get().getWidth() - 1 && new_y + this->get_height() < desktop::get().getHeight())
+        if(new_x >= 0 && new_y >= 0 && new_x + this->get_width() < desktop::get().get_width() - 1 && new_y + this->get_height() < desktop::get().get_height())
         {
             set_x(new_x);
             set_y(new_y);
@@ -159,7 +159,7 @@ bool cogui::window::mouse_move(int x, int y)
             set_height( m_prev_h + dy);
 
             // if there is a layout attached
-            reLayout(get_width(), get_height(), true);
+            relayout(get_width(), get_height(), true);
 
             emit sig_on_resize(this, m_prev_w + dx, m_prev_h + dy);
 
@@ -184,7 +184,7 @@ bool cogui::window::mouse_move(int x, int y)
             if(has_menubar() && m_current_menu != &m_sysmenu)
             {
 
-				const auto& [m, p] = desktop::get().getTheme()->menu_at(x, y);
+				const auto& [m, p] = desktop::get().get_theme()->menu_at(x, y);
 				if(m)
 				{
 					m_current_menu->close();
@@ -268,12 +268,12 @@ void cogui::window::click()
 
 int cogui::window::minimum_drawable_width() const
 {
-    return desktop::get().getTheme()->minimum_window_width(*this);
+    return desktop::get().get_theme()->minimum_window_width(*this);
 }
 
 int cogui::window::minimum_drawable_height() const
 {
-    return desktop::get().getTheme()->minimum_window_height(*this);
+    return desktop::get().get_theme()->minimum_window_height(*this);
 }
 
 void cogui::window::redraw()
@@ -283,7 +283,7 @@ void cogui::window::redraw()
 
 int cogui::window::first_available_row() const
 {
-    return desktop::get().getTheme()->first_available_row(*this);
+    return desktop::get().get_theme()->first_available_row(*this);
 }
 
 bool cogui::window::has_menubar() const
@@ -381,7 +381,7 @@ void cogui::window::left_mouse_down(int x, int y)
         return;
     }
 
-    if(y == get_y() && !desktop::get().getTheme()->close_button_pos(*this).inside(x, y) && !desktop::get().getTheme()->sysmenu_button_pos(*this).inside(x, y)) // down on the top line, usually this means move the window
+    if(y == get_y() && !desktop::get().get_theme()->close_button_pos(*this).inside(x, y) && !desktop::get().get_theme()->sysmenu_button_pos(*this).inside(x, y)) // down on the top line, usually this means move the window
     {
         if(m_current_menu)
         {
@@ -479,7 +479,7 @@ void cogui::window::right_mouse_up(int x, int y)
 
 void cogui::window::doubleclick(int x, int y)
 {
-    if(!desktop::get().getTheme()->close_button_pos(*this).inside(x, y) && desktop::get().getTheme()->sysmenu_button_pos(*this).inside(x, y)) // down on the top line, usually this means move the window
+    if(!desktop::get().get_theme()->close_button_pos(*this).inside(x, y) && desktop::get().get_theme()->sysmenu_button_pos(*this).inside(x, y)) // down on the top line, usually this means move the window
     {
         maximize();
         return;
@@ -502,12 +502,12 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
     {
         if(*hk == *k)
         {
-			if(desktop::get().getTheme()->current_menu_position_stored(*m))
+			if(desktop::get().get_theme()->current_menu_position_stored(*m))
             {
                 m_current_menu = nullptr;
                 redraw();
 
-				auto p = desktop::get().getTheme()->current_menu_position(*m);
+				auto p = desktop::get().get_theme()->current_menu_position(*m);
                 m_current_menu = m;
                 m_current_menu->open(p.x, p.y + p.height + 1);
                 m_current_menu->activate_action(0);
@@ -607,12 +607,12 @@ void cogui::window::maximize()
 
         set_x(0);
         set_y(0);
-        set_width(desktop::get().getWidth() - 2);
-        set_height(desktop::get().getHeight() - 1);
+        set_width(desktop::get().get_width() - 2);
+        set_height(desktop::get().get_height() - 1);
 
         m_window_state = window_state::maximized;
 
-        reLayout();
+        relayout();
     }
     else
     {
@@ -625,7 +625,7 @@ void cogui::window::maximize()
 
         m_window_state = window_state::normal;
 
-        reLayout();
+        relayout();
     }
 
     redraw();
