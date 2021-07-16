@@ -305,6 +305,7 @@ std::wstring cogui::control::get_title() const
 
 void cogui::control::set_title(const std::wstring &title)
 {
+	log_info() << "Title:" << title;
     m_title = title;
     redraw();
 }

@@ -22,18 +22,22 @@ cogui::action &cogui::action::operator=(const cogui::action &o)
     m_conn = o.m_conn;
     m_checkable = o.m_checkable;
     miso::connect(this, sig_on_trigger, m_conn.get());
-
+	determine_hotchar();
     return *this;
 }
 
 void cogui::action::trigger()
 {
-    if(is_checkable())
-    {
-        m_checked = !m_checked;
-    }
+	check();
+	emit sig_on_trigger(this);
+}
 
-    emit sig_on_trigger(this);
+void cogui::action::check()
+{
+	if(is_checkable())
+	{
+		m_checked = !m_checked;
+	}
 }
 
 std::wstring cogui::action::get_title() const
@@ -44,6 +48,7 @@ std::wstring cogui::action::get_title() const
 void cogui::action::set_title(const std::wstring &title)
 {
     m_title = title;
+	determine_hotchar();
 }
 
 bool cogui::action::is_checkable() const
@@ -53,5 +58,29 @@ bool cogui::action::is_checkable() const
 
 bool cogui::action::is_checked() const
 {
-    return m_checked;
+	return m_checked;
+}
+
+wchar_t cogui::action::hotchar() const
+{
+	return m_hotchar;
+}
+
+void cogui::action::determine_hotchar()
+{
+	for(std::size_t i=0; i<m_title.length(); i++)
+	{
+		if(m_title[i] == L'&')
+		{
+			i++;
+			if( i< m_title.length() )
+			{
+				if( m_title[i] != L'&')
+				{
+					m_hotchar = m_title[i];
+					break;
+				}
+			}
+		}
+	}
 }

@@ -10,7 +10,8 @@ void b_handler(cogui::button* b)
 
 void chk_click_handler(cogui::checkbox* cb)
 {
-	cb->set_title(cb->checked() ? L"Checked" : L"Unchecked");
+	log_info() << "click handler:" << cb->is_checked() ;
+	cb->set_title(cb->is_checked() ? L"C:Checked" : L"C:Unchecked");
 }
 
 
@@ -120,15 +121,17 @@ int main( int argc, char* argv[] )
     );
 	auto f = a.add_button(35,5, 5, 2, L"C", button::on_click = b_handler);
 
-	auto e = a.add_checkbox(35,5, 5, 2, L"Check me!", false,
-//                             checkbox::on_state_change = [&f](checkbox*, bool checked) {
-//								f->set_title(checked ? L"Checked" : L"Unchecked");
-//                             },
+	auto e = a.add_checkbox(35,5, 5, 2, L"Check me!", checkbox::checked = false,
+							 checkbox::on_state_change = [&f](checkbox*, bool checked) {
+								log_info() << "check state change lambda:" << checked;
+								f->set_title(checked ? L"Checked" : L"Unchecked");
+							 },
 							 checkbox::on_click = chk_click_handler
     );
 	auto g = a.add_button(55,5, 5, 2, "Da button",
-                           button::on_click = [&e](button*){log_info() << "Thanks";
-								e->setChecked( !e->checked() );
+						   button::on_click = [&e](button*){
+								log_info() << "Thanks";
+								e->set_checked( !e->is_checked() );
     });
 
 

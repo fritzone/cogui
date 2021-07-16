@@ -21,13 +21,19 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
         return;
     }
 
-    bool normal_state = w.get_draw_state() == window::draw_state::normal; // resizing the window?
-    bool active_state = w.is_active();
-
-    int drawY = w.get_y();
-    int drawX = w.get_x();
     int drawHeight = w.get_height();
     int drawWidth = w.get_width();
+
+	if(drawWidth <= 0 || drawHeight <=0)
+	{
+		return;
+	}
+
+	bool normal_state = w.get_draw_state() == window::draw_state::normal; // resizing the window?
+	bool active_state = w.is_active();
+
+	int drawY = w.get_y();
+	int drawX = w.get_x();
 
     std::wstring empty_line = cogui::utils::repeated(drawWidth + 1, L" ");
     // clear the window
@@ -108,7 +114,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
     if(!w.get_title().empty())
     {
         std::wstring wtitle = w.get_title();
-        available_width -= title_delim_left_char.length() + title_delim_right_char.length(); // two title delimiters
+		available_width -= title_delim_left_char.length() + title_delim_right_char.length() - 2; // two title delimiters
         int lefts = drawX + available_width / 2 - (wtitle.length() +1) / 2;
 
         std::wstring t = title_delim_left_char + wtitle + title_delim_right_char;
@@ -178,10 +184,18 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
 
 void cogui::themes::cursive::draw_button(const cogui::button &b)
 {
+
     if(!b.is_visible())
     {
         return;
     }
+	int drawWidth = b.get_width();
+	int drawHeight = b.get_height();
+
+	if(drawWidth <= 0 || drawHeight <=0)
+	{
+		return;
+	}
 
     // picking the right characters, since a button can have three states: normal, focuses, pressed
     auto ul_char = BTN_UL_CORNER_STATE_UP ;
@@ -217,11 +231,8 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
         right_border = BTN_RIGHT_PRESSED;
     }
 
-    int drawX = b.get_x();
-    int drawY = b.get_y();
-    int drawWidth = b.get_width();
-    int drawHeight = b.get_height();
-
+	int drawX = b.get_x();
+	int drawY = b.get_y();
     // top line
     cogui::graphics()->draw_text(drawX, drawY, (ul_char + cogui::utils::repeated(drawWidth - 1, top_char ) + ur_char).c_str());
 
@@ -282,11 +293,16 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
 
 void cogui::themes::cursive::draw_menu(const cogui::menu &m)
 {
-    int drawY = m.getY();
     int drawHeight = m.getHeight();
-    int drawX = m.getX();
     int drawWidth = m.getWidth();
 
+	if(drawWidth <= 0 || drawHeight <=0)
+	{
+		return;
+	}
+
+	int drawX = m.getX();
+	int drawY = m.getY();
     bool one_is_selectable = false;
     // see if there is a menu action which is selectable or not
     for(int i=0; i<m.get_action_count(); i++)
@@ -396,12 +412,12 @@ void cogui::themes::cursive::draw_checkbox(const checkbox &c)
 
     if(c.get_focus_state() == cogui::control::focus_state::focused)
     {
-        cogui::graphics()->draw_text(drawX, drawY, (c.checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
+		cogui::graphics()->draw_text(drawX, drawY, (c.is_checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
         cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title && cogui::textflags::underline & cogui::textflags::bold);
     }
     else
     {
-        cogui::graphics()->draw_text(drawX, drawY, (c.checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::normal);
+		cogui::graphics()->draw_text(drawX, drawY, (c.is_checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::normal);
         cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title);
     }
 }
@@ -531,4 +547,3 @@ void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::
     }
     cogui::graphics()->set_bg_color(color::black);
 }
-

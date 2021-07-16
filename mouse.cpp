@@ -16,6 +16,7 @@ std::string mouse::buttonName(mouse::button b)
         case button::right: return "right";
         case button::left_and_right: return "left and right";
         case button::none: return "none";
+		default: return "unknown";
     }
 }
 

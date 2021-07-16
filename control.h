@@ -205,19 +205,4 @@ private:
 
 }
 
-#define CONTROL_INTEGRATION(a)                                               \
-void draw() const override                                                   \
-{                                                                            \
-	cogui::desktop::get().get_theme()->draw_##a (*this);                     \
-}                                                                            \
-int minimum_drawable_width() const override                                  \
-{                                                                            \
-	return desktop::get().get_theme()->minimum_##a##_width(*this);           \
-}                                                                            \
-int minimum_drawable_height() const override                                 \
-{                                                                            \
-	return desktop::get().get_theme()->minimum_##a##_height(*this);          \
-}
-
-
 #endif // CONTROL_H

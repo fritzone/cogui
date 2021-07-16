@@ -6,6 +6,7 @@
 #include <map>
 
 #include "rect.h"
+#include "desktop.h"
 
 namespace cogui
 {
@@ -80,6 +81,15 @@ private:
 	// key is the menu, followed by two coordinates on the screen, upper left, lower right corner
 	std::map<menu*, rect> m_menu_positions;
 };
+
+
+auto builtin_button_minimum_button_width = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_width(*o); };
+auto builtin_button_minimum_button_height = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_height(*o); };
+auto builtin_button_draw = [](button* o) -> int { cogui::desktop::get().get_theme()->draw_button(*o); return 0; };
+
+auto builtin_checkbox_minimum_checkbox_width = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_width(*o); };
+auto builtin_checkbox_minimum_checkbox_height = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_height(*o); };
+auto builtin_checkbox_draw = [](checkbox* o) -> int { cogui::desktop::get().get_theme()->draw_checkbox(*o); return 0; };
 
 }
 

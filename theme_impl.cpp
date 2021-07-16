@@ -1,6 +1,7 @@
 #include "theme.h"
 #include "cogui.h"
 #include "menu.h"
+#include "log.h"
 
 cogui::rect cogui::theme::close_button_pos(const cogui::window &w)
 {
@@ -48,6 +49,7 @@ void cogui::theme::set_window_sysmenu_button_position(const cogui::window &w, co
 
 void cogui::theme::set_window_maximize_button_position(const cogui::window &w, const cogui::rect &r)
 {
+	log_info() << "Max at:" << r.x << "," << r.y;
 	m_maximize_button_positions[&w] = r;
 }
 

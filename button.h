@@ -8,6 +8,7 @@
 #include "named_type.h"
 #include "tuple_iterator.h"
 #include "overload_impl.h"
+#include "themeable.h"
 
 namespace cogui {
 
@@ -43,22 +44,10 @@ namespace cogui {
  *
  */
 
-class button : public control
+
+class button : public themeable<button>
 {
 public:
-
-    button() = default;
-
-	/**
-	 * @brief Create a button at the given position, with the given wide string title
-	 *
-	 * @param x - the X position of the button (relative to its parent window)
-	 * @param y - the Y position of the button (relative to its parent window)
-	 * @param width - the width of the button
-	 * @param height - the height of the button
-	 * @param title - the text that will be shown on the button - widestring
-	 */
-	button(int x, int y, int width, int height, const std::wstring& title) : control(x, y, width, height, title) {}
 
 	/**
 	 * @brief Create a button at the given position, with the given string title
@@ -69,7 +58,8 @@ public:
 	 * @param height - the height of the button
 	 * @param title - the text that will be shown on the button - string
 	 */
-	button(int x, int y, int width, int height, const std::string& title) : control(x, y, width, height, title) {}
+	template<typename S>
+	button(int x, int y, int width, int height, const S& title) : themeable(x, y, width, height, title, this, builtin_button_draw, builtin_button_minimum_button_width, builtin_button_minimum_button_height) {}
 
 	/**
 	 * @brief Create a button at the given position, with the given title and the possible signal connections.
@@ -96,7 +86,7 @@ public:
 	 * @param args - the signal handlers of the button
 	 */
 	template<typename S, typename ... Args>
-    button(int x, int y, int width, int height, const S& title, Args... args) : control(x, y, width, height, title)
+	button(int x, int y, int width, int height, const S& title, Args... args) : themeable(x, y, width, height, title, this, builtin_button_draw, builtin_button_minimum_button_width, builtin_button_minimum_button_height)
     {
         init(std::forward<Args>(args)...);
     }
@@ -112,7 +102,7 @@ public:
 	using OnClick = fluent::NamedType<std::function<void(button*)>, struct OnClickHelper>;
     static OnClick::argument on_click;
     miso::signal<button*> sig_on_click{"on_click"};
-	CONTROL_INTEGRATION(button)
+
 private:
 
 	template<typename ... Args>

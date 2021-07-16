@@ -54,22 +54,22 @@ void cogui::window::click(int x, int y)
         return redraw();
     }
 
-    if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
-    {
-        m_draw_state = draw_state::normal;
-        return redraw();
-    }
-
 	if(desktop::get().get_theme()->close_button_pos(*this).inside_excluding_borders(x, y))
     {
+		m_draw_state = draw_state::normal;
+
         emit sig_on_close(this);
         return redraw();
     }
 
 	if(desktop::get().get_theme()->maximize_button_pos(*this).inside_excluding_borders(x, y))
     {
+		log_info () << "Maximizing:" << x << "," << y;
         maximize();
-        return redraw();
+		m_draw_state = draw_state::normal;
+
+		redraw();
+		return;
     }
 
     // click on sysmenu?
@@ -78,8 +78,17 @@ void cogui::window::click(int x, int y)
         log_info() << "click on sysmenu";
         m_current_menu = &m_sysmenu;
         m_current_menu->open(x - 1, y + 1);
+		m_draw_state = draw_state::normal;
+
         return redraw();
     }
+
+
+	if(m_draw_state == draw_state::moving || m_draw_state == draw_state::resizing)
+	{
+		m_draw_state = draw_state::normal;
+		return redraw();
+	}
 
     // click on a menu from menubar
     if(has_menubar())
@@ -498,7 +507,7 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
     log_debug() << "Key:" << k->get_chardata();
 
     // first try: was it a hotkey to open a menu?
-    for(auto& [hk, m] : m_menubar_openers)
+	for(auto& [hk, m] : m_menubar_openers)
     {
         if(*hk == *k)
         {
@@ -555,7 +564,10 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
         // if we press Enter/Return we should activate the currently selected action
         if(*k == cogui::events::key_class::key_return || *k == cogui::events::key_class::key_kp_enter)
         {
-
+			auto tempm = m_current_menu;
+			m_current_menu = nullptr;
+			tempm->click(this->get_x(), this->get_y());
+			return true;
         }
     }
 

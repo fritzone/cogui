@@ -8,20 +8,21 @@
 #include "named_type.h"
 #include "tuple_iterator.h"
 #include "overload_impl.h"
-
+#include "themeable.h"
 
 namespace cogui {
 
-class checkbox : public control
+class checkbox : public themeable<checkbox>
 {
 public:
 
-	checkbox(int x, int y, int width, int height, const std::string& title);
-	checkbox(int x, int y, int width, int height, const std::wstring& title);
+	template<typename S>
+	checkbox(int x, int y, int width, int height, const S& title) : themeable(x, y, width, height, title, this, builtin_checkbox_draw, builtin_checkbox_minimum_checkbox_width, builtin_checkbox_minimum_checkbox_height)
+	{}
 
-    template<typename S, typename ... Args>
-    checkbox(int x, int y, int width, int height, const S& title, bool checked = false, Args... args) : control(x, y, width, height, title), m_checked(checked)
-    {
+	template<typename S, typename ... Args>
+	checkbox(int x, int y, int width, int height, const S& title, Args... args) :  themeable(x, y, width, height, title, this, builtin_checkbox_draw, builtin_checkbox_minimum_checkbox_width, builtin_checkbox_minimum_checkbox_height)
+	{
 		init(std::forward<Args>(args)...);
     }
 
@@ -61,7 +62,9 @@ public:
 	 * }
 	 * ....
 	 * auto c = win.add_checkbox(35,5, 5, 2, L"Check me!", false,
-	 *                           checkbox::on_click = chk_click_handler
+	 *                           checkbox::on_click = [](checkbox* cb) {
+	 *                                cb->set_title(cb->checked() ? L"Checked" : L"Unchecked");
+	 *                            }
 	 * );
 	 * \endcode
 	 *
@@ -75,12 +78,14 @@ public:
     static OnStateChange::argument on_state_change;
     miso::signal<checkbox*,bool> sig_on_state_change{"on_state_change"};
 
-    void setChecked(bool);
-    bool checked() const;
+	// check state
+	using CheckState = fluent::NamedType<bool, struct CheckStateHelper>;
+	static CheckState::argument checked;
+
+	void set_checked(bool);
+	bool is_checked() const;
     void check();
     void uncheck();
-
-	CONTROL_INTEGRATION(checkbox)
 
 private:
 
@@ -89,7 +94,8 @@ private:
 	{
 		auto connector = overload_unref(
 			[&,this](OnClick c) { miso::connect(this, sig_on_click, c.get()); },
-			[&,this](OnStateChange s) { miso::connect(this, sig_on_state_change, s.get()); }
+			[&,this](OnStateChange s) { miso::connect(this, sig_on_state_change, s.get()); },
+			[&,this](CheckState cs) {m_checked = cs.get(); }
 		);
 
 		auto tup = std::make_tuple(std::forward<Args>(args)...);

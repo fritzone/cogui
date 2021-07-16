@@ -25,21 +25,25 @@ public:
 
     action(const std::wstring& title) : m_title(title)
     {
+		determine_hotchar();
     }
 
     template<typename ... Args>
     action(const std::wstring& title, Args... args) : m_title(title)
     {
         resolve_named_parameters(std::forward<Args>(args)...);
+		determine_hotchar();
     }
 
     template<typename ... Args>
     action(const std::wstring& title, cogui::key hotkey, Args... args) : m_title(title)
     {
         resolve_named_parameters(std::forward<Args>(args)...);
+		determine_hotchar();
     }
 
     void trigger();
+	void check();
     std::wstring get_title() const;
     void set_title(const std::wstring &getTitle);
 
@@ -58,6 +62,7 @@ public:
 
     bool is_checkable() const;
     bool is_checked() const;
+	wchar_t hotchar() const;
 
     template<typename ... Args>
     void resolve_named_parameters(Args... args)
@@ -76,10 +81,13 @@ public:
     }
 
 private:
+	void determine_hotchar();
+
     std::wstring m_title;
     OnTrigger m_conn;
     bool m_checkable = false;
     bool m_checked = false;
+	wchar_t m_hotchar = L'\0';
 };
 
 }

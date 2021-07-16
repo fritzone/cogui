@@ -139,6 +139,18 @@ bool cogui::menu::keypress(std::shared_ptr<cogui::events::keypress> k)
         return true;
     }
     // Now let's see if this key is a hotkey key for and action in this menu this
+	if(k->get_chardata().length() == 1)
+	{
+		for(auto& a : m_actions)
+		{
+			if(towupper(a.hotchar()) == towupper(k->get_chardata()[0]) )
+			{
+				a.trigger();
+				m_opened = false;
+				return true;
+			}
+		}
+	}
     return false;
 }
 
