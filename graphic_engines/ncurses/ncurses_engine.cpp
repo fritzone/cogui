@@ -252,7 +252,7 @@ void cogui::graphic_engines::ncurses::swap_buffers(){
     pframe = buffers[currentFrame];
 }
 
-static void* thread_met(void* o)
+void* cogui::graphic_engines::ncurses::thread_met(void* o)
 {
 	((cogui::graphic_engines::ncurses*)o)->m_renderCallback();
 	return 0;
@@ -279,7 +279,14 @@ void cogui::graphic_engines::ncurses::set_rendering_function(std::function<bool 
 
 void cogui::graphic_engines::ncurses::erase_screen()
 {
-    ::erase();
+	::erase();
+}
+
+void cogui::graphic_engines::ncurses::set_clip_area(const cogui::rect &r)
+{
+//	log_info() << "clip area:" << r;
+	rframe->set_clip_area(r);
+	pframe->set_clip_area(r);
 }
 
 void cogui::graphic_engines::ncurses::refresh_screen()
@@ -329,9 +336,9 @@ void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstrin
     if(highlight_char != L'\0')
     {
         // ad an extra space at the end, because we took away an & sign
-		desktop::get().get_graphics()->draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
+		draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
 
-		desktop::get().get_graphics()->draw_text(x + highlight_pos, y, highlight_char,
+		draw_text(x + highlight_pos, y, highlight_char,
                                            cogui::textflags::underline & cogui::textflags::bold);
 
 
@@ -387,6 +394,17 @@ void cogui::graphic_engines::frame::clear()
 
 void cogui::graphic_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
 {
+	// are we inside the clip area?
+	if(clip_area.height > 0 && clip_area.width > 0)
+	{
+		if(! (x >= clip_area.x && x <= clip_area.x + clip_area.width && y > clip_area.y && y < clip_area.y + clip_area.height)	)
+		{
+			return;
+		}
+		//log_debug() << "("<< x <<","<<y<<") inside " << clip_area;
+	}
+
+
     if(x < width && y < height && x >= 0 && y >= 0)
     {
         int index = (y * width) + x;
@@ -394,7 +412,12 @@ void cogui::graphic_engines::frame::set(int x, int y, std::wstring v, uint8_t fg
         bg_colors[index] = bgc;
         attrs[index] = flag;
         data[index] = v;
-    }
+	}
+}
+
+void cogui::graphic_engines::frame::set_clip_area(const cogui::rect &r)
+{
+	clip_area = r;
 }
 
 void cogui::graphic_engines::frame::print()

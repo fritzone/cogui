@@ -2,6 +2,7 @@
 #define _LOGSTREAM_H_
 
 #include "logtypes.h"
+#include "rect.h"
 
 #include <sstream>
 #include <string>
@@ -30,7 +31,7 @@ public:
     logstream& operator<<(const std::string &rString);
     logstream& operator<<(const std::wstring &ws);
     logstream& operator<<(const void *pData);
-
+	logstream& operator<<(const cogui::rect& r);
     logstream& operator<< (const std::chrono::system_clock::time_point& time);
 
 private:

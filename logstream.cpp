@@ -59,6 +59,12 @@ logstream &logstream::operator<<(bool t)
     return appendSpace();
 }
 
+logstream &logstream::operator<<(const cogui::rect& r)
+{
+	mOutputStream << "{ (" << r.x <<", " << r.y <<") x (" << r.width << ", " << r.height << ")}";
+	return appendSpace();
+}
+
 logstream &logstream::operator<<(char t)
 {
     std::string s = "";

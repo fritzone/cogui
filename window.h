@@ -120,7 +120,7 @@ public:
 
     bool is_active() const;
     void activate();
-    void deactivate();
+	void deactivate();
     void close();
 
     void draw() const override;
@@ -178,10 +178,12 @@ public:
     using ScrollBar = fluent::NamedType<scrollbar, struct ScrollBarHelper>;
     static ScrollBar::argument scrollbars;
 
+	menu *get_current_menu() const;
+
 private:
 
-    menu m_sysmenu;
-    menubar m_mainmenu = cogui::menubar::no_mainmenu;
+	menu m_sysmenu;
+	menubar m_mainmenu = cogui::menubar::no_mainmenu;
     hotkey_associations m_hotkeys;
     scrollbar m_scrollbar;
 

@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
 
 	std::shared_ptr<button> b;
 
-    auto a = cogui::window(5, 5, 70, 15, L"A not so special window",
+	auto a = cogui::window(5, 5, 70, 15, L"A not so special window",
                            window::on_resize = [](window*, int w, int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
                            window::on_close  = [&](window*){log_info() << "Closing this window"; app.exit(1);},
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
@@ -102,7 +102,7 @@ int main( int argc, char* argv[] )
                            /*  */
     );
 
-    b = a.add_button(5,5, 10, 2, L"&Vertical layout",
+	b = a.add_button(5,5, 10, 2, L"&Vertical layout",
                            button::on_click = [&a](button*){log_info() << "Thanks";
 								a.set_layout<cogui::layout::vertical>().expand(2);
                                 a.redraw();
@@ -110,15 +110,15 @@ int main( int argc, char* argv[] )
     );
 
 	auto c = a.add_button(35,5, 20, 2, L"&Horizontal layout",
-                           button::on_click = [&a](button* btn){ btn->set_title(L"Thanks");
+						   button::on_click = [&a](button* btn){ btn->set_title(L"Thanks");
 								a.set_layout<cogui::layout::horizontal>().expand(1);
-                           }
-    );
+						   }
+	);
 	auto d = a.add_button(35,5, 5, 2, L"G&rid layout",
-                           button::on_click = [&a](button*){log_info() << "Thanks";
+						   button::on_click = [&a](button*){log_info() << "Thanks";
 								a.set_layout<cogui::layout::grid>(4, 4);
-                           }
-    );
+						   }
+	);
 	auto f = a.add_button(35,5, 5, 2, L"C", button::on_click = b_handler);
 
 	auto e = a.add_checkbox(35,5, 5, 2, L"Check me!", checkbox::checked = false,
@@ -127,20 +127,20 @@ int main( int argc, char* argv[] )
 								f->set_title(checked ? L"Checked" : L"Unchecked");
 							 },
 							 checkbox::on_click = chk_click_handler
-    );
+	);
 	auto g = a.add_button(55,5, 5, 2, "Da button",
 						   button::on_click = [&e](button*){
 								log_info() << "Thanks";
 								e->set_checked( !e->is_checked() );
-    });
+	});
 
 
-    miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
+	miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
 	miso::connect(&c, c->sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
 
-//    auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
+	auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
 
-//	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
+	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
     //a.setLayout<cogui::layout::grid>(3, 3);
 

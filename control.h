@@ -6,6 +6,7 @@
 #include "named_type.h"
 #include "tuple_iterator.h"
 #include "overload_impl.h"
+#include "rect.h"
 
 #include <string>
 
@@ -112,6 +113,8 @@ public:
      * @return
      */
     virtual int first_available_row() const { return 1; };
+
+	rect get_rect() const;
 
     int get_width() const;
     void set_width(int width);

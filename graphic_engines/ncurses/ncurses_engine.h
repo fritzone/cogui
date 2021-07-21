@@ -19,7 +19,7 @@ struct frame final
     void clear();
 
     void set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag);
-
+	void set_clip_area(const rect& r);
     void print();
 
     int width;
@@ -28,6 +28,7 @@ struct frame final
     uint8_t* fg_colors;
     uint8_t* bg_colors;
     int* attrs;
+	rect clip_area;
 
 };
 
@@ -42,9 +43,7 @@ public:
     void draw_text(int x, int y, wchar_t c, int flags) override;
     void draw_text(int x, int y, const wchar_t* s, cogui::textflags flags) override;
 
-    void draw_text(int x, int y, const wchar_t* s, int flags) ;
-    void draw_text(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
-    void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
+
     void refresh_screen() override;
     void clear_screen() override;
     int get_screen_width() const override;
@@ -59,9 +58,21 @@ public:
     void present_scene() override;
     void set_rendering_function(std::function<bool()> rendercb) override;
     void erase_screen() override;
-	std::function<bool()> m_renderCallback;
+
+	/**
+	 * @brief set_clip_area Sets the clip area in which we can draw. Drawing outside of the clip area is not
+	 * permitted, all visual artifacts going there should not be processed
+	 * @param r
+	 */
+	virtual void set_clip_area(const rect& r) override;
+
 
 private:
+	std::function<bool()> m_renderCallback;
+	void draw_text(int x, int y, const wchar_t* s, int flags) ;
+	void draw_text(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
+	void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
+
     WINDOW *stdscr = nullptr;
     int m_width = -1;
     int m_height = -1;
@@ -72,6 +83,8 @@ private:
     frame* rframe = nullptr;
     frame* buffers[2];
     int currentFrame = 0;
+
+	static void* thread_met(void* o);
 
 };
 }

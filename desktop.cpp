@@ -116,15 +116,17 @@ bool desktop::handle_mouse_left_down(int x, int y)
         if(w->inside(x, y))
         {
             log_info() << "captured a window";
-
+			auto m_before = w->get_current_menu();
             w->left_mouse_down(x, y);
-            if(w->get_draw_state() != window::draw_state::normal)
-            {
-                log_info() << "captured a window";
-                m_captured_window = w;
-                return true;
-            }
-            handled = true;
+			auto m_after = w->get_current_menu();
+			log_info() << "captured a window:" << static_cast<int>( w->get_draw_state() );
+			m_captured_window->deactivate();
+
+			// see if we need to close a menu: m_before == m_after
+
+			m_captured_window = w;
+			m_captured_window->activate();
+			return true;
         }
     }
     return handled;
@@ -285,10 +287,14 @@ void desktop::redraw()
     {
         if(&w != &m_captured_window)
         {
+			graphics()->set_clip_area(w->get_rect());
             w->draw();
+			graphics()->set_clip_area(rect());
         }
     }
-    m_captured_window->draw();
+	graphics()->set_clip_area(m_captured_window->get_rect());
+	m_captured_window->draw();
+	graphics()->set_clip_area(rect());
 
 }
 

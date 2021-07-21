@@ -66,7 +66,7 @@ public:
 	/**
 	 * @brief set_clip_area Sets the clip area in which we can draw. Drawing outside of the clip area is not
 	 * permitted, all visual artifacts going there should not be processed
-	 * @param r
+	 * @param r the rect where the drawing is permittedl It has absolute desktop coordinates
 	 */
 	virtual void set_clip_area(const rect& r) = 0;
 

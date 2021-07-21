@@ -285,7 +285,12 @@ void cogui::control::set_bounds(int x, int y, int w, int h)
     set_x(x);
     set_y(y);
     set_width(w);
-    set_height(h);
+	set_height(h);
+}
+
+cogui::rect cogui::control::get_rect() const
+{
+	return {m_x - 1, m_y - 1, m_width + 2, m_height + 2};
 }
 
 int cogui::control::get_x() const

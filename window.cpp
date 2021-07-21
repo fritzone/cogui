@@ -25,8 +25,11 @@ cogui::window::~window()
 void cogui::window::draw() const
 {
     auto t = cogui::desktop::get().get_theme();
-    t->draw_window(*this);
+	t->clear(*this);
+
     container::draw();
+	t->draw_window(*this);
+
     if(m_current_menu)
     {
         t->draw_menu(*m_current_menu);
@@ -314,7 +317,11 @@ const cogui::menu &cogui::window::get_system_menu() const
 
 void cogui::window::close_current_menu()
 {
-    m_current_menu->close();
+	if(m_current_menu)
+	{
+		m_current_menu->close();
+	}
+
     m_current_menu = nullptr;
 }
 
@@ -330,6 +337,7 @@ void cogui::window::activate()
 
 void cogui::window::deactivate()
 {
+	log_info() << "deactivate" << m_title;
     m_is_active = false;
 }
 
@@ -671,4 +679,13 @@ bool cogui::window::is_resizeable() const
 void cogui::window::set_resizeable(bool resizeable)
 {
     m_resizeable = resizeable;
+}
+
+
+namespace cogui {
+menu *window::get_current_menu() const
+{
+	return m_current_menu;
+}
+
 }

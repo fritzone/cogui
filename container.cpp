@@ -51,14 +51,25 @@ void cogui::container::focus_next_element()
     if(m_focused == m_tab_order.end())
     {
         m_focused = m_tab_order.begin();
-    }
+		while( m_focused != m_tab_order.end() && !(*m_focused)->is_visible()) ++m_focused;
+		if(m_focused == m_tab_order.end())
+		{
+			return;
+		}
+	}
     else
     {
         (*m_focused)->set_focus_state(cogui::control::focus_state::not_focused);
-        ++m_focused;
+		++m_focused;
+		while( m_focused != m_tab_order.end() && !(*m_focused)->is_visible()) ++m_focused;
         if(m_focused == m_tab_order.end())
         {
             m_focused = m_tab_order.begin();
+			while( m_focused != m_tab_order.end() && !(*m_focused)->is_visible()) ++m_focused;
+			if(m_focused == m_tab_order.end())
+			{
+				return;
+			}
         }
     }
 

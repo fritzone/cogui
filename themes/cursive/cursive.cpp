@@ -37,10 +37,10 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
 
     std::wstring empty_line = cogui::utils::repeated(drawWidth + 1, L" ");
     // clear the window
-    for(int y=0; y<drawHeight; y++)
-    {
-        cogui::graphics()->draw_text(drawX, drawY + y, empty_line.c_str());
-    }
+//    for(int y=0; y<drawHeight; y++)
+//    {
+//        cogui::graphics()->draw_text(drawX, drawY + y, empty_line.c_str());
+//    }
 
     // depending whether this window is in resize mode or not we pick different border characters
     auto line_char = normal_state ? active_state ? WND_HORZ_LINE : HORZ_LINE_RESIZE : HORZ_LINE_RESIZE;
