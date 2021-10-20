@@ -17,6 +17,8 @@ class window;
 class button;
 class scrollbar;
 class checkbox;
+class radiobutton;
+class radiobutton_group;
 
 class theme
 {
@@ -33,18 +35,27 @@ public:
      * @param c
      */
     virtual void clear(const control& c) = 0;
+
     virtual void draw_window(const window& w) = 0;
     virtual void draw_button(const button& b) = 0;
     virtual void draw_menu(const menu &m) = 0;
     virtual void draw_checkbox(const checkbox& c) = 0;
-    virtual void draw_scrollbar(const scrollbar& s) = 0;
+	virtual void draw_radiobutton(const radiobutton& c) = 0;
+	virtual void draw_radiobutton_group(const radiobutton_group& c) = 0;
+	virtual void draw_scrollbar(const scrollbar& s) = 0;
+
     virtual int minimum_checkbox_width(const checkbox& c) = 0;
     virtual int minimum_checkbox_height(const checkbox& c) = 0;
-    virtual int minimum_button_width(const button& b) = 0;
+	virtual int minimum_radiobutton_width(const radiobutton& c) = 0;
+	virtual int minimum_radiobutton_height(const radiobutton& c) = 0;
+	virtual int minimum_button_width(const button& b) = 0;
     virtual int minimum_button_height(const button& b) = 0;
     virtual int minimum_window_width(const window& w) = 0;
     virtual int minimum_window_height(const window& w) = 0;
-    virtual int first_available_row(const window& w) = 0;
+	virtual int minimum_radiobutton_group_width(const radiobutton_group& c) = 0;
+	virtual int minimum_radiobutton_group_height(const radiobutton_group& c) = 0;
+
+	virtual int first_available_row(const window& w) = 0;
 
     virtual std::string name() = 0;
 
@@ -90,6 +101,14 @@ auto builtin_button_draw = [](button* o) -> int { cogui::desktop::get().get_them
 auto builtin_checkbox_minimum_checkbox_width = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_width(*o); };
 auto builtin_checkbox_minimum_checkbox_height = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_height(*o); };
 auto builtin_checkbox_draw = [](checkbox* o) -> int { cogui::desktop::get().get_theme()->draw_checkbox(*o); return 0; };
+
+auto builtin_radiobutton_minimum_radiobutton_width = [](radiobutton* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_width(*o); };
+auto builtin_radiobutton_minimum_radiobutton_height = [](radiobutton* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_height(*o); };
+auto builtin_radiobutton_draw = [](radiobutton* o) -> int { cogui::desktop::get().get_theme()->draw_radiobutton(*o); return 0; };
+
+auto builtin_radiobutton_group_minimum_radiobutton_group_width = [](radiobutton_group* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_group_width(*o); };
+auto builtin_radiobutton_group_minimum_radiobutton_group_height = [](radiobutton_group* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_group_height(*o); };
+auto builtin_radiobutton_group_draw = [](radiobutton_group* o) -> int { cogui::desktop::get().get_theme()->draw_radiobutton_group(*o); return 0; };
 
 }
 

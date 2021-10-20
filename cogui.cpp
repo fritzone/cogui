@@ -94,3 +94,4 @@ std::shared_ptr<cogui::graphics_engine> cogui::graphics()
 {
 	return desktop::get().get_graphics();
 }
+

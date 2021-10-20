@@ -103,10 +103,10 @@ int main( int argc, char* argv[] )
     );
 
 	b = a.add_button(5,5, 10, 2, L"&Vertical layout",
-                           button::on_click = [&a](button*){log_info() << "Thanks";
+						   button::on_click = [&a](button*){log_info() << "Thanks";
 								a.set_layout<cogui::layout::vertical>().expand(2);
                                 a.redraw();
-                           }
+						   }
     );
 
 	auto c = a.add_button(35,5, 20, 2, L"&Horizontal layout",
@@ -121,28 +121,40 @@ int main( int argc, char* argv[] )
 	);
 	auto f = a.add_button(35,5, 5, 2, L"C", button::on_click = b_handler);
 
-	auto e = a.add_checkbox(35,5, 5, 2, L"Check me!", checkbox::checked = false,
+    auto e = a.add_checkbox(35,5, 5, 2, L"Check me!", checkbox::checked = false,
 							 checkbox::on_state_change = [&f](checkbox*, bool checked) {
 								log_info() << "check state change lambda:" << checked;
 								f->set_title(checked ? L"Checked" : L"Unchecked");
 							 },
-							 checkbox::on_click = chk_click_handler
+                             checkbox::on_click = chk_click_handler
 	);
-	auto g = a.add_button(55,5, 5, 2, "Da button",
-						   button::on_click = [&e](button*){
+	auto g = a.add_radiobutton(55,5, 5, 2, "Some radion",
+						   radiobutton::on_state_change = [&e](radiobutton*, bool cs){
 								log_info() << "Thanks";
-								e->set_checked( !e->is_checked() );
+								e->set_checked( cs );
 	});
+
+
+	auto rbg = a.add_radiobutton_group(10, 10, L"Stuff",
+									   {
+										   {L"The first stuff", radiobutton::on_state_change = [](radiobutton*,bool){log_info() << "First stuff click";} },
+										   {L"The second stuff"},
+										   {L"The third stuff"}
+                                       },
+                                       radiobutton_group::on_state_change = [](radiobutton_group* rbg, int seli) {
+                                            log_info() << "RBG item:" << seli;
+                                       }
+	);
 
 
 	miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
 	miso::connect(&c, c->sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
 
-	auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
+//    auto w2 = cogui::window(5, 28, 70, 10, L"Another window");
 
-	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
+//	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
-    //a.setLayout<cogui::layout::grid>(3, 3);
+	//a.setLayout<cogui::layout::grid>(3, 3);
 
     app.run();
 

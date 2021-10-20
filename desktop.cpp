@@ -116,9 +116,9 @@ bool desktop::handle_mouse_left_down(int x, int y)
         if(w->inside(x, y))
         {
             log_info() << "captured a window";
-			auto m_before = w->get_current_menu();
+//			auto m_before = w->get_current_menu();
             w->left_mouse_down(x, y);
-			auto m_after = w->get_current_menu();
+//			auto m_after = w->get_current_menu();
 			log_info() << "captured a window:" << static_cast<int>( w->get_draw_state() );
 			m_captured_window->deactivate();
 

@@ -251,7 +251,6 @@ const cogui::scrollbar &cogui::control::get_vertical_scrollbar() const
 void cogui::control::redraw()
 {
     clear();
-    draw();
 }
 
 void cogui::control::doubleclick(int, int)

@@ -111,7 +111,7 @@ void cogui::window::click(int x, int y)
     {
         release_control(under);
         // debug() << "found under ontrol";
-        under->click();
+		under->click(x, y);
     }
     redraw();
 
@@ -273,10 +273,6 @@ bool cogui::window::inside(int x, int y) const
             ;
 }
 
-void cogui::window::click()
-{
-    log_info() << "This window was clicked:" << this;
-}
 
 int cogui::window::minimum_drawable_width() const
 {
@@ -465,7 +461,7 @@ void cogui::window::left_mouse_up(int x, int y)
         {
             release_control(under);
             // call the click
-            under->click();
+			under->click(x, y);
         }
         return redraw();
     }

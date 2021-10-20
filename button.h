@@ -2,15 +2,13 @@
 #define BUTTON_H
 
 #include "control.h"
-#include "miso.h"
 #include "desktop.h"
 #include "theme.h"
-#include "named_type.h"
-#include "tuple_iterator.h"
-#include "overload_impl.h"
+#include "clickable.h"
 #include "themeable.h"
 
 namespace cogui {
+
 
 /**
  * @brief The button class represents a push button control that a user can interact with by pressing it.
@@ -45,7 +43,7 @@ namespace cogui {
  */
 
 
-class button : public themeable<button>
+class button : public themeable<button>, public clickable<button>
 {
 public:
 
@@ -88,37 +86,20 @@ public:
 	template<typename S, typename ... Args>
 	button(int x, int y, int width, int height, const S& title, Args... args) : themeable(x, y, width, height, title, this, builtin_button_draw, builtin_button_minimum_button_width, builtin_button_minimum_button_height)
     {
-        init(std::forward<Args>(args)...);
-    }
+		if constexpr (sizeof... (args))
+		{
+			init(overload_unref(clickable::connector(this)) , std::forward<Args>(args)...);
+		}
+	}
 
 	/**
 	 * @brief The click of the button emits the given on_click signal. Called by the underlying architecture
 	 */
-	void click() override
+	void click(int x, int y) override
 	{
-		emit sig_on_click(this);
+		clickable::click(this);
 	}
 
-	using OnClick = fluent::NamedType<std::function<void(button*)>, struct OnClickHelper>;
-    static OnClick::argument on_click;
-    miso::signal<button*> sig_on_click{"on_click"};
-
-private:
-
-	template<typename ... Args>
-	void init(Args... args)
-	{
-		auto connector = overload_unref(
-			[&,this](OnClick c) { miso::connect(this, sig_on_click, c.get()); }
-		);
-
-		auto tup = std::make_tuple(std::forward<Args>(args)...);
-
-		for (auto const& elem : to_range(tup))
-		{
-			std::visit(connector, elem);
-		}
-	}
 
 };
 

@@ -5,6 +5,8 @@
 #include "button.h"
 #include "layout.h"
 #include "checkbox.h"
+#include "radiobutton.h"
+#include "radiobutton_group.h"
 
 #include <vector>
 #include <iterator>
@@ -24,29 +26,33 @@ public:
     }
 
     /* to add a button to the container */
-	std::shared_ptr<button> add_button(int x, int y, int width, int height, const std::wstring& title);
-
-	template<typename ... Args> std::shared_ptr<button> add_button(int x, int y, int width, int height, const std::wstring& title, Args... args)
-    {
-		return add_control<button>(x, y, width, height, this, title, std::forward<Args>(args)...);
-    }
-	template<typename ... Args> std::shared_ptr<button> add_button(int x, int y, int width, int height, const std::string& title, Args... args)
+	template<typename S, typename ... Args>
+	std::shared_ptr<button> add_button(int x, int y, int width, int height, const S& title, Args... args)
     {
 		return add_control<button>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
 
     /* to add a checkbox to the container */
-	std::shared_ptr<checkbox> add_checkbox(int x, int y, int width, int height, const std::wstring& title);
-    template<typename ... Args>
-	std::shared_ptr<checkbox> add_checkbox(int x, int y, int width, int height, const std::wstring& title, Args... args)
+	template<typename S, typename ... Args>
+	std::shared_ptr<checkbox> add_checkbox(int x, int y, int width, int height, const S& title, Args... args)
     {
 		return add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
-    template<typename ... Args>
-	std::shared_ptr<checkbox> add_checkbox(int x, int y, int width, int height, const std::string& title, Args... args)
-    {
-		return add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
-    }
+
+	/* to add a radiobutton to the container */
+	template<typename S, typename ... Args>
+	std::shared_ptr<radiobutton> add_radiobutton(int x, int y, int width, int height, const S& title, Args... args)
+	{
+		return add_control<radiobutton>(x, y, width, height, this, title, std::forward<Args>(args)...);
+	}
+
+	/* to add a radiobutton group to the container */
+	template<typename S, typename ... Args>
+    std::shared_ptr<radiobutton_group> add_radiobutton_group(int x, int y, const S& title, const std::initializer_list<radiobutton_creator>& buttons, Args... args)
+	{
+        return add_control<radiobutton_group>(x, y, this, title, buttons, std::forward<Args>(args)...);
+	}
+
 
     void draw() const;
     void focus_next_element();
@@ -144,8 +150,8 @@ private:
     /**
      * Adds a control to the container
      */
-    template<typename C>
-    std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc, const std::wstring& title = L"")
+	template<typename C, typename S>
+	std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc, const S& title = S())
     {
         static store<C> cc(pc);
         cc.m_controls.emplace_back(std::make_shared<C>(x, y, width, height, title))->set_parent(pc);
@@ -161,12 +167,29 @@ private:
         return shp;
     }
 
+    template<typename C = radiobutton_group, typename S, typename ... Args>
+    std::shared_ptr<radiobutton_group> add_control(int x, int y, container* pc, const S& title = S(), std::initializer_list<radiobutton_creator> buttons = {}, Args... args)
+	{
+		static store<radiobutton_group> cc(pc);
+        cc.m_controls.emplace_back(std::make_shared<radiobutton_group>(x, y, title, buttons, args...))->set_parent(pc);
+
+		auto shp = cc.m_controls.back();
+		m_tab_order.push_back(shp);
+
+		// invalidate the press and focused elements
+		m_focused = m_tab_order.end();
+		m_pressed = m_tab_order.end();
+		m_prev_pressed = m_tab_order.end();
+
+		return shp;
+	}
+
+
     /**
      * Add a control with a set of forwarded arguments as slots for specific signals
      */
     template<typename C, typename S, typename ... Args>
-    std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc,
-                                   const S& title = L"", Args... args)
+	std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc, const S& title = S(), Args... args)
     {
         static store<C> cc(pc);
         cc.m_controls.emplace_back(std::make_shared<C>(x, y, width, height, title,

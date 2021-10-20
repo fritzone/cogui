@@ -90,6 +90,8 @@ namespace cogui {
 #include "desktop.h"
 #include "control.h"
 #include "checkbox.h"
+#include "radiobutton.h"
+#include "radiobutton_group.h"
 #include "graphics_engine.h"
 #include "log.h"
 #include "utils.h"

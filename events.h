@@ -303,7 +303,7 @@ public:
         if(first_check) return true;
         if(m_hotkey)
         {
-			log_info() << cogui::utils::str2upper(m_chardata) << "==" <<cogui::utils::str2upper(rhs.m_chardata);
+            log_debug() << cogui::utils::str2upper(m_chardata) << "==" <<cogui::utils::str2upper(rhs.m_chardata);
 
 			return (m_alt == rhs.m_alt &&
                     m_shift == rhs.m_shift && m_ctrl == rhs.m_ctrl &&

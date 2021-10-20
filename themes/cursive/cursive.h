@@ -135,7 +135,16 @@ class cursive final : public ::cogui::theme
     /******************************************************************************************************************/
 
     std::wstring CHK_UNCHECKED = L"\x2610"; // unchecked checkbox
-    std::wstring CHK_CHECKED = L"\x2611"; // unchecked checkbox
+	std::wstring CHK_CHECKED = L"\x2611"; // checked checkbox
+
+	/******************************************************************************************************************/
+	/*                                                    RADIO BUTTON                                                */
+	/******************************************************************************************************************/
+
+	std::wstring RDB_UNSELECTED = L"\x2B58"; // unselected radiobutton
+	std::wstring RDB_SELECTED = L"\x2B57"; // selected radio
+
+
 
     /******************************************************************************************************************/
     /*                                                    SCROLLBAR                                                   */
@@ -162,6 +171,9 @@ public:
     void draw_menu(const menu &m) override;
     void draw_checkbox(const checkbox& c) override;
     void draw_scrollbar(const scrollbar &s) override;
+	void draw_radiobutton(const radiobutton& rb) override;
+	void draw_radiobutton_group(const radiobutton_group& rbg) override;
+
 
     int minimum_checkbox_width(const checkbox& c) override;
     int minimum_checkbox_height(const checkbox& c) override;
@@ -171,6 +183,12 @@ public:
 
     int minimum_window_width(const window& w) override;
     int minimum_window_height(const window& w) override;
+
+	int minimum_radiobutton_width(const radiobutton& r) override;
+	int minimum_radiobutton_height(const radiobutton& r) override;
+
+	int minimum_radiobutton_group_width(const radiobutton_group& c) override;
+	int minimum_radiobutton_group_height(const radiobutton_group& c) override;
 
     int first_available_row(const window& w) override;
 

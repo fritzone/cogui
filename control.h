@@ -9,6 +9,8 @@
 #include "rect.h"
 
 #include <string>
+#include <variant>
+#include <utility>
 
 namespace cogui
 {
@@ -162,7 +164,7 @@ public:
     virtual void draw() const = 0;
 
     virtual bool inside(int x, int y) const;
-    virtual void click() = 0;
+	virtual void click(int x, int y) = 0;
 
     virtual bool deal_with_scrollbar_mouse_down(int x, int y);
 
@@ -194,10 +196,10 @@ private:
 	/**
 	 * @brief copying, moving, assigning is prohibited
 	 */
-	control(const control&) = default;
-	control(control&&) = default;
-	control& operator = (const control&) = default;
-	control& operator = (control&&) = default;
+    control(const control&) = delete;
+    control(control&&) = delete;
+    control& operator = (const control&) = delete;
+    control& operator = (control&&) = delete;
 
 
 private:

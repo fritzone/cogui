@@ -4,10 +4,22 @@
 #include <string>
 #include <locale>
 #include <codecvt>
+#include <vector>
+#include <numeric>
 
 namespace cogui {
 
 namespace utils {
+
+
+// will generate a sequence vector
+static std::vector<int> generate_sequence(int cnt)
+{
+    std::vector<int> result(cnt);
+    std::iota(result.begin(), result.end(), 0);
+    return result;
+}
+
 
 template <class T>
 T repeat(T str, const std::size_t n)

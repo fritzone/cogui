@@ -444,6 +444,85 @@ void cogui::themes::cursive::draw_scrollbar(const scrollbar &s)
 
 }
 
+void cogui::themes::cursive::draw_radiobutton(const cogui::radiobutton &rb)
+{
+	if(!rb.is_visible())
+	{
+		return;
+	}
+
+	int drawX = rb.get_x();
+
+	int titleX = (int)(drawX + rb.get_width() / 2 - rb.get_title().length() / 2);
+
+	if(titleX <= drawX + 2)
+	{
+		titleX = drawX + 4;
+	}
+
+	std::wstring title_to_draw = rb.get_title();
+
+	if(static_cast<int>(title_to_draw.length()) >= rb.get_width() - 4)
+	{
+		title_to_draw = title_to_draw.substr(0, rb.get_width() - 4 - 4) + L"...";
+	}
+
+	int drawY = rb.get_y() + rb.get_height() / 2;
+
+	if(rb.get_focus_state() == cogui::control::focus_state::focused)
+	{
+		cogui::graphics()->draw_text(drawX, drawY, (rb.is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
+		cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title && cogui::textflags::underline & cogui::textflags::bold);
+	}
+	else
+	{
+		cogui::graphics()->draw_text(drawX, drawY, (rb.is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::normal);
+		cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title);
+	}
+}
+
+void cogui::themes::cursive::draw_radiobutton_group(const cogui::radiobutton_group &rbg)
+{
+	if(!rbg.is_visible())
+	{
+		return;
+	}
+
+	int drawX = rbg.get_x();
+	int y_ctr = 0;
+
+	for(const auto& rb : rbg.buttons())
+	{
+		int drawY = rbg.get_y() + y_ctr++;
+
+		int titleX = (int)(drawX + rb->get_width() / 2 - rb->get_title().length() / 2);
+
+		if(titleX <= drawX + 2)
+		{
+			titleX = drawX + 4;
+		}
+
+		std::wstring title_to_draw = rb->get_title();
+
+		if(static_cast<int>(title_to_draw.length()) >= rb->get_width() - 4)
+		{
+			title_to_draw = title_to_draw.substr(0, rb->get_width() - 4 - 4) + L"...";
+		}
+
+
+		if(rb->get_focus_state() == cogui::control::focus_state::focused)
+		{
+			cogui::graphics()->draw_text(drawX, drawY, (rb->is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
+			cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title && cogui::textflags::underline & cogui::textflags::bold);
+		}
+		else
+		{
+			cogui::graphics()->draw_text(drawX, drawY, (rb->is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::normal);
+			cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title);
+		}
+	}
+}
+
 int cogui::themes::cursive::minimum_checkbox_width(const cogui::checkbox &c)
 {
     return c.get_title().length() + 2; // +2 for the checkmarek followed by a space
@@ -475,7 +554,27 @@ int cogui::themes::cursive::minimum_window_width(const cogui::window &w)
 
 int cogui::themes::cursive::minimum_window_height(const cogui::window &)
 {
-    return 3; // top line + content line + bottomline
+	return 3; // top line + content line + bottomline
+}
+
+int cogui::themes::cursive::minimum_radiobutton_width(const cogui::radiobutton &r)
+{
+	return r.get_title().length() + 2; // +2 for the circle  followed by a space
+}
+
+int cogui::themes::cursive::minimum_radiobutton_height(const cogui::radiobutton&)
+{
+	return 1;
+}
+
+int cogui::themes::cursive::minimum_radiobutton_group_width(const cogui::radiobutton_group &c)
+{
+	return c.calculate_width();
+}
+
+int cogui::themes::cursive::minimum_radiobutton_group_height(const cogui::radiobutton_group &c)
+{
+	return c.calculate_height();
 }
 
 int cogui::themes::cursive::first_available_row(const cogui::window &w)

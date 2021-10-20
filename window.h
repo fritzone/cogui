@@ -88,7 +88,6 @@ public:
     ~window() override;
 
     /* mouse related */
-    void click(int x, int y);
     bool mouse_move(int x, int y);
     void left_mouse_down(int x, int y);
     void left_mouse_up(int x, int y);
@@ -125,7 +124,7 @@ public:
 
     void draw() const override;
     bool inside(int x, int y) const override;
-    void click() override;
+	void click(int x, int y) override;
     int minimum_drawable_width() const override;
     int minimum_drawable_height() const override;
     void redraw() override;
