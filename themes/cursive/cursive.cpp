@@ -491,7 +491,7 @@ void cogui::themes::cursive::draw_radiobutton_group(const cogui::radiobutton_gro
 	int drawX = rbg.get_x();
 	int y_ctr = 0;
 
-	for(const auto& rb : rbg.buttons())
+    for(const auto& rb : rbg.controls())
 	{
 		int drawY = rbg.get_y() + y_ctr++;
 

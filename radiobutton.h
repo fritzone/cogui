@@ -12,31 +12,13 @@
 #include "clickable.h"
 #include "state_changer.h"
 #include "checkable.h"
+#include "control_creator.h"
 
 namespace cogui {
 
-class radiobutton_group;
-
-struct radiobutton_creator
-{
-    template<typename S, typename ... Args>
-    radiobutton_creator(const S& s, Args... args)
-    {
-        m_rbutton = new radiobutton(s, std::forward<Args>(args)...);
-    }
-
-    radiobutton* get_button() const
-    {
-        return m_rbutton;
-    }
-
-    radiobutton* m_rbutton;
-};
-
-class radiobutton : public themeable<radiobutton>, public checkable<radiobutton>
+class radiobutton : public themeable<radiobutton>, public checkable<radiobutton>, public control_creator<radiobutton>
 {
 public:
-
 
     template<typename S, typename ... Args>
     radiobutton(int x, int y, int width, int height, const S& title, Args... args) :

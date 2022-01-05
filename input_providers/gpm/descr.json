@@ -1,0 +1,7 @@
+{
+	"input_provider": {
+		"name": "gpm_input_provider",
+		"mode": "console",
+		"library": "gpm_input_provider"
+	}
+}

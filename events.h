@@ -109,6 +109,7 @@ enum class key_class
     key_kp_minus,
     key_kp_plus,
     key_kp_enter,
+    key_kp_comma,
     key_kp_0,
     key_kp_1,
     key_kp_2,
@@ -120,9 +121,23 @@ enum class key_class
     key_kp_8,
     key_kp_9,
 
+    // numbers
+    key_1,
+    key_2,
+    key_3,
+    key_4,
+    key_5,
+    key_6,
+    key_7,
+    key_8,
+    key_9,
+    key_0,
+
     // no key
     key_none
 };
+
+bool is_function_key(key_class kc);
 
 /*
  * A simple map that assigns to each key the corresponding key class
@@ -289,6 +304,12 @@ public:
     bool handle() override;
 };
 
+class mouse_left_doubleclick : public mouse_event
+{
+public:
+    mouse_left_doubleclick(int x, int y) : mouse_event(x,y) {}
+    bool handle() override;
+};
 
 class keypress : public event, public std::enable_shared_from_this<keypress>
 {
@@ -297,20 +318,7 @@ public:
     keypress(key_class type, bool alt, bool shift, bool ctrl, const std::wstring& chardata);
     bool handle() override;
     std::wstring get_chardata();
-    bool operator == (const keypress& rhs) const
-    {
-        bool first_check = (m_type == rhs.m_type && m_alt == rhs.m_alt && m_shift == rhs.m_shift && m_ctrl == rhs.m_ctrl && m_chardata == rhs.m_chardata);
-        if(first_check) return true;
-        if(m_hotkey)
-        {
-            log_debug() << cogui::utils::str2upper(m_chardata) << "==" <<cogui::utils::str2upper(rhs.m_chardata);
-
-			return (m_alt == rhs.m_alt &&
-                    m_shift == rhs.m_shift && m_ctrl == rhs.m_ctrl &&
-                    cogui::utils::str2upper(m_chardata) == cogui::utils::str2upper(rhs.m_chardata));
-        }
-        return false;
-    }
+    bool operator == (const keypress& rhs) const;
 
     bool operator == (key_class r);
 

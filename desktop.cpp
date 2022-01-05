@@ -34,8 +34,10 @@ bool desktop::initialize()
 {
     bool b = true;
 
+    // do not change the order, input provider needs to be initialized first
+    b &= m_input->init();
+
     b &= m_graphics->initialize();
-	b &= m_input->init();
 
     if(b)
     {
@@ -306,6 +308,7 @@ void desktop::init(const std::string &theme_name)
 desktop &desktop::get()
 {
     static desktop d;
+    static int init_count = 0;
     if(!d.m_initialized)
     {
         static bool desk_init = d.initialize();
@@ -313,6 +316,12 @@ desktop &desktop::get()
         if(!d.m_initialized)
         {
             log_error() << "Cannot initialize the desktop";
+            init_count ++;
+            if(init_count == 16)
+            {
+                log_emergency() << "Giving up";
+                std::abort();
+            }
         }
     }
     return d;

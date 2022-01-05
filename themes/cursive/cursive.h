@@ -27,34 +27,34 @@ class cursive final : public ::cogui::theme
     /******************************************************************************************************************/
 
     // the line characters of the window
-    std::wstring WND_UL_CORNER = L"\x2554";
-    std::wstring WND_UR_CORNER = L"\x2557";
-    std::wstring WND_LL_CORNER = L"\x255A";
-    std::wstring WND_LR_CORNER = L"\x255D";
-    std::wstring WND_HORZ_LINE = L"\x2550";
-    std::wstring WND_VERT_LINE = L"\x2551";
+    std::wstring WND_UL_CORNER = L"\x250F"; // L"\x2554";
+    std::wstring WND_UR_CORNER = L"\x2513"; // L"\x2557";
+    std::wstring WND_LL_CORNER = L"\x2517"; // L"\x255A";
+    std::wstring WND_LR_CORNER = L"\x251B"; // L"\x255D";
+    std::wstring WND_HORZ_LINE = L"\x2501"; // L"\x2550";
+    std::wstring WND_VERT_LINE = L"\x2503"; // L"\x2551";
 
     // if there is a main menu attached to this window
-    std::wstring WND_VERT_MENULINE_START = L"\x2520";
-    std::wstring WND_VERT_MENULINE_END = L"\x2528";
-    std::wstring WND_HORZ_MENULINE = L"\x2500";
-    std::wstring WND_VERT_MENULINE_START_RESIZE = L"\x255F";
-    std::wstring WND_VERT_MENULINE_END_RESIZE = L"\x2562";
+    std::wstring WND_VERT_MENULINE_START =          L"\x2523"; // L"\x2520";
+    std::wstring WND_VERT_MENULINE_END =            L"\x252B"; // L"\x2528";
+    std::wstring WND_HORZ_MENULINE =                L"\x2500";
+    std::wstring WND_VERT_MENULINE_START_RESIZE =   L"\x2523";
+    std::wstring WND_VERT_MENULINE_END_RESIZE =     L"\x252B";
 
     // if the window is resizeable this is the corner of it
     std::wstring WND_LR_RESIZE = L"\x251B";
 
     // the close button of the theme
-    std::wstring WND_CLOSE = L"\x2561\x2613\x255e";
-    std::wstring WND_MAXIMIZE = L"\x2561\x25ab\x255e";
+    std::wstring WND_CLOSE = L"\x252B\x2613\x2523";
+    std::wstring WND_MAXIMIZE = L"\x252B\x25ab\x2523";
 
     // the system menu
-    std::wstring WND_SYSMENU =  L"\x2561\x25bf\x255e";
-    std::wstring WND_SYSMENU_DOWN =  L"\x2561\x25b5\x255e";
+    std::wstring WND_SYSMENU =  L"\x252B\x25bf\x2523";
+    std::wstring WND_SYSMENU_DOWN =  L"\x252B\x25b5\x2523";
 
     // the delimiters of the title
-    std::wstring WND_TITLE_DELIM_LEFT = L"\x2563 ";
-    std::wstring WND_TITLE_DELIM_RIGHT = L" \x2560";
+    std::wstring WND_TITLE_DELIM_LEFT = L"\x252B ";
+    std::wstring WND_TITLE_DELIM_RIGHT = L" \x2523";
 
     /* resize graphics for windows down */
 

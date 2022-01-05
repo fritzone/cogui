@@ -67,6 +67,8 @@ public:
 	virtual void set_clip_area(const rect& r) override;
 
 
+    WINDOW *getStdscr() const;
+
 private:
 	std::function<bool()> m_renderCallback;
 	void draw_text(int x, int y, const wchar_t* s, int flags) ;

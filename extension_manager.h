@@ -85,7 +85,11 @@ private:
         for (const auto & entry : fs::directory_iterator(path))
         {
             std::shared_ptr<dynamic_lib> l = std::make_shared<dynamic_lib>(entry.path());
-            m_loadables.emplace_back(l, std::shared_ptr<T>(cogui::instantiate<T>(l->handle)));
+            auto inst = std::shared_ptr<T>(cogui::instantiate<T>(l->handle));
+            if(inst)
+            {
+                m_loadables.emplace_back(l, inst);
+            }
         }
     }
 private:

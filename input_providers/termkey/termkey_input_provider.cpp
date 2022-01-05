@@ -3,6 +3,7 @@
 #include <string.h>
 #include <log.h>
 #include <mouse.h>
+#include <X11/Xlib.h>
 
 static auto t_start = std::chrono::high_resolution_clock::now();
 static cogui::mouse::button last_button = cogui::mouse::button::none;
@@ -10,6 +11,8 @@ static cogui::mouse::button last_button = cogui::mouse::button::none;
 
 extern "C" cogui::input_provider* create()
 {
+//    return nullptr;
+    if(!XOpenDisplay(NULL)) return nullptr;
 	return static_cast<cogui::input_provider*>(new cogui::input_providers::termkey_input);
 }
 
@@ -81,6 +84,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
         return result;
     }
     bool handled = false;
+    log_info() <<  "termkey event type:" << key.type;
 
     if(key.type == TERMKEY_TYPE_MOUSE)
     {
@@ -88,7 +92,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
         int button;
         int line, col;
         termkey_interpret_mouse(tk, &key, &ev, &button, &line, &col);
-//        log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
+        log_info() << "Mouse:" << (col-1) << "x" <<  line-1;
 
         cogui::mouse::get().setX(col - 1);
         cogui::mouse::get().setY(line - 1);
@@ -99,18 +103,14 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
             {
                 t_start = std::chrono::high_resolution_clock::now();
                 last_button = cogui::mouse::button::left;
-//                handled = handled | cogui::desktop::get().handle_mouse_left_down(col - 1, line - 1);
                 result.push_back(cogui::events::event::create<cogui::events::mouse_left_down>(col-1, line-1));
             }
 
             if(button == 3) // Right
             {
                 last_button = cogui::mouse::button::right;
-                //handled = handled | cogui::desktop::get().handle_mouse_right_down(col - 1, line - 1);
                 result.push_back(cogui::events::event::create<cogui::events::mouse_right_down>(col-1, line-1));
-
             }
-
         }
         else
         if(ev == 3) // Release
@@ -124,30 +124,23 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
                 if(elapsed_time_ms < 200) // this was a fast exchange handle it as a click
                 {
                     log_debug() << "Event Type: LEFT CLICK at " <<  col - 1 << "," << line - 1;
-//                    handled = handled | cogui::desktop::get().handle_mouse_left_click(col - 1, line - 1);
                     result.push_back(cogui::events::event::create<cogui::events::mouse_left_click>(col-1, line-1));
-
                 }
                 else
                 {
                     log_debug() << "Event Type: LEFT UP at " <<  col - 1<< "," << line - 1;
-                    //handled = handled | cogui::desktop::get().handle_mouse_left_up(col - 1, line - 1);
                     result.push_back(cogui::events::event::create<cogui::events::mouse_left_up>(col-1, line-1));
-
                 }
             }
             else
             if(last_button == cogui::mouse::button::right)
             {
                 log_debug() << "Event Type: RIGHT UP at " <<  col - 1 << "," << line - 1;
-                //handled = handled | cogui::desktop::get().handle_mouse_right_up(col - 1, line - 1);
                 result.push_back(cogui::events::event::create<cogui::events::mouse_right_up>(col-1, line-1));
             }
             else    // just move around, strangely the plain move is reported as release
             {
-                //cogui::desktop::get().handle_mouse_move(col - 1, line - 1);
                 result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
-
             }
 
 
@@ -156,9 +149,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
         else
         if(ev == 2) //Drag
         {
-            //cogui::desktop::get().handle_mouse_move(col - 1, line - 1);
             result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
-
         }
 
     }

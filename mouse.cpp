@@ -74,6 +74,11 @@ void mouse::clear_button(mouse::button b)
     }
 }
 
+bool mouse::needs_cursor_emulation() const
+{
+    return m_needs_cursor_emulation;
+}
+
 mouse::mouse()
 {
 

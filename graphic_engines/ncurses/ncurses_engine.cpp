@@ -107,11 +107,12 @@ cogui::graphic_engines::ncurses::~ncurses()
 
 bool cogui::graphic_engines::ncurses::initialize()
 {
-    setenv("TERM", "linux", 1);
+    setenv("TERM", "xterm", 1);
     std::setlocale(LC_ALL, "");
     stdscr = initscr();
 
     raw();
+
 
     if(stdscr == nullptr)
     {
@@ -131,6 +132,9 @@ bool cogui::graphic_engines::ncurses::initialize()
     }
 
     fflush(stdout) ;
+    curs_set(0);
+    keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
 
     // screen size
     getmaxyx(stdscr, m_height, m_width);
@@ -301,6 +305,7 @@ void cogui::graphic_engines::ncurses::clear_screen()
 
 void cogui::graphic_engines::ncurses::shutdown()
 {
+    ::curs_set(1);
     ::endwin();
 }
 
@@ -332,7 +337,7 @@ void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstrin
             final_title += s[i];
         }
     }
-	desktop::get().get_graphics()->draw_text(x, y, final_title.c_str(), flags);
+    draw_text(x, y, final_title.c_str(), flags);
     if(highlight_char != L'\0')
     {
         // ad an extra space at the end, because we took away an & sign
@@ -420,17 +425,93 @@ void cogui::graphic_engines::frame::set_clip_area(const cogui::rect &r)
 	clip_area = r;
 }
 
+extern "C" const char* unicode_to_utf8(wchar_t c)
+{
+    static unsigned char b_static[5];
+    unsigned char* b = b_static;
+
+    if (c<(1<<7))// 7 bit Unicode encoded as plain ascii
+    {
+        *b++ = (unsigned char)(c);
+    }
+    else if (c<(1<<11))// 11 bit Unicode encoded in 2 UTF-8 bytes
+    {
+        *b++ = (unsigned char)((c>>6)|0xC0);
+        *b++ = (unsigned char)((c&0x3F)|0x80);
+    }
+    else if (c<(1<<16))// 16 bit Unicode encoded in 3 UTF-8 bytes
+    {
+        *b++ = (unsigned char)(((c>>12))|0xE0);
+        *b++ =  (unsigned char)(((c>>6)&0x3F)|0x80);
+        *b++ =  (unsigned char)((c&0x3F)|0x80);
+    }
+
+    else if (c<(1<<21))// 21 bit Unicode encoded in 4 UTF-8 bytes
+    {
+        *b++ = (unsigned char)(((c>>18))|0xF0);
+        *b++ = (unsigned char)(((c>>12)&0x3F)|0x80);
+        *b++ = (unsigned char)(((c>>6)&0x3F)|0x80);
+        *b++ = (unsigned char)((c&0x3F)|0x80);
+    }
+    *b = '\0';
+    return (const char*)b_static;
+}
+
 void cogui::graphic_engines::frame::print()
 {
+
+    int mx = mouse::get().x();
+    int my = mouse::get().y();
+
     for(int i = 0; i < width; i++)
     {
         for(int j = 0; j < height; j++)
         {
             int index = (width * j) + i;
             int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
-            attron(attrs[index] | COLOR_PAIR(a));
-            mvaddwstr(j, i, data[index].c_str());
-            attroff(attrs[index] | COLOR_PAIR(a));
+
+            if(mx == i && my == j)
+            {
+                attron(COLOR_PAIR(3));
+            }
+            else
+            {
+                attron(attrs[index] | COLOR_PAIR(a));
+            }
+            if(data[index].c_str())
+            {
+                mvaddstr(j, i, unicode_to_utf8(*data[index].c_str()));
+            }
+            else
+            {
+                if(mx == i && my == j)
+                {
+                    mvaddstr(j, i, " ");
+                }
+            }
+            if(mx == i && my == j)
+            {
+                attroff(COLOR_PAIR(3));
+            }
+            else
+            {
+                attroff(attrs[index] | COLOR_PAIR(a));
+            }
         }
     }
+
+
+
+
+}
+
+
+namespace cogui {
+namespace graphic_engines {
+WINDOW *ncurses::getStdscr() const
+{
+    return stdscr;
+}
+
+}
 }

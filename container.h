@@ -48,7 +48,7 @@ public:
 
 	/* to add a radiobutton group to the container */
 	template<typename S, typename ... Args>
-    std::shared_ptr<radiobutton_group> add_radiobutton_group(int x, int y, const S& title, const std::initializer_list<radiobutton_creator>& buttons, Args... args)
+    std::shared_ptr<radiobutton_group> add_radiobutton_group(int x, int y, const S& title, const std::initializer_list<radiobutton::CREATOR>& buttons, Args... args)
 	{
         return add_control<radiobutton_group>(x, y, this, title, buttons, std::forward<Args>(args)...);
 	}
@@ -168,7 +168,7 @@ private:
     }
 
     template<typename C = radiobutton_group, typename S, typename ... Args>
-    std::shared_ptr<radiobutton_group> add_control(int x, int y, container* pc, const S& title = S(), std::initializer_list<radiobutton_creator> buttons = {}, Args... args)
+    std::shared_ptr<radiobutton_group> add_control(int x, int y, container* pc, const S& title = S(), std::initializer_list<radiobutton::CREATOR> buttons = {}, Args... args)
 	{
 		static store<radiobutton_group> cc(pc);
         cc.m_controls.emplace_back(std::make_shared<radiobutton_group>(x, y, title, buttons, args...))->set_parent(pc);

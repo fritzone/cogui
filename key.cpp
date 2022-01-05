@@ -329,6 +329,7 @@ template<> cogui::key& cogui::on_impl<&cogui::key::Ctrl_Alt_Shift_F10>::press = 
 cogui::key cogui::key::Ctrl_Alt_Shift_F11( {cogui::events::key_class::key_f11, true, true, true, L"Ctrl-Alt-f11"} );
 template<> cogui::key& cogui::on_impl<&cogui::key::Ctrl_Alt_Shift_F11>::press = cogui::key::Ctrl_Alt_Shift_F11;
 cogui::key cogui::key::Ctrl_Alt_Shift_F12( {cogui::events::key_class::key_f12, true, true, true, L"Ctrl-Alt-f12"} );
+template<> cogui::key& cogui::on_impl<&cogui::key::Ctrl_Alt_Shift_F12>::press = cogui::key::Ctrl_Alt_Shift_F12;
 
 
 cogui::key::key(const cogui::events::keypress &generator): m_generator(generator)

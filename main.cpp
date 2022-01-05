@@ -92,11 +92,14 @@ int main( int argc, char* argv[] )
                                 }
 
                            },
-                           window::on_keypress = [&](window*, std::shared_ptr<cogui::key> k){log_info() << "pressed a key:" << k->get_character();},
+                           window::on_keypress = [&](window* w, std::shared_ptr<cogui::key> k){
+                                log_info() << "pressed a key:" << k->get_character();
+                                w->set_title(k->get_character());
+                           },
                            window::hotkeys = hotkey_associations {
                                on(F2) = [&](window*){log_info() << "pressed the F2 key";},
                                on(F4)= [&](window* w){log_info() << "pressed the F4 key"; w->set_title(L"F4 pressed");},
-                               on_impl<&key::Ctrl_Q>::press = [&](window*){app.exit();}
+                               on(Ctrl_Q) = [&](window*){app.exit();}
                            },
                            window::scrollbars = scrollbar::horizontal
                            /*  */
