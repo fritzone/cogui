@@ -18,7 +18,7 @@ ENDMACRO()
 FUNCTION (InjectThemeImplementation THEME)
   
   target_sources(${THEME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/theme_impl.cpp
+    ${CMAKE_SOURCE_DIR}/themes/theme_impl.cpp
   )
 
 ENDFUNCTION()
