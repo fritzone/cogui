@@ -1,5 +1,7 @@
 #include "action.h"
 
+#include <menu.h>
+
 cogui::action::OnTrigger::argument cogui::action::on_trigger;
 cogui::action::Checkable::argument cogui::action::checkable;
 cogui::action::Checked::argument cogui::action::checked;
@@ -64,6 +66,11 @@ bool cogui::action::is_checked() const
 wchar_t cogui::action::hotchar() const
 {
 	return m_hotchar;
+}
+
+bool cogui::action::is_separator() const
+{
+    return get_title() == cogui::menu::separator_item.get_title();
 }
 
 void cogui::action::determine_hotchar()

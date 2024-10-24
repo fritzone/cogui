@@ -341,10 +341,10 @@ void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstrin
     if(highlight_char != L'\0')
     {
         // ad an extra space at the end, because we took away an & sign
-		draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal);
+		draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal());
 
 		draw_text(x + highlight_pos, y, highlight_char,
-                                           cogui::textflags::underline & cogui::textflags::bold);
+                                           cogui::textflags::underline() & cogui::textflags::bold());
 
 
     }

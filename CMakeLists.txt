@@ -1,44 +1,98 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.20)
 
 project(cogui)
 
 set (CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_EXTRA_DEBUG 0)
+
 include(cmake/cogui.cmake)
 include(cmake/JSONParser.cmake)
 
+#
+# Checking the platform
+#
+set(TargetPlatform "" CACHE STRING "The target platform for the build of the library")
+
+if (WIN32)
+    message("Running on Win32")
+    set(TargetPlatform "windows")
+endif (WIN32)
+
+if (UNIX)
+    message("Running on Unix*Like. Defaulting to Linux.")
+    set(TargetPlatform "linux")
+endif (UNIX)
+
+message(STATUS "TargetPlatform='${TargetPlatform}'")
+
+#
+# The current timestamp will be placed in the generated files
+#
 STRING(TIMESTAMP TIMEZ UTC)    
 
+#
+# The trarget renderer: console or GUI based
+#
+set(TargetRenderer "console" CACHE STRING "The target renderer for the build of the library")
+set(TargetRenderers "console;graphics" CACHE INTERNAL "The possible target engines for the library: console (ncurses) or GUI based (graphics)")
+set_property(CACHE TargetRenderer PROPERTY STRINGS ${TargetRenderers})
+message(STATUS "TargetRenderer='${TargetRenderer}'")
+
+#
+# Generic includes
+#
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 ###################################################
 #         Sorting out the themes                  #
 ###################################################
 SUBDIRLIST(themes ${CMAKE_SOURCE_DIR}/themes)
-#set(theme "" CACHE STRING "The theme used to run the application")
-#set_property(CACHE theme PROPERTY STRINGS ${themes})
 
-#set(THEMES_SOURCES "" CACHE STRING "All the source files for all the themes")
-#set(THEMES_INCLUDES "" CACHE STRING "All the theme headers gathered")
-#set(THEMES_LIBS "" CACHE STRING "All the themes' libraries")
+message("## Sorting out the themes")
 
 FOREACH(theme ${themes})
-	message("Theme found: ${theme}")
+        message(STATUS "Theme found: ${theme}")
 	file(READ ${CMAKE_SOURCE_DIR}/themes/${theme}/theme.json ${theme}_json_content)
 	sbeParseJson(${theme}_json ${theme}_json_content)
 
+        # Theme check will be set to 2 if the current theme has the required platform and renderer
+        set("${theme}_check" "0")
+
 	foreach(var ${${theme}_json})
-	    message("${var} = ${${var}}")
-	endforeach()
 
-	list(APPEND THEMES_INCLUDE "themes/${theme}/${${theme}_json.theme.name}.h")
+            if(CMAKE_EXTRA_DEBUG)
+                message("-- ${theme} using as: ${var} = ${${var}}")
+            endif()
 
-	option(ENABLE_THEME_${theme} "Enable theme ${theme}" ON)
-	if(ENABLE_THEME_${theme})
-	    add_subdirectory(themes/${theme})
-	endif()
+            # Theme platform mathces?
+            if("${var}" STREQUAL "${theme}_json.theme.platform" )
+                if(${${var}} STREQUAL ${TargetPlatform})
+                    message(STATUS "Platform match: ${theme} (theme) has the right platform: ${TargetPlatform}")
+                    math(EXPR "${theme}_check" "${${theme}_check} + 1")
+                endif()
+            endif()
 
-ENDFOREACH()
+            # Theme mode mathces?
+            if("${var}" STREQUAL "${theme}_json.theme.mode" )
+                if(${${var}} STREQUAL ${TargetRenderer})
+                    message(STATUS "Renderer match: ${theme} (theme) has the right mode: ${TargetRenderer}")
+                    math(EXPR "${theme}_check" "${${theme}_check} + 1")
+                endif()
+            endif()
+
+        endforeach(var ${${theme}_json})
+
+        # Do we accept the theme?
+        if(${theme}_check EQUAL 2)
+            message("** ${theme} accepted, initializing")
+            list(APPEND THEMES_INCLUDE "themes/${theme}/${${theme}_json.theme.name}.h")
+            add_subdirectory(themes/${theme})
+            InjectThemeImplementation(${theme})
+            message("** ${theme} accepted, initialized")
+        endif()
+
+ENDFOREACH(theme ${themes})
 
 # message("All themes: ${themes} in libraries: ${THEMES_LIBS}")
 
@@ -65,9 +119,9 @@ SUBDIRLIST(engines ${CMAKE_SOURCE_DIR}/graphic_engines)
 #set(ENGINES_SOURCES "" CACHE STRING "All the source files for all the engines")
 #set(ENGINES_INCLUDES "" CACHE STRING "All the engine headers gathered")
 #set(ENGINES_LIBS "" CACHE STRING "All the engines' libraries")
-
+message(STATUS "##### Sorting out the graphic engines")
 FOREACH(engine ${engines})
-	message("Theme found: ${engine}")
+        message("Engine found: ${engine}")
 	file(READ ${CMAKE_SOURCE_DIR}/graphic_engines/${engine}/engine.json ${engine}_json_content)
 	sbeParseJson(${engine}_json ${engine}_json_content)
 
@@ -159,11 +213,21 @@ set(PROJECT_SOURCES
     window.cpp desktop.cpp theme_impl.cpp
     application.cpp events.cpp mouse.cpp arguments.cpp action.cpp menubar.cpp key.cpp
     control.cpp button.cpp container.cpp layout.cpp menu.cpp checkbox.cpp radiobutton.cpp radiobutton_group.cpp scrollbar.cpp
-    logstream.cpp
 )
 
-add_library(${PROJECT_NAME}  ${PROJECT_SOURCES})
-target_link_libraries(${PROJECT_NAME} dl)
+add_library(cogui_mouse SHARED mouse.cpp)
+set_property(TARGET cogui_mouse PROPERTY POSITION_INDEPENDENT_CODE ON)
+install(TARGETS cogui_mouse LIBRARY DESTINATION lib)
+
+add_library(cogui_logger SHARED logstream.cpp)
+set_property(TARGET cogui_logger PROPERTY POSITION_INDEPENDENT_CODE ON)
+install(TARGETS cogui_logger LIBRARY DESTINATION lib)
+
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
+set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
+
+target_link_libraries(${PROJECT_NAME} dl cogui_mouse cogui_logger)
 
 add_executable(cogui_ex main.cpp)
 target_link_libraries(cogui_ex ${PROJECT_NAME})

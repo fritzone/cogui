@@ -2,6 +2,7 @@
 	"theme": {
 		"name": "cursive",
 		"mode": "console",
-		"library": "cursive"
+		"library": "cursive",
+		"platform": "linux"
 	}
 }

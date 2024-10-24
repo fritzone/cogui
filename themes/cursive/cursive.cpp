@@ -140,7 +140,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
         for(size_t i = 0; i < items.size(); i++)
         {
             menu& itm = const_cast<cogui::menu&>(items[i]);
-            if(itm.caption() == cogui::menubar::align_right_after.caption())
+            if(itm.is_right_align_specifier())
             {
                 size_t accumulated_width = 0;
                 for(size_t j=i+1; j<items.size(); j++)
@@ -152,7 +152,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
             }
             else
             {
-                cogui::graphics()->draw_text(mdix, drawY + 1, itm.caption().c_str(), cogui::textflags::title & cogui::textflags::bold);
+                cogui::graphics()->draw_text(mdix, drawY + 1, itm.caption().c_str(), cogui::textflags::title() & cogui::textflags::bold());
 				update_menubar_positions(&itm, {mdix, drawY + 1}, {mdix + itm.caption().length(), drawY + 1});
                 mdix += (itm.caption().length());
             }
@@ -279,14 +279,14 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
         if(b.get_focus_state() == cogui::control::focus_state::focused)
         {
 //            log_debug()<<"button is focused, drawing underlined";
-            cogui::textflags f = cogui::textflags::title;
-            f = f & cogui::textflags::underline;
-            f = f & cogui::textflags::bold;
+            cogui::textflags f = cogui::textflags::title();
+            f = f & cogui::textflags::underline();
+            f = f & cogui::textflags::bold();
             cogui::graphics()->draw_text(title_x, title_y, title_to_draw.c_str(), f);
         }
         else
         {
-            cogui::graphics()->draw_text(title_x, title_y, title_to_draw.c_str(), cogui::textflags::title);
+            cogui::graphics()->draw_text(title_x, title_y, title_to_draw.c_str(), cogui::textflags::title());
         }
     }
 }
@@ -351,12 +351,12 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
         {
             titleToDraw = (m[mc].is_checked() ? CHK_CHECKED : CHK_UNCHECKED) + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + titleToDraw;
         }
-        else if (titleToDraw != cogui::menu::separator_item.get_title() && one_is_selectable)
+        else if (!(m[mc].is_separator()) && one_is_selectable)
         {
             titleToDraw = MNU_EMPTY_CHAR + MNU_EMPTY_CHAR + MNU_EMPTY_CHAR +titleToDraw;
         }
 
-        if(titleToDraw == cogui::menu::separator_item.get_title())
+        if(m[mc].is_separator())
         {
             cogui::graphics()->draw_text(drawX, y, (MNU_LEFT_SEPARATOR + cogui::utils::repeated(drawWidth - 1, MNU_HORIZONTAL)  + MNU_RIGHT_SEPARATOR).c_str());
         }
@@ -367,12 +367,12 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
             if(mc == m.getLastSelectedIndex())
             {
                 cogui::graphics()->set_colors(color::black, color::white);
-                cogui::graphics()->draw_text(drawX + 1, y, titleToDraw.c_str(), cogui::textflags::title);
+                cogui::graphics()->draw_text(drawX + 1, y, titleToDraw.c_str(), cogui::textflags::title());
                 cogui::graphics()->set_colors(color::white, color::black);
             }
             else
             {
-                cogui::graphics()->draw_text(drawX + 1, y, titleToDraw.c_str(), cogui::textflags::title);
+                cogui::graphics()->draw_text(drawX + 1, y, titleToDraw.c_str(), cogui::textflags::title());
             }
 
         }
@@ -412,13 +412,13 @@ void cogui::themes::cursive::draw_checkbox(const checkbox &c)
 
     if(c.get_focus_state() == cogui::control::focus_state::focused)
     {
-		cogui::graphics()->draw_text(drawX, drawY, (c.is_checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
-        cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title && cogui::textflags::underline & cogui::textflags::bold);
+        cogui::graphics()->draw_text(drawX, drawY, (c.is_checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::underline() & cogui::textflags::bold());
+        cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title() && cogui::textflags::underline() & cogui::textflags::bold());
     }
     else
     {
-		cogui::graphics()->draw_text(drawX, drawY, (c.is_checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::normal);
-        cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title);
+        cogui::graphics()->draw_text(drawX, drawY, (c.is_checked() ? CHK_CHECKED : CHK_UNCHECKED).c_str(), cogui::textflags::normal());
+        cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title());
     }
 }
 
@@ -471,13 +471,13 @@ void cogui::themes::cursive::draw_radiobutton(const cogui::radiobutton &rb)
 
 	if(rb.get_focus_state() == cogui::control::focus_state::focused)
 	{
-		cogui::graphics()->draw_text(drawX, drawY, (rb.is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
-		cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title && cogui::textflags::underline & cogui::textflags::bold);
+        cogui::graphics()->draw_text(drawX, drawY, (rb.is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::underline() & cogui::textflags::bold());
+        cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title() && cogui::textflags::underline() & cogui::textflags::bold());
 	}
 	else
 	{
-		cogui::graphics()->draw_text(drawX, drawY, (rb.is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::normal);
-		cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title);
+        cogui::graphics()->draw_text(drawX, drawY, (rb.is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::normal());
+        cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title());
 	}
 }
 
@@ -512,13 +512,13 @@ void cogui::themes::cursive::draw_radiobutton_group(const cogui::radiobutton_gro
 
 		if(rb->get_focus_state() == cogui::control::focus_state::focused)
 		{
-			cogui::graphics()->draw_text(drawX, drawY, (rb->is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::underline & cogui::textflags::bold);
-			cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title && cogui::textflags::underline & cogui::textflags::bold);
+            cogui::graphics()->draw_text(drawX, drawY, (rb->is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::underline() & cogui::textflags::bold());
+            cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title() && cogui::textflags::underline() & cogui::textflags::bold());
 		}
 		else
 		{
-			cogui::graphics()->draw_text(drawX, drawY, (rb->is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::normal);
-			cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title);
+            cogui::graphics()->draw_text(drawX, drawY, (rb->is_checked() ? RDB_SELECTED : RDB_UNSELECTED).c_str(), cogui::textflags::normal());
+            cogui::graphics()->draw_text(titleX, drawY, title_to_draw.c_str(), cogui::textflags::title());
 		}
 	}
 }
@@ -598,20 +598,20 @@ void cogui::themes::cursive::draw_horizontal_scrollbar(cogui::control *c, cogui:
     int y = c->get_y();
     cogui::graphics()->set_bg_color(color::white);
 
-    cogui::graphics()->draw_text(x + 1, y + h, SCROLL_LEFT_ARROW.c_str(), cogui::textflags::normal);
+    cogui::graphics()->draw_text(x + 1, y + h, SCROLL_LEFT_ARROW.c_str(), cogui::textflags::normal());
     s.set_dec_arrow_screen_position({x + 1, y + h, 1, 1});
 
-    cogui::graphics()->draw_text(x + w, y + h, SCROLL_RIGHT_ARROW.c_str(), cogui::textflags::normal);
+    cogui::graphics()->draw_text(x + w, y + h, SCROLL_RIGHT_ARROW.c_str(), cogui::textflags::normal());
     s.set_inc_arrow_screen_position({x + w, y + h, 1, 1});
 
     int handle_counter = 0;
 
     for(int i =x + 2; i<= x + w - 1; i++)
     {
-        cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_BODY.c_str(), cogui::textflags::normal);
+        cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_BODY.c_str(), cogui::textflags::normal());
         if(handle_counter == s.get_handle_position())
         {
-            cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE.c_str(), cogui::textflags::normal);
+            cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE.c_str(), cogui::textflags::normal());
             s.set_handle_screen_position({i, y+h, 1, 1});
         }
         handle_counter ++;
@@ -627,19 +627,19 @@ void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::
     int h = c->get_height() - c->first_available_row() - 1;
     cogui::graphics()->set_bg_color(color::white);
 
-    cogui::graphics()->draw_text(x + w + 1, y, SCROLL_UP_ARROW.c_str(), cogui::textflags::normal);
+    cogui::graphics()->draw_text(x + w + 1, y, SCROLL_UP_ARROW.c_str(), cogui::textflags::normal());
     s.set_dec_arrow_screen_position({x + w + 1, y, 1 ,1});
 
-    cogui::graphics()->draw_text(x + w + 1, y + h, SCROLL_DOWN_ARROW.c_str(), cogui::textflags::normal);
+    cogui::graphics()->draw_text(x + w + 1, y + h, SCROLL_DOWN_ARROW.c_str(), cogui::textflags::normal());
     s.set_inc_arrow_screen_position({x + w + 1, y + h, 1, 1});
 
     int handle_counter = 0;
     for(int i=y + 1; i<y+h; i++)
     {
-        cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_BODY.c_str(), cogui::textflags::normal);
+        cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_BODY.c_str(), cogui::textflags::normal());
         if(handle_counter == s.get_handle_position())
         {
-            cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE.c_str(), cogui::textflags::normal);
+            cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE.c_str(), cogui::textflags::normal());
             s.set_handle_screen_position({x + w + 1, i, 1, 1});
         }
         handle_counter ++;

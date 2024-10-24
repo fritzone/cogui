@@ -94,21 +94,21 @@ private:
 };
 
 
-auto builtin_button_minimum_button_width = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_width(*o); };
-auto builtin_button_minimum_button_height = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_height(*o); };
-auto builtin_button_draw = [](button* o) -> int { cogui::desktop::get().get_theme()->draw_button(*o); return 0; };
+static constexpr auto builtin_button_minimum_button_width = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_width(*o); };
+static constexpr auto builtin_button_minimum_button_height = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_height(*o); };
+static constexpr auto builtin_button_draw = [](button* o) -> int { cogui::desktop::get().get_theme()->draw_button(*o); return 0; };
 
-auto builtin_checkbox_minimum_checkbox_width = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_width(*o); };
-auto builtin_checkbox_minimum_checkbox_height = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_height(*o); };
-auto builtin_checkbox_draw = [](checkbox* o) -> int { cogui::desktop::get().get_theme()->draw_checkbox(*o); return 0; };
+static constexpr auto builtin_checkbox_minimum_checkbox_width = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_width(*o); };
+static constexpr auto builtin_checkbox_minimum_checkbox_height = [](checkbox* o) -> int { return desktop::get().get_theme()->minimum_checkbox_height(*o); };
+static constexpr auto builtin_checkbox_draw = [](checkbox* o) -> int { cogui::desktop::get().get_theme()->draw_checkbox(*o); return 0; };
 
-auto builtin_radiobutton_minimum_radiobutton_width = [](radiobutton* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_width(*o); };
-auto builtin_radiobutton_minimum_radiobutton_height = [](radiobutton* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_height(*o); };
-auto builtin_radiobutton_draw = [](radiobutton* o) -> int { cogui::desktop::get().get_theme()->draw_radiobutton(*o); return 0; };
+static constexpr auto builtin_radiobutton_minimum_radiobutton_width = [](radiobutton* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_width(*o); };
+static constexpr auto builtin_radiobutton_minimum_radiobutton_height = [](radiobutton* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_height(*o); };
+static constexpr auto builtin_radiobutton_draw = [](radiobutton* o) -> int { cogui::desktop::get().get_theme()->draw_radiobutton(*o); return 0; };
 
-auto builtin_radiobutton_group_minimum_radiobutton_group_width = [](radiobutton_group* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_group_width(*o); };
-auto builtin_radiobutton_group_minimum_radiobutton_group_height = [](radiobutton_group* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_group_height(*o); };
-auto builtin_radiobutton_group_draw = [](radiobutton_group* o) -> int { cogui::desktop::get().get_theme()->draw_radiobutton_group(*o); return 0; };
+static constexpr auto builtin_radiobutton_group_minimum_radiobutton_group_width = [](radiobutton_group* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_group_width(*o); };
+static constexpr auto builtin_radiobutton_group_minimum_radiobutton_group_height = [](radiobutton_group* o) -> int { return desktop::get().get_theme()->minimum_radiobutton_group_height(*o); };
+static constexpr auto builtin_radiobutton_group_draw = [](radiobutton_group* o) -> int { cogui::desktop::get().get_theme()->draw_radiobutton_group(*o); return 0; };
 
 }
 

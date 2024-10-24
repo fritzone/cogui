@@ -72,8 +72,8 @@ public:
 private:
 	std::function<bool()> m_renderCallback;
 	void draw_text(int x, int y, const wchar_t* s, int flags) ;
-	void draw_text(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
-	void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal);
+    void draw_text(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal() );
+    void draw_title(int x, int y, const std::wstring& s, cogui::textflags flags = cogui::textflags::normal() );
 
     WINDOW *stdscr = nullptr;
     int m_width = -1;

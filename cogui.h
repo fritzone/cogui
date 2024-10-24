@@ -59,10 +59,7 @@ namespace cogui {
             v_title = 1 << 22
         };
 
-        static textflags normal;
-        static textflags bold;
-        static textflags underline;
-        static textflags title;
+
 
         textflags() = default;
 
@@ -73,8 +70,36 @@ namespace cogui {
 
         operator int() const;
 
+        static textflags bold()
+        {
+            static textflags l_bold(textflags::v_bold);
+            return l_bold;
+        }
+
+        static textflags normal()
+        {
+            static textflags l_normal(textflags::v_normal);
+            return l_normal;
+        }
+
+        static textflags underline()
+        {
+            static textflags l_underline(textflags::v_underline);
+            return l_underline;
+        }
+
+        static textflags title()
+        {
+            static textflags l_title(textflags::v_title);
+            return l_title;
+        }
+
     private:
         int m_value;
+
+
+
+
     };
 
 

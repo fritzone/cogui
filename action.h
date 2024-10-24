@@ -63,6 +63,7 @@ public:
     bool is_checkable() const;
     bool is_checked() const;
 	wchar_t hotchar() const;
+    bool is_separator() const;
 
     template<typename ... Args>
     void resolve_named_parameters(Args... args)

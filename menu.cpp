@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "menubar.h"
 #include "utils.h"
 
 #include <string>
@@ -247,6 +248,11 @@ std::wstring cogui::menu::caption() const
 int cogui::menu::get_action_count() const
 {
     return m_actions.size();
+}
+
+bool cogui::menu::is_right_align_specifier() const
+{
+    return caption() == cogui::menubar::align_right_after.caption();
 }
 
 void cogui::menu::register_action_activators()

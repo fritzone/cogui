@@ -74,6 +74,8 @@ namespace cogui
 
         int get_action_count() const;
 
+        bool is_right_align_specifier() const;
+
     private:
         std::vector<action> m_actions;
         int m_x = 0;

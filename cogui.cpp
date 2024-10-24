@@ -32,11 +32,6 @@
 
 using namespace cogui;
 
-cogui::textflags cogui::textflags::normal(textflags::v_normal);
-cogui::textflags cogui::textflags::bold(textflags::v_bold);
-cogui::textflags cogui::textflags::underline(textflags::v_underline);
-cogui::textflags cogui::textflags::title(textflags::v_title);
-
 void do_resize(int)
 {
      log_info() << "Resize window";

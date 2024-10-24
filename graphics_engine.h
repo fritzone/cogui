@@ -48,7 +48,7 @@ public:
     virtual bool start_rendering() = 0;
     virtual void set_rendering_function(std::function<bool()>) = 0;
     virtual void draw_text(int x, int y, wchar_t c, int flags) = 0;
-    virtual void draw_text(int x, int y, const wchar_t* s, cogui::textflags flags = cogui::textflags::normal) = 0;
+    virtual void draw_text(int x, int y, const wchar_t* s, cogui::textflags flags = cogui::textflags::normal() ) = 0;
 
     virtual void refresh_screen() = 0;
     virtual void clear_screen() = 0;

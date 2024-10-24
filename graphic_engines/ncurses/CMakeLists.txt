@@ -12,6 +12,6 @@ else()
 endif()
 
 add_library(${PROJECT_NAME} SHARED ncurses_engine.cpp)
-target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm)
+target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm cogui cogui_mouse cogui_logger)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/cogui/graphic_engines)
