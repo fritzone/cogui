@@ -19,9 +19,9 @@
 #include "log.h"
 
 
-extern "C" cogui::graphics_engine* create()
+extern "C" cogui::rendering_engine* create()
 {
-    return static_cast<cogui::graphics_engine*>(new cogui::graphic_engines::ncurses);
+    return static_cast<cogui::rendering_engine*>(new cogui::graphic_engines::ncurses);
 }
 
 

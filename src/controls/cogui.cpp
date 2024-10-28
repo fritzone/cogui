@@ -1,7 +1,7 @@
 #include "desktop.h"
 #include "window.h"
 #include "application.h"
-#include "graphics_engine.h"
+#include "rendering_engine.h"
 
 #include "log.h"
 
@@ -85,7 +85,7 @@ int textflags::operator &(const textflags &o) const
     return (a | b);
 }
 
-std::shared_ptr<cogui::graphics_engine> cogui::graphics()
+std::shared_ptr<cogui::rendering_engine> cogui::graphics()
 {
 	return desktop::get().get_graphics();
 }

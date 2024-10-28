@@ -22,7 +22,7 @@ namespace cogui
  *
  * In case a graphic engine does not support nor require double buffering just leave those methods empty.
  */
-class graphics_engine
+class rendering_engine
 {
 public:
 
@@ -33,8 +33,8 @@ public:
     /**
      * Default constructor and destructor for the base class
      */
-    graphics_engine() noexcept = default;
-    virtual ~graphics_engine() = default;
+    rendering_engine() noexcept = default;
+    virtual ~rendering_engine() = default;
 
     /**
      * @brief name gives us the name of the graphics engine

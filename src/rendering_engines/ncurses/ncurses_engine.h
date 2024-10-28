@@ -1,7 +1,7 @@
 #ifndef NCURSES_ENGINE_H
 #define NCURSES_ENGINE_H
 
-#include <graphics_engine.h>
+#include <rendering_engine.h>
 #include <string.h>
 #include <string>
 
@@ -32,7 +32,7 @@ struct frame final
 
 };
 
-class ncurses : public graphics_engine
+class ncurses : public rendering_engine
 {
 public:
 

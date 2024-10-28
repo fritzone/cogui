@@ -9,16 +9,22 @@
 #include <algorithm>
 #include "log.h"
 
+
+extern std::string g_s_theme_name;
+extern std::string g_s_input_provider_name;
+extern std::string g_s_rendering_engine_name;
+
+extern std::vector<std::string> g_s_all_themes;
+extern std::vector<std::string> g_s_all_rendering_engines;
+extern std::vector<std::string> g_s_all_input_providers;
+
 namespace cogui
 {
 
-std::string desktop::m_s_theme_name;
-std::string desktop::m_s_input_provider_name;
-std::string desktop::m_s_graphics_engine_name;
 
-desktop::desktop() : m_theme( m_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(m_s_theme_name)),
-					 m_graphics(m_s_graphics_engine_name.empty() ? graphics_engine_manager::instance().current_loadable() : graphics_engine_manager::instance().get_loadable(m_s_graphics_engine_name)),
-					 m_input( m_s_input_provider_name .empty() ? input_provider_manager::instance().current_loadable() :input_provider_manager::instance().get_loadable(m_s_input_provider_name)  )
+desktop::desktop() : m_theme( g_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(g_s_theme_name)),
+                     m_graphics(g_s_rendering_engine_name.empty() ? rendering_engine_manager::instance().current_loadable() : rendering_engine_manager::instance().get_loadable(g_s_rendering_engine_name)),
+                     m_input( g_s_input_provider_name .empty() ? input_provider_manager::instance().current_loadable() :input_provider_manager::instance().get_loadable(g_s_input_provider_name)  )
 {
     log_info() << "Picking theme:" << m_theme->name();
     log_info() << "Picking graphics engine:" << m_graphics->name();
@@ -223,7 +229,7 @@ std::shared_ptr<theme> desktop::get_theme() const
     return m_theme;
 }
 
-std::shared_ptr<graphics_engine> desktop::get_graphics() const
+std::shared_ptr<rendering_engine> desktop::get_graphics() const
 {
     return m_graphics;
 }
@@ -302,7 +308,7 @@ void desktop::redraw()
 
 void desktop::init(const std::string &theme_name)
 {
-    m_s_theme_name = theme_name;
+    g_s_theme_name = theme_name;
 }
 
 desktop &desktop::get()

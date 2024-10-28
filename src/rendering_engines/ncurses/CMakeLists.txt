@@ -11,7 +11,5 @@ else()
     message(FATAL_ERROR STATUS "ncurses not found!")
 endif()
 
-add_library(${PROJECT_NAME} SHARED ncurses_engine.cpp)
-target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl gpm cogui cogui_mouse cogui_logger)
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/cogui/graphic_engines)
+add_library(${PROJECT_NAME} STATIC ncurses_engine.cpp)
+target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl cogui cogui_mouse cogui_logger)

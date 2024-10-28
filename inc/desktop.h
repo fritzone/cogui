@@ -9,7 +9,7 @@
 
 namespace cogui {
 
-class graphics_engine;
+class rendering_engine;
 class theme;
 class window;
 class input_provider;
@@ -34,7 +34,7 @@ public:
     bool handle_key(std::shared_ptr<cogui::events::keypress> k);
 
 	std::shared_ptr<theme> get_theme() const;
-	std::shared_ptr<graphics_engine> get_graphics() const;
+	std::shared_ptr<rendering_engine> get_graphics() const;
 	std::shared_ptr<input_provider> get_input() const;
 	const std::vector<window *>& get_windows() const;
 	int get_width() const;
@@ -63,16 +63,12 @@ private:
     bool initialize();
 
     std::shared_ptr<cogui::theme> m_theme;
-    std::shared_ptr<cogui::graphics_engine> m_graphics;
+    std::shared_ptr<cogui::rendering_engine> m_graphics;
 	std::shared_ptr<cogui::input_provider> m_input;
 
     std::vector<window*> m_windows;
     window* m_captured_window = nullptr;
     bool m_initialized = false;
-
-    static std::string m_s_theme_name;
-    static std::string m_s_graphics_engine_name;
-	static std::string m_s_input_provider_name;
 
     static bool renderer();
 

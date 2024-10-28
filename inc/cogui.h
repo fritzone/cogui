@@ -5,7 +5,7 @@
 
 namespace cogui {
 
-    class graphics_engine;
+    class rendering_engine;
 
     /**
      * @brief MAX_CAPTION_WIDTH The maximum width of the captions for each of the UI elements
@@ -19,7 +19,7 @@ namespace cogui {
      * @brief graphics will return the current graphics engine.
      * @return the current graphics engine
      */
-    std::shared_ptr<graphics_engine> graphics();
+    std::shared_ptr<rendering_engine> graphics();
 
     class color
     {
@@ -117,7 +117,7 @@ namespace cogui {
 #include "checkbox.h"
 #include "radiobutton.h"
 #include "radiobutton_group.h"
-#include "graphics_engine.h"
+#include "rendering_engine.h"
 #include "log.h"
 #include "utils.h"
 #include "key.h"

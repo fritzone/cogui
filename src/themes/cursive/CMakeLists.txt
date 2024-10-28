@@ -11,11 +11,8 @@ else()
     message(FATAL_ERROR STATUS "ncursesw not found! To use the ${PROJECT_NAME} theme you will need to install it.")
 endif()
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/cursive.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} pthread dl cogui)
-# set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/cogui/themes)

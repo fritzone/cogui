@@ -2,6 +2,7 @@
 	"input_provider": {
 		"name": "termkey_input_provider",
 		"mode": "console",
+		"platform": "linux",
 		"library": "termkey_input_provider"
 	}
 }

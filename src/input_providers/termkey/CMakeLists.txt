@@ -5,7 +5,5 @@ include(cmake/FindCursesW.cmake)
 
 project(termkey_input_provider)
 
-add_library(${PROJECT_NAME} SHARED termkey_input_provider.cpp)
+add_library(${PROJECT_NAME} STATIC termkey_input_provider.cpp)
 target_link_libraries(${PROJECT_NAME} ${LIBTERMKEY_LIBRARY} pthread ${CURSES_NCURSESW_LIBRARY} X11)
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/cogui/input_providers)

@@ -2,9 +2,9 @@ project(cogui_controls)
 
 
 set(PROJECT_SOURCES
-        ${CMAKE_BINARY_DIR}/theme.cpp
-        ${CMAKE_BINARY_DIR}/graphics_engine.cpp
-        ${CMAKE_BINARY_DIR}/input_provider.cpp
+        ${CMAKE_BINARY_DIR}/themes.cpp
+        ${CMAKE_BINARY_DIR}/rendering_engines.cpp
+        ${CMAKE_BINARY_DIR}/input_providers.cpp
 
     cogui.cpp dynamic_library.cpp
     window.cpp desktop.cpp
