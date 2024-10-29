@@ -10,17 +10,10 @@
 #include "log.h"
 
 
-extern std::string g_s_theme_name;
-extern std::string g_s_input_provider_name;
-extern std::string g_s_rendering_engine_name;
 
-extern std::vector<std::string> g_s_all_themes;
-extern std::vector<std::string> g_s_all_rendering_engines;
-extern std::vector<std::string> g_s_all_input_providers;
 
 namespace cogui
 {
-
 
 desktop::desktop() : m_theme( g_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(g_s_theme_name)),
                      m_graphics(g_s_rendering_engine_name.empty() ? rendering_engine_manager::instance().current_loadable() : rendering_engine_manager::instance().get_loadable(g_s_rendering_engine_name)),

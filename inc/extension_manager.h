@@ -46,6 +46,14 @@ template<typename T>
 class extension_manager final
 {
 public:
+
+    /**
+     * @brief init will initialize the extension manager, ie. identify the libraries
+     * @param argc
+     * @param argv
+     */
+    static init(int argc, char* argv []);
+
     static extension_manager<T>& instance()
     {
         static extension_manager<T> i;

@@ -19,7 +19,7 @@ namespace cogui
  * @param argc the argc from main
  * @param argv the argv from main
  */
-void init(int argc, char* argv[], const std::string &theme);
+void init(int argc, char* argv[]);
 
 /**
  * @brief The application class is responsible for the lifetime of an application using the cogui framework
@@ -32,7 +32,6 @@ public:
     template<typename ... Args>
     application(int argc, char* argv[], Args&&... args)
     {
-        std::string theme = "cursive";
         try
         {
             log_info() << "application constructing or something";
@@ -56,7 +55,7 @@ public:
 
             (loop(args), ...);
 
-            cogui::init(argc, argv, theme);
+            cogui::init(argc, argv);
 
         }
         catch (const arguments::invalid_parameter& e)

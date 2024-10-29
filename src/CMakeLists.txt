@@ -34,7 +34,7 @@ ENDFUNCTION()
 #
 # Enumerates the objects at a given location, and builds up the required structures
 #
-function(EnumerateObjects type location)
+function(EnumerateObjects type location target_var)
 
     set(INCLUDE_RESULTS "")
     set(all_objects "")
@@ -92,8 +92,8 @@ function(EnumerateObjects type location)
             set(callback_function_name "")
 
             # Check if a callback function name is provided as the last argument
-            if(ARGC GREATER 2)
-                set(callback_function_name ${ARGV2})
+            if(ARGC GREATER 3)
+                set(callback_function_name ${ARGV3})
                 set(options_callback_provided TRUE)
             endif()
 
@@ -128,6 +128,7 @@ function(EnumerateObjects type location)
 
     # Identify the first theme
     list(LENGTH all_objects obj_cnt)
+    message("object count: ${obj_cnt}")
     if(obj_cnt GREATER_EQUAL 1)
         JoinList(${all_objects} "\";\"" str_all_objects)
         file(APPEND ${CMAKE_BINARY_DIR}/${type}s.cpp "std::vector<std::string> g_s_all_${type}s={\"${str_all_objects}\"};\n")
@@ -143,19 +144,22 @@ endfunction(EnumerateObjects)
 #         Sorting out the themes                  #
 ###################################################
 
-EnumerateObjects(theme "${CMAKE_CURRENT_SOURCE_DIR}/themes" InjectThemeImplementation)
+set(ALL_THEMES "")
+EnumerateObjects(theme "${CMAKE_CURRENT_SOURCE_DIR}/themes" ALL_THEMES InjectThemeImplementation)
 
 ###################################################
 #         Sorting out the graphic engines         #
 ###################################################
 
-EnumerateObjects(rendering_engine "${CMAKE_CURRENT_SOURCE_DIR}/rendering_engines" )
+set(ALL_RENDERING_ENGINES "")
+EnumerateObjects(rendering_engine "${CMAKE_CURRENT_SOURCE_DIR}/rendering_engines" ALL_RENDERING_ENGINES)
 
 ###################################################
 #         Sorting out the input providers         #
 ###################################################
 
-EnumerateObjects(input_provider "${CMAKE_CURRENT_SOURCE_DIR}/input_providers" )
+set(ALL_INPUT_PROVIDERS "")
+EnumerateObjects(input_provider "${CMAKE_CURRENT_SOURCE_DIR}/input_providers" ALL_INPUT_PROVIDERS)
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

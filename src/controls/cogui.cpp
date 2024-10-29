@@ -54,14 +54,26 @@ void handler(int sig)
   exit(1);
 }
 
-void cogui::init(int /*argc*/, char* /*argv*/ [], const std::string& theme)
+extern std::string g_s_theme_name;
+extern std::string g_s_input_provider_name;
+extern std::string g_s_rendering_engine_name;
+
+extern std::vector<std::string> g_s_all_themes;
+extern std::vector<std::string> g_s_all_rendering_engines;
+extern std::vector<std::string> g_s_all_input_providers;
+
+void cogui::init(int argc, char* argv [])
 {
+    cogui::extension_manager::init(argc, argv);
+
     signal(SIGWINCH, do_resize);
     signal(SIGSEGV, handler);
     signal(SIGINT, handler);
 
-    cogui::desktop::init(theme);
+    cogui::desktop::init(g_);
     cogui::desktop::get();
+
+
 }
 
 cogui::textflags::operator int() const
