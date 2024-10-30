@@ -114,7 +114,7 @@ void cogui::application::handle_event(cogui::event c)
     }
 }*/
 
-std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::application::handle_command_line(int argc, char *argv[], std::string& theme)
+std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::application::handle_command_line(int argc, char *argv[])
 {
     std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments;
     std::string current_flag;
@@ -132,7 +132,7 @@ std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::
         {
             if(i + 1 < argc)
             {
-                theme = argv[i + 1];
+                std::string theme = argv[i + 1];
                 i++;
                 continue;
             }

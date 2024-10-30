@@ -1,0 +1,8 @@
+{
+	"rendering_engine": {
+		"name": "ncurses_rendering_engine",
+		"mode": "console",
+		"library": "ncurses_rendering_engine",
+		"platform": "linux"
+	}
+}

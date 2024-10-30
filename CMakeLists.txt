@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 project(cogui)
 
 set (CMAKE_CXX_STANDARD 20)
-
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXTRA_DEBUG 0)
 
 include(cmake/cogui.cmake)
@@ -54,4 +54,5 @@ add_subdirectory(src)
 # Test app
 #
 add_executable(cogui_ex main.cpp)
+
 target_link_libraries(cogui_ex cogui_controls)

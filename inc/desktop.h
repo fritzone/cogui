@@ -63,7 +63,7 @@ private:
     bool initialize();
 
     std::shared_ptr<cogui::theme> m_theme;
-    std::shared_ptr<cogui::rendering_engine> m_graphics;
+    std::shared_ptr<cogui::rendering_engine> m_rendering_engine;
 	std::shared_ptr<cogui::input_provider> m_input;
 
     std::vector<window*> m_windows;

@@ -9,7 +9,7 @@ typedef struct _win_st WINDOW;
 
 namespace cogui {
 
-namespace graphic_engines {
+namespace rendering_engines {
 
 struct frame final
 {
@@ -32,11 +32,11 @@ struct frame final
 
 };
 
-class ncurses : public rendering_engine
+class ncurses_rendering_engine : public rendering_engine
 {
 public:
 
-    virtual ~ncurses();
+    virtual ~ncurses_rendering_engine();
 
     bool initialize() override;
     void shutdown() override;

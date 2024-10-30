@@ -3,6 +3,7 @@
 
 #include "cogui.h"
 #include "rect.h"
+#include "extension.h"
 
 #include <string>
 #include <functional>
@@ -22,7 +23,7 @@ namespace cogui
  *
  * In case a graphic engine does not support nor require double buffering just leave those methods empty.
  */
-class rendering_engine
+class rendering_engine : public extension
 {
 public:
 

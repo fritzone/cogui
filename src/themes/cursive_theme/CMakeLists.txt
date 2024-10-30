@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(cursive)
+project(cursive_theme)
 
 include(cmake/FindCursesW.cmake)
 
@@ -15,4 +15,4 @@ add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/cursive.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} pthread dl cogui)
+target_link_libraries(${PROJECT_NAME} pthread dl)

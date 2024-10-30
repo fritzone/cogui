@@ -8,16 +8,7 @@
 static auto t_start = std::chrono::high_resolution_clock::now();
 static cogui::mouse::button last_button = cogui::mouse::button::none;
 
-
-extern "C" cogui::input_provider* create()
-{
-//    return nullptr;
-    if(!XOpenDisplay(NULL)) return nullptr;
-	return static_cast<cogui::input_provider*>(new cogui::input_providers::termkey_input);
-}
-
-
-std::map<TermKeySym, cogui::events::key_class> cogui::input_providers::termkey_input::m_keymap =
+std::map<TermKeySym, cogui::events::key_class> cogui::input_providers::termkey_input_provider::m_keymap =
 {
     {TERMKEY_SYM_UP, cogui::events::key_class::key_up},
     {TERMKEY_SYM_DOWN, cogui::events::key_class::key_down},
@@ -51,8 +42,10 @@ std::map<TermKeySym, cogui::events::key_class> cogui::input_providers::termkey_i
 
 };
 
-bool cogui::input_providers::termkey_input::init()
+bool cogui::input_providers::termkey_input_provider::init()
 {
+    if(!XOpenDisplay(NULL)) return false;
+
     TERMKEY_CHECK_VERSION;
     tk = termkey_new(0, TERMKEY_FLAG_SPACESYMBOL|TERMKEY_FLAG_CTRLC);
     if(!tk) {
@@ -70,7 +63,7 @@ bool cogui::input_providers::termkey_input::init()
     return true;
 }
 
-std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termkey_input::get_next_event()
+std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termkey_input_provider::get_next_event()
 {
     std::vector<std::shared_ptr<cogui::events::event>> result;
 
@@ -233,7 +226,7 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
     return result;
 }
 
-bool cogui::input_providers::termkey_input::shutdown()
+bool cogui::input_providers::termkey_input_provider::shutdown()
 {
     printf("\033[?1003l\n");
     printf("\033[?9l\n");
@@ -243,7 +236,7 @@ bool cogui::input_providers::termkey_input::shutdown()
 	return true;
 }
 
-std::string cogui::input_providers::termkey_input::name() const
+std::string cogui::input_providers::termkey_input_provider::name() const
 {
 	return "termkey";
 }

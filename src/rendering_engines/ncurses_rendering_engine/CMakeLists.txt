@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(ncurses_engine)
+project(ncurses_rendering_engine)
 
 include(cmake/FindCursesW.cmake)
 

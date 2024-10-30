@@ -29,6 +29,7 @@
 #include "cogui.h"
 
 #include "ncurses.h"
+#include "extension_manager.h"
 
 using namespace cogui;
 
@@ -54,23 +55,15 @@ void handler(int sig)
   exit(1);
 }
 
-extern std::string g_s_theme_name;
-extern std::string g_s_input_provider_name;
-extern std::string g_s_rendering_engine_name;
-
-extern std::vector<std::string> g_s_all_themes;
-extern std::vector<std::string> g_s_all_rendering_engines;
-extern std::vector<std::string> g_s_all_input_providers;
-
 void cogui::init(int argc, char* argv [])
 {
-    cogui::extension_manager::init(argc, argv);
+    cogui::extension::init(argc, argv);
 
     signal(SIGWINCH, do_resize);
     signal(SIGSEGV, handler);
     signal(SIGINT, handler);
 
-    cogui::desktop::init(g_);
+    cogui::desktop::init(g_s_theme_name);
     cogui::desktop::get();
 
 

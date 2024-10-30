@@ -48,12 +48,9 @@ class extension_manager final
 public:
 
     /**
-     * @brief init will initialize the extension manager, ie. identify the libraries
-     * @param argc
-     * @param argv
+     * @brief instance returns the instance
+     * @return
      */
-    static init(int argc, char* argv []);
-
     static extension_manager<T>& instance()
     {
         static extension_manager<T> i;

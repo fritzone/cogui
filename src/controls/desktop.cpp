@@ -7,20 +7,18 @@
 #include "window.h"
 
 #include <algorithm>
+#include <factory.h>
 #include "log.h"
-
-
-
 
 namespace cogui
 {
 
-desktop::desktop() : m_theme( g_s_theme_name.empty() ? theme_manager::instance().current_loadable() : theme_manager::instance().get_loadable(g_s_theme_name)),
-                     m_graphics(g_s_rendering_engine_name.empty() ? rendering_engine_manager::instance().current_loadable() : rendering_engine_manager::instance().get_loadable(g_s_rendering_engine_name)),
-                     m_input( g_s_input_provider_name .empty() ? input_provider_manager::instance().current_loadable() :input_provider_manager::instance().get_loadable(g_s_input_provider_name)  )
+desktop::desktop() : m_theme( Factory<theme>::getInstance().create(g_s_theme_name) ),
+                     m_rendering_engine( Factory<rendering_engine>::getInstance().create(g_s_rendering_engine_name)),
+                     m_input( Factory<input_provider>::getInstance().create(g_s_input_provider_name) )
 {
     log_info() << "Picking theme:" << m_theme->name();
-    log_info() << "Picking graphics engine:" << m_graphics->name();
+    log_info() << "Picking graphics engine:" << m_rendering_engine->name();
 	log_info() << "Picking input provider engine:" << m_input->name();
 }
 
@@ -36,12 +34,12 @@ bool desktop::initialize()
     // do not change the order, input provider needs to be initialized first
     b &= m_input->init();
 
-    b &= m_graphics->initialize();
+    b &= m_rendering_engine->initialize();
 
     if(b)
     {
-        m_graphics->refresh_screen();
-        m_graphics->set_rendering_function(renderer);
+        m_rendering_engine->refresh_screen();
+        m_rendering_engine->set_rendering_function(renderer);
     }
     return b;
 }
@@ -224,7 +222,7 @@ std::shared_ptr<theme> desktop::get_theme() const
 
 std::shared_ptr<rendering_engine> desktop::get_graphics() const
 {
-    return m_graphics;
+    return m_rendering_engine;
 }
 
 std::shared_ptr<input_provider> desktop::get_input() const
@@ -266,20 +264,20 @@ void desktop::clear()
 
 void desktop::shutdown()
 {
-    m_graphics->shutdown();
+    m_rendering_engine->shutdown();
     m_input->shutdown();
 }
 
 void desktop::resize()
 {
-    m_graphics->shutdown();
-    m_graphics->initialize();
-    m_graphics->refresh_screen();
+    m_rendering_engine->shutdown();
+    m_rendering_engine->initialize();
+    m_rendering_engine->refresh_screen();
 }
 
-int desktop::get_width() const {return m_graphics->get_screen_width();}
+int desktop::get_width() const {return m_rendering_engine->get_screen_width();}
 
-int desktop::get_height() const {return m_graphics->get_screen_height();}
+int desktop::get_height() const {return m_rendering_engine->get_screen_height();}
 
 void desktop::redraw()
 {

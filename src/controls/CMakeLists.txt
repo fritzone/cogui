@@ -4,6 +4,7 @@ set(PROJECT_SOURCES
         ${CMAKE_BINARY_DIR}/themes.cpp
         ${CMAKE_BINARY_DIR}/rendering_engines.cpp
         ${CMAKE_BINARY_DIR}/input_providers.cpp
+        ${CMAKE_BINARY_DIR}/extension_manager.cpp
 
     cogui.cpp dynamic_library.cpp
     window.cpp desktop.cpp
@@ -13,7 +14,8 @@ set(PROJECT_SOURCES
 
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
-set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
+
+message("all extensions: ${ALL_THEMES} ${ALL_RENDERING_ENGINES} ${ALL_INPUT_PROVIDERS}")
 
 target_link_libraries(${PROJECT_NAME} dl cogui_mouse cogui_logger ${ALL_THEMES} ${ALL_RENDERING_ENGINES} ${ALL_INPUT_PROVIDERS})

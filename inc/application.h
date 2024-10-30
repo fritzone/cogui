@@ -35,7 +35,7 @@ public:
         try
         {
             log_info() << "application constructing or something";
-            std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments = handle_command_line(argc, argv, theme);
+            std::map<std::string, std::shared_ptr<arguments::argument_base>> gathered_arguments = handle_command_line(argc, argv);
 			auto loop = [&gathered_arguments] (auto && input)
             {
                 for(auto&[key, value] : gathered_arguments)
@@ -85,7 +85,7 @@ public:
 
 private:
     //void handle_event(cogui::event c);
-    std::map<std::string, std::shared_ptr<arguments::argument_base>> handle_command_line(int argc, char*argv[], std::string &theme);
+    std::map<std::string, std::shared_ptr<arguments::argument_base>> handle_command_line(int argc, char*argv[]);
 
     template<typename ... Args>
     void print_help( Args&&... args )

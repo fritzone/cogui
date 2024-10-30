@@ -1,4 +1,4 @@
-#include "cursive.h"
+#include "cursive_theme.h"
 #include "cogui.h"
 
 #include <variant>
@@ -6,15 +6,15 @@
 
 extern "C" cogui::theme* create()
 {
-    return static_cast<cogui::theme*>(new cogui::themes::cursive);
+    return static_cast<cogui::theme*>(new cogui::themes::cursive_theme);
 }
 
-void cogui::themes::cursive::clear(const cogui::control &c)
+void cogui::themes::cursive_theme::clear(const cogui::control &c)
 {
     cogui::graphics()->clear_area(c.get_x(), c.get_y(), c.get_width() + 2, c.get_height());
 }
 
-void cogui::themes::cursive::draw_window(const cogui::window &w)
+void cogui::themes::cursive_theme::draw_window(const cogui::window &w)
 {
     if(!w.is_visible())
     {
@@ -182,7 +182,7 @@ void cogui::themes::cursive::draw_window(const cogui::window &w)
 
 }
 
-void cogui::themes::cursive::draw_button(const cogui::button &b)
+void cogui::themes::cursive_theme::draw_button(const cogui::button &b)
 {
 
     if(!b.is_visible())
@@ -291,7 +291,7 @@ void cogui::themes::cursive::draw_button(const cogui::button &b)
     }
 }
 
-void cogui::themes::cursive::draw_menu(const cogui::menu &m)
+void cogui::themes::cursive_theme::draw_menu(const cogui::menu &m)
 {
     int drawHeight = m.getHeight();
     int drawWidth = m.getWidth();
@@ -385,7 +385,7 @@ void cogui::themes::cursive::draw_menu(const cogui::menu &m)
     }
 }
 
-void cogui::themes::cursive::draw_checkbox(const checkbox &c)
+void cogui::themes::cursive_theme::draw_checkbox(const checkbox &c)
 {
     if(!c.is_visible())
     {
@@ -422,7 +422,7 @@ void cogui::themes::cursive::draw_checkbox(const checkbox &c)
     }
 }
 
-void cogui::themes::cursive::draw_scrollbar(const scrollbar &s)
+void cogui::themes::cursive_theme::draw_scrollbar(const scrollbar &s)
 {
     control* c = s.get_parent();
     if(!c)
@@ -444,7 +444,7 @@ void cogui::themes::cursive::draw_scrollbar(const scrollbar &s)
 
 }
 
-void cogui::themes::cursive::draw_radiobutton(const cogui::radiobutton &rb)
+void cogui::themes::cursive_theme::draw_radiobutton(const cogui::radiobutton &rb)
 {
 	if(!rb.is_visible())
 	{
@@ -481,7 +481,7 @@ void cogui::themes::cursive::draw_radiobutton(const cogui::radiobutton &rb)
 	}
 }
 
-void cogui::themes::cursive::draw_radiobutton_group(const cogui::radiobutton_group &rbg)
+void cogui::themes::cursive_theme::draw_radiobutton_group(const cogui::radiobutton_group &rbg)
 {
 	if(!rbg.is_visible())
 	{
@@ -523,27 +523,27 @@ void cogui::themes::cursive::draw_radiobutton_group(const cogui::radiobutton_gro
 	}
 }
 
-int cogui::themes::cursive::minimum_checkbox_width(const cogui::checkbox &c)
+int cogui::themes::cursive_theme::minimum_checkbox_width(const cogui::checkbox &c)
 {
     return c.get_title().length() + 2; // +2 for the checkmarek followed by a space
 }
 
-int cogui::themes::cursive::minimum_checkbox_height(const cogui::checkbox &)
+int cogui::themes::cursive_theme::minimum_checkbox_height(const cogui::checkbox &)
 {
     return 1;
 }
 
-int cogui::themes::cursive::minimum_button_width(const cogui::button &b)
+int cogui::themes::cursive_theme::minimum_button_width(const cogui::button &b)
 {
     return b.get_title().length() + 2; // +2 for the beginning and ending lines
 }
 
-int cogui::themes::cursive::minimum_button_height(const cogui::button&)
+int cogui::themes::cursive_theme::minimum_button_height(const cogui::button&)
 {
     return 2; // topline = 0 + text = 1 + bottomline = 2
 }
 
-int cogui::themes::cursive::minimum_window_width(const cogui::window &w)
+int cogui::themes::cursive_theme::minimum_window_width(const cogui::window &w)
 {
     return w.get_title().length() + (w.get_title().length() > 0? WND_TITLE_DELIM_LEFT.length() + WND_TITLE_DELIM_RIGHT.length() : 0) +
             (w.has_sysmenu_button() ? WND_SYSMENU.length() : 0) +
@@ -552,32 +552,32 @@ int cogui::themes::cursive::minimum_window_width(const cogui::window &w)
             ;
 }
 
-int cogui::themes::cursive::minimum_window_height(const cogui::window &)
+int cogui::themes::cursive_theme::minimum_window_height(const cogui::window &)
 {
 	return 3; // top line + content line + bottomline
 }
 
-int cogui::themes::cursive::minimum_radiobutton_width(const cogui::radiobutton &r)
+int cogui::themes::cursive_theme::minimum_radiobutton_width(const cogui::radiobutton &r)
 {
 	return r.get_title().length() + 2; // +2 for the circle  followed by a space
 }
 
-int cogui::themes::cursive::minimum_radiobutton_height(const cogui::radiobutton&)
+int cogui::themes::cursive_theme::minimum_radiobutton_height(const cogui::radiobutton&)
 {
 	return 1;
 }
 
-int cogui::themes::cursive::minimum_radiobutton_group_width(const cogui::radiobutton_group &c)
+int cogui::themes::cursive_theme::minimum_radiobutton_group_width(const cogui::radiobutton_group &c)
 {
 	return c.calculate_width();
 }
 
-int cogui::themes::cursive::minimum_radiobutton_group_height(const cogui::radiobutton_group &c)
+int cogui::themes::cursive_theme::minimum_radiobutton_group_height(const cogui::radiobutton_group &c)
 {
 	return c.calculate_height();
 }
 
-int cogui::themes::cursive::first_available_row(const cogui::window &w)
+int cogui::themes::cursive_theme::first_available_row(const cogui::window &w)
 {
     if(w.has_menubar()) return 3;
     return 1;
@@ -585,12 +585,12 @@ int cogui::themes::cursive::first_available_row(const cogui::window &w)
 
 
 
-std::string cogui::themes::cursive::name()
+std::string cogui::themes::cursive_theme::name()
 {
 	return "cursive";
 }
 
-void cogui::themes::cursive::draw_horizontal_scrollbar(cogui::control *c, cogui::scrollbar &s)
+void cogui::themes::cursive_theme::draw_horizontal_scrollbar(cogui::control *c, cogui::scrollbar &s)
 {
     int x = c->get_x();
     int h = c->get_height();
@@ -619,7 +619,7 @@ void cogui::themes::cursive::draw_horizontal_scrollbar(cogui::control *c, cogui:
     cogui::graphics()->set_bg_color(color::black);
 }
 
-void cogui::themes::cursive::draw_verticall_scrollbar(cogui::control *c, cogui::scrollbar &s)
+void cogui::themes::cursive_theme::draw_verticall_scrollbar(cogui::control *c, cogui::scrollbar &s)
 {
     int x = c->get_x();
     int w = c->get_width();

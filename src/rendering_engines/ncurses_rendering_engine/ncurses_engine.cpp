@@ -3,7 +3,7 @@
 
 #define MAX_DESKTOP_SIZE 4096
 
-#include "ncurses_engine.h"
+#include "ncurses_rendering_engine.h"
 #include "events.h"
 #include "mouse.h"
 #include "cogui.h"
@@ -17,13 +17,6 @@
 #include <pthread.h>
 
 #include "log.h"
-
-
-extern "C" cogui::rendering_engine* create()
-{
-    return static_cast<cogui::rendering_engine*>(new cogui::graphic_engines::ncurses);
-}
-
 
 namespace {
 // code, index, foreground, background
@@ -97,7 +90,7 @@ const std::map<int, std::tuple<int, int, int>> colorpairs =
 
 }
 
-cogui::graphic_engines::ncurses::~ncurses()
+cogui::rendering_engines::ncurses_rendering_engine::~ncurses_rendering_engine()
 {
     log_info() << "Shutting down ncurses";
     delete buffers[0];
@@ -105,7 +98,7 @@ cogui::graphic_engines::ncurses::~ncurses()
     shutdown();
 }
 
-bool cogui::graphic_engines::ncurses::initialize()
+bool cogui::rendering_engines::ncurses_rendering_engine::initialize()
 {
     setenv("TERM", "xterm", 1);
     std::setlocale(LC_ALL, "");
@@ -146,7 +139,7 @@ bool cogui::graphic_engines::ncurses::initialize()
     return true;
 }
 
-void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, int flags)
+void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y, const wchar_t *s, int flags)
 {
 
     if(flags & textflags::v_title)
@@ -204,7 +197,7 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t *s, 
     //mvwaddwstr(stdscr, y, x, s);
 }
 
-void cogui::graphic_engines::ncurses::draw_text(int x, int y, wchar_t c, int flags)
+void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y, wchar_t c, int flags)
 {
     std::wstring b;
     b += c;
@@ -213,28 +206,28 @@ void cogui::graphic_engines::ncurses::draw_text(int x, int y, wchar_t c, int fla
     //mvwaddch(stdscr, y, x, c | flags);
 }
 
-void cogui::graphic_engines::ncurses::set_fg_color(const color &c)
+void cogui::rendering_engines::ncurses_rendering_engine::set_fg_color(const color &c)
 {
     m_currentFgColor = c;
 }
 
-void cogui::graphic_engines::ncurses::set_bg_color(const color &c)
+void cogui::rendering_engines::ncurses_rendering_engine::set_bg_color(const color &c)
 {
     m_currentBgColor = c;
 }
 
-void cogui::graphic_engines::ncurses::set_colors(const color &fg, const color &bg)
+void cogui::rendering_engines::ncurses_rendering_engine::set_colors(const color &fg, const color &bg)
 {
     m_currentBgColor = bg;
     m_currentFgColor = fg;
 }
 
-std::string cogui::graphic_engines::ncurses::name() const
+std::string cogui::rendering_engines::ncurses_rendering_engine::name() const
 {
     return "ncurses";
 }
 
-void cogui::graphic_engines::ncurses::clear_area(int x, int y, int width, int height)
+void cogui::rendering_engines::ncurses_rendering_engine::clear_area(int x, int y, int width, int height)
 {
     for(int rc = y; rc <= y + height; rc++)
     {
@@ -242,7 +235,7 @@ void cogui::graphic_engines::ncurses::clear_area(int x, int y, int width, int he
     }
 }
 
-bool cogui::graphic_engines::ncurses::start_rendering()
+bool cogui::rendering_engines::ncurses_rendering_engine::start_rendering()
 {
     present_scene();
     swap_buffers();
@@ -250,19 +243,19 @@ bool cogui::graphic_engines::ncurses::start_rendering()
     return true;
 }
 
-void cogui::graphic_engines::ncurses::swap_buffers(){
+void cogui::rendering_engines::ncurses_rendering_engine::swap_buffers(){
     currentFrame ^= 1;
     rframe = buffers[currentFrame ^ 1];
     pframe = buffers[currentFrame];
 }
 
-void* cogui::graphic_engines::ncurses::thread_met(void* o)
+void* cogui::rendering_engines::ncurses_rendering_engine::thread_met(void* o)
 {
-	((cogui::graphic_engines::ncurses*)o)->m_renderCallback();
+    ((cogui::rendering_engines::ncurses_rendering_engine*)o)->m_renderCallback();
 	return 0;
 }
 
-void cogui::graphic_engines::ncurses::present_scene()
+void cogui::rendering_engines::ncurses_rendering_engine::present_scene()
 {
 	[[maybe_unused]] int iret;
 	pthread_t thread1;
@@ -276,40 +269,40 @@ void cogui::graphic_engines::ncurses::present_scene()
     }
 }
 
-void cogui::graphic_engines::ncurses::set_rendering_function(std::function<bool ()> rendercb)
+void cogui::rendering_engines::ncurses_rendering_engine::set_rendering_function(std::function<bool ()> rendercb)
 {
     m_renderCallback = rendercb;
 }
 
-void cogui::graphic_engines::ncurses::erase_screen()
+void cogui::rendering_engines::ncurses_rendering_engine::erase_screen()
 {
 	::erase();
 }
 
-void cogui::graphic_engines::ncurses::set_clip_area(const cogui::rect &r)
+void cogui::rendering_engines::ncurses_rendering_engine::set_clip_area(const cogui::rect &r)
 {
 //	log_info() << "clip area:" << r;
 	rframe->set_clip_area(r);
 	pframe->set_clip_area(r);
 }
 
-void cogui::graphic_engines::ncurses::refresh_screen()
+void cogui::rendering_engines::ncurses_rendering_engine::refresh_screen()
 {
     ::refresh();
 }
 
-void cogui::graphic_engines::ncurses::clear_screen()
+void cogui::rendering_engines::ncurses_rendering_engine::clear_screen()
 {
     rframe->clear();
 }
 
-void cogui::graphic_engines::ncurses::shutdown()
+void cogui::rendering_engines::ncurses_rendering_engine::shutdown()
 {
     ::curs_set(1);
     ::endwin();
 }
 
-void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::rendering_engines::ncurses_rendering_engine::draw_title(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     std::wstring final_title;
     wchar_t highlight_char = L'\0';
@@ -350,21 +343,21 @@ void cogui::graphic_engines::ncurses::draw_title(int x, int y, const std::wstrin
     }
 }
 
-void cogui::graphic_engines::ncurses::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
+void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y, const wchar_t* s, cogui::textflags flags)
 {
     draw_text(x, y, s, static_cast<int>(flags));
 }
 
-void cogui::graphic_engines::ncurses::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
+void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y, const std::wstring &s, cogui::textflags flags)
 {
     draw_text(x, y, s.c_str(), flags);
 }
 
-int cogui::graphic_engines::ncurses::get_screen_width() const {return m_width;}
+int cogui::rendering_engines::ncurses_rendering_engine::get_screen_width() const {return m_width;}
 
-int cogui::graphic_engines::ncurses::get_screen_height() const {return m_height;}
+int cogui::rendering_engines::ncurses_rendering_engine::get_screen_height() const {return m_height;}
 
-cogui::graphic_engines::frame::frame(int w, int h)
+cogui::rendering_engines::frame::frame(int w, int h)
 {
     this->width = w;
     this->height = h;
@@ -380,7 +373,7 @@ cogui::graphic_engines::frame::frame(int w, int h)
     clear();
 }
 
-cogui::graphic_engines::frame::~frame()
+cogui::rendering_engines::frame::~frame()
 {
     delete [] bg_colors;
     delete [] fg_colors;
@@ -388,7 +381,7 @@ cogui::graphic_engines::frame::~frame()
     delete []data;
 }
 
-void cogui::graphic_engines::frame::clear()
+void cogui::rendering_engines::frame::clear()
 {
     memset(fg_colors, COLOR_WHITE, sizeof(uint8_t) * width * height);
     memset(bg_colors, COLOR_BLACK, sizeof(uint8_t) * width * height);
@@ -397,7 +390,7 @@ void cogui::graphic_engines::frame::clear()
     memset(data, 0, sizeof(std::wstring) * width * height);
 }
 
-void cogui::graphic_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
+void cogui::rendering_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
 {
 	// are we inside the clip area?
 	if(clip_area.height > 0 && clip_area.width > 0)
@@ -420,7 +413,7 @@ void cogui::graphic_engines::frame::set(int x, int y, std::wstring v, uint8_t fg
 	}
 }
 
-void cogui::graphic_engines::frame::set_clip_area(const cogui::rect &r)
+void cogui::rendering_engines::frame::set_clip_area(const cogui::rect &r)
 {
 	clip_area = r;
 }
@@ -457,7 +450,7 @@ extern "C" const char* unicode_to_utf8(wchar_t c)
     return (const char*)b_static;
 }
 
-void cogui::graphic_engines::frame::print()
+void cogui::rendering_engines::frame::print()
 {
 
     int mx = mouse::get().x();
@@ -507,8 +500,8 @@ void cogui::graphic_engines::frame::print()
 
 
 namespace cogui {
-namespace graphic_engines {
-WINDOW *ncurses::getStdscr() const
+namespace rendering_engines {
+WINDOW *ncurses_rendering_engine::getStdscr() const
 {
     return stdscr;
 }

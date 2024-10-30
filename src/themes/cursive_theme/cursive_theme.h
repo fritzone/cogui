@@ -20,7 +20,7 @@ namespace themes {
 /**
  * @brief The cursive class is the example class for a console based theme
  */
-class cursive final : public ::cogui::theme
+class cursive_theme final : public ::cogui::theme
 {
     /******************************************************************************************************************/
     /*                                                      WINDOW                                                    */
@@ -161,8 +161,8 @@ class cursive final : public ::cogui::theme
 
 public:
 
-    cursive() = default;
-    ~cursive() override = default;
+    cursive_theme() = default;
+    ~cursive_theme() override = default;
 
     void clear(const control& c) override;
 

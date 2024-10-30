@@ -7,6 +7,7 @@
 
 #include "rect.h"
 #include "desktop.h"
+#include "extension.h"
 
 namespace cogui
 {
@@ -20,7 +21,7 @@ class checkbox;
 class radiobutton;
 class radiobutton_group;
 
-class theme
+class theme : public extension
 {
 public:
 
