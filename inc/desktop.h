@@ -33,9 +33,9 @@ public:
 
     bool handle_key(std::shared_ptr<cogui::events::keypress> k);
 
-	std::shared_ptr<theme> get_theme() const;
-	std::shared_ptr<rendering_engine> get_graphics() const;
-	std::shared_ptr<input_provider> get_input() const;
+    theme *get_theme() const;
+    rendering_engine *get_graphics() const;
+    input_provider *get_input() const;
 	const std::vector<window *>& get_windows() const;
 	int get_width() const;
 	int get_height() const;
@@ -62,9 +62,9 @@ private:
     ~desktop();
     bool initialize();
 
-    std::shared_ptr<cogui::theme> m_theme;
-    std::shared_ptr<cogui::rendering_engine> m_rendering_engine;
-	std::shared_ptr<cogui::input_provider> m_input;
+    cogui::theme* m_theme;
+    cogui::rendering_engine* m_rendering_engine;
+    cogui::input_provider* m_input;
 
     std::vector<window*> m_windows;
     window* m_captured_window = nullptr;

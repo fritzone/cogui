@@ -8,7 +8,11 @@ cogui::action::Checked::argument cogui::action::checked;
 
 cogui::action::~action()
 {
-    sig_on_trigger.disconnect(this, m_conn.get(), true);
+    if(!is_separator())
+    {
+        log_info() << "Disconnecting:" << m_title;
+        sig_on_trigger.disconnect(this, m_conn.get(), true);
+    }
 }
 
 cogui::action::action(const cogui::action &o)

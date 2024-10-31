@@ -2,6 +2,7 @@
 #define INPUT_PROVIDER_H
 
 #include "events.h"
+#include "extension.h"
 #include <termkey.h>
 
 #include <vector>
@@ -15,7 +16,7 @@ namespace cogui {
 /**
  * @brief The input class is a basic class that will deal with the user input (keyboard/mouse)
  */
-class input_provider
+class input_provider : public extension
 {
 public:
 

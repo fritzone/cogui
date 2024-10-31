@@ -10,6 +10,7 @@ set(PROJECT_SOURCES
     window.cpp desktop.cpp
     application.cpp events.cpp arguments.cpp action.cpp menubar.cpp key.cpp
     control.cpp button.cpp container.cpp layout.cpp menu.cpp checkbox.cpp radiobutton.cpp radiobutton_group.cpp scrollbar.cpp
+    theme_impl.cpp
 )
 
 

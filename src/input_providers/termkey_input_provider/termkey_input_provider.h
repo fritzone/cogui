@@ -13,7 +13,8 @@ class termkey_input_provider : public cogui::input_provider
 {
 public:
     termkey_input_provider() = default;
-    ~termkey_input_provider() = default;
+    virtual ~termkey_input_provider();
+
     bool init() override;
     bool shutdown() override;
 	std::string name() const override;

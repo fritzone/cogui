@@ -3,54 +3,56 @@
 #include <string.h>
 #include <log.h>
 #include <mouse.h>
-#include <X11/Xlib.h>
 
 static auto t_start = std::chrono::high_resolution_clock::now();
 static cogui::mouse::button last_button = cogui::mouse::button::none;
 
 std::map<TermKeySym, cogui::events::key_class> cogui::input_providers::termkey_input_provider::m_keymap =
-{
-    {TERMKEY_SYM_UP, cogui::events::key_class::key_up},
-    {TERMKEY_SYM_DOWN, cogui::events::key_class::key_down},
-    {TERMKEY_SYM_LEFT, cogui::events::key_class::key_left},
-    {TERMKEY_SYM_RIGHT, cogui::events::key_class::key_right},
-    {TERMKEY_SYM_ESCAPE, cogui::events::key_class::key_escape},
-    {TERMKEY_SYM_ENTER, cogui::events::key_class::key_return},
-    {TERMKEY_SYM_TAB, cogui::events::key_class::key_tab},
-    {TERMKEY_SYM_INSERT, cogui::events::key_class::key_insert},
-    {TERMKEY_SYM_DELETE, cogui::events::key_class::key_delete},
-    {TERMKEY_SYM_HOME, cogui::events::key_class::key_home},
-    {TERMKEY_SYM_END, cogui::events::key_class::key_end},
-    {TERMKEY_SYM_PAGEUP, cogui::events::key_class::key_pgup},
-    {TERMKEY_SYM_PAGEDOWN, cogui::events::key_class::key_pgdn},
-    {TERMKEY_SYM_BACKSPACE, cogui::events::key_class::key_backspace},
-    {TERMKEY_SYM_KPDIV, cogui::events::key_class::key_kp_div},
-    {TERMKEY_SYM_KPMULT, cogui::events::key_class::key_kp_mul},
-    {TERMKEY_SYM_KPMINUS, cogui::events::key_class::key_kp_minus},
-    {TERMKEY_SYM_KPPLUS, cogui::events::key_class::key_kp_plus},
-    {TERMKEY_SYM_KPENTER, cogui::events::key_class::key_kp_enter},
-    {TERMKEY_SYM_KP0, cogui::events::key_class::key_kp_0},
-    {TERMKEY_SYM_KP1, cogui::events::key_class::key_kp_1},
-    {TERMKEY_SYM_KP2, cogui::events::key_class::key_kp_2},
-    {TERMKEY_SYM_KP3, cogui::events::key_class::key_kp_3},
-    {TERMKEY_SYM_KP4, cogui::events::key_class::key_kp_4},
-    {TERMKEY_SYM_KP5, cogui::events::key_class::key_kp_5},
-    {TERMKEY_SYM_KP6, cogui::events::key_class::key_kp_6},
-    {TERMKEY_SYM_KP7, cogui::events::key_class::key_kp_7},
-    {TERMKEY_SYM_KP8, cogui::events::key_class::key_kp_8},
-    {TERMKEY_SYM_KP9, cogui::events::key_class::key_kp_9}
+    {
+        {TERMKEY_SYM_UP, cogui::events::key_class::key_up},
+        {TERMKEY_SYM_DOWN, cogui::events::key_class::key_down},
+        {TERMKEY_SYM_LEFT, cogui::events::key_class::key_left},
+        {TERMKEY_SYM_RIGHT, cogui::events::key_class::key_right},
+        {TERMKEY_SYM_ESCAPE, cogui::events::key_class::key_escape},
+        {TERMKEY_SYM_ENTER, cogui::events::key_class::key_return},
+        {TERMKEY_SYM_TAB, cogui::events::key_class::key_tab},
+        {TERMKEY_SYM_INSERT, cogui::events::key_class::key_insert},
+        {TERMKEY_SYM_DELETE, cogui::events::key_class::key_delete},
+        {TERMKEY_SYM_HOME, cogui::events::key_class::key_home},
+        {TERMKEY_SYM_END, cogui::events::key_class::key_end},
+        {TERMKEY_SYM_PAGEUP, cogui::events::key_class::key_pgup},
+        {TERMKEY_SYM_PAGEDOWN, cogui::events::key_class::key_pgdn},
+        {TERMKEY_SYM_BACKSPACE, cogui::events::key_class::key_backspace},
+        {TERMKEY_SYM_KPDIV, cogui::events::key_class::key_kp_div},
+        {TERMKEY_SYM_KPMULT, cogui::events::key_class::key_kp_mul},
+        {TERMKEY_SYM_KPMINUS, cogui::events::key_class::key_kp_minus},
+        {TERMKEY_SYM_KPPLUS, cogui::events::key_class::key_kp_plus},
+        {TERMKEY_SYM_KPENTER, cogui::events::key_class::key_kp_enter},
+        {TERMKEY_SYM_KP0, cogui::events::key_class::key_kp_0},
+        {TERMKEY_SYM_KP1, cogui::events::key_class::key_kp_1},
+        {TERMKEY_SYM_KP2, cogui::events::key_class::key_kp_2},
+        {TERMKEY_SYM_KP3, cogui::events::key_class::key_kp_3},
+        {TERMKEY_SYM_KP4, cogui::events::key_class::key_kp_4},
+        {TERMKEY_SYM_KP5, cogui::events::key_class::key_kp_5},
+        {TERMKEY_SYM_KP6, cogui::events::key_class::key_kp_6},
+        {TERMKEY_SYM_KP7, cogui::events::key_class::key_kp_7},
+        {TERMKEY_SYM_KP8, cogui::events::key_class::key_kp_8},
+        {TERMKEY_SYM_KP9, cogui::events::key_class::key_kp_9}
 
 };
 
+cogui::input_providers::termkey_input_provider::~termkey_input_provider()
+{
+    log_info() << "Termkey shutting down";
+}
+
 bool cogui::input_providers::termkey_input_provider::init()
 {
-    if(!XOpenDisplay(NULL)) return false;
-
     TERMKEY_CHECK_VERSION;
     tk = termkey_new(0, TERMKEY_FLAG_SPACESYMBOL|TERMKEY_FLAG_CTRLC);
     if(!tk) {
-      fprintf(stderr, "Cannot allocate termkey instance\n");
-      exit(1);
+        log_emergency() << "Cannot allocate termkey instance";
+        exit(1);
     }
 
     // mouse movement reported too
@@ -126,15 +128,15 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
                 }
             }
             else
-            if(last_button == cogui::mouse::button::right)
-            {
-                log_debug() << "Event Type: RIGHT UP at " <<  col - 1 << "," << line - 1;
-                result.push_back(cogui::events::event::create<cogui::events::mouse_right_up>(col-1, line-1));
-            }
-            else    // just move around, strangely the plain move is reported as release
-            {
-                result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
-            }
+                if(last_button == cogui::mouse::button::right)
+                {
+                    log_debug() << "Event Type: RIGHT UP at " <<  col - 1 << "," << line - 1;
+                    result.push_back(cogui::events::event::create<cogui::events::mouse_right_up>(col-1, line-1));
+                }
+                else    // just move around, strangely the plain move is reported as release
+                {
+                    result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
+                }
 
 
             last_button = cogui::mouse::button::none;
@@ -144,7 +146,6 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
         {
             result.push_back(cogui::events::event::create<cogui::events::mouse_move>(col-1, line-1));
         }
-
     }
     else
     {
@@ -160,8 +161,8 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
         if(key.type == TERMKEY_TYPE_UNICODE)
         {
             result.push_back(cogui::events::event::create<cogui::events::keypress>(cogui::events::key_class::key_textinput,
-                                                                              alt_press, shift_press, ctrl_press,
-                                                                              cogui::utils::std2ws(key.utf8)));
+                                                                                   alt_press, shift_press, ctrl_press,
+                                                                                   cogui::utils::std2ws(key.utf8)));
         }
         else
         if(key.type == TERMKEY_TYPE_KEYSYM)
@@ -170,8 +171,8 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
             {
                 log_info() << "Got a symbol key" << buffer;
                 result.push_back(cogui::events::event::create<cogui::events::keypress>(m_keymap[key.code.sym],
-                                                                                  alt_press, shift_press, ctrl_press,
-                                                                                  cogui::utils::std2ws(buffer)));
+                                                                                       alt_press, shift_press, ctrl_press,
+                                                                                       cogui::utils::std2ws(buffer)));
             }
         }
         else
@@ -202,8 +203,8 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
             if(function_keys.find(buffer) != function_keys.end())
             {
                 result.push_back(cogui::events::event::create<cogui::events::keypress>(function_keys.at(buffer),
-                                                                                  alt_press, shift_press, ctrl_press,
-                                                                                  cogui::utils::std2ws(buffer)));
+                                                                                       alt_press, shift_press, ctrl_press,
+                                                                                       cogui::utils::std2ws(buffer)));
             }
             else // function key + modifier
             {
@@ -215,8 +216,8 @@ std::vector<std::shared_ptr<cogui::events::event>> cogui::input_providers::termk
                         *(strchr(buffer, '-') + 1) = 'f';
                     }
                     result.push_back(cogui::events::event::create<cogui::events::keypress>(function_keys.at(F),
-                                                                                      alt_press, shift_press, ctrl_press,
-                                                                                      cogui::utils::std2ws(buffer)));
+                                                                                           alt_press, shift_press, ctrl_press,
+                                                                                           cogui::utils::std2ws(buffer)));
                 }
 
             }
@@ -233,10 +234,10 @@ bool cogui::input_providers::termkey_input_provider::shutdown()
     termkey_destroy(tk);
     curs_set(prev_curs);
 
-	return true;
+    return true;
 }
 
 std::string cogui::input_providers::termkey_input_provider::name() const
 {
-	return "termkey";
+    return "termkey";
 }

@@ -19,7 +19,7 @@ namespace cogui {
      * @brief graphics will return the current graphics engine.
      * @return the current graphics engine
      */
-    std::shared_ptr<rendering_engine> graphics();
+    rendering_engine* graphics();
 
     class color
     {

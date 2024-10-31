@@ -215,17 +215,17 @@ bool desktop::handle_key(std::shared_ptr<cogui::events::keypress> k)
 }
 
 
-std::shared_ptr<theme> desktop::get_theme() const
+theme* desktop::get_theme() const
 {
     return m_theme;
 }
 
-std::shared_ptr<rendering_engine> desktop::get_graphics() const
+rendering_engine* desktop::get_graphics() const
 {
     return m_rendering_engine;
 }
 
-std::shared_ptr<input_provider> desktop::get_input() const
+input_provider* desktop::get_input() const
 {
     return m_input;
 }
