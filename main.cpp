@@ -97,9 +97,7 @@ int main( int argc, char* argv[] )
                                 w->set_title(k->get_character());
                            },
                            window::hotkeys = hotkey_associations {
-                               on(F2) = [&](window*){log_info() << "pressed the F2 key";},
-                               on(F4)= [&](window* w){log_info() << "pressed the F4 key"; w->set_title(L"F4 pressed");},
-                               on(Ctrl_Q) = [&](window*){app.exit();}
+                               on(Ctrl_b) = [&](window*){app.exit();}
                            },
                            window::scrollbars = scrollbar::horizontal
                            /*  */

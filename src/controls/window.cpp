@@ -578,9 +578,9 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
     // see if this was one of the hotkeys that were registered
     for(const auto& hkh : m_hotkeys)
     {
-        log_debug() << "K=" << k->get_chardata() << " H:" << hkh->k->generator().get_chardata();
+        log_debug() << "K=" << k->get_chardata() << " H:" << hkh->get_key()->generator().get_chardata();
 
-        if(*k == hkh->k->generator())
+        if(*k == hkh->get_key()->generator())
         {
             hkh->handle();
             return true;
