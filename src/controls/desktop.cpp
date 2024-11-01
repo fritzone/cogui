@@ -13,9 +13,9 @@
 namespace cogui
 {
 
-desktop::desktop() : m_theme( Factory<theme>::getInstance().create(g_s_theme_name) ),
-                     m_rendering_engine( Factory<rendering_engine>::getInstance().create(g_s_rendering_engine_name)),
-                     m_input( Factory<input_provider>::getInstance().create(g_s_input_provider_name) )
+desktop::desktop() : m_theme( factory<theme>::instance().create(g_s_theme_name) ),
+                     m_rendering_engine( factory<rendering_engine>::instance().create(g_s_rendering_engine_name)),
+                     m_input( factory<input_provider>::instance().create(g_s_input_provider_name) )
 {
     log_info() << "Picking theme:" << m_theme->name();
     log_info() << "Picking graphics engine:" << m_rendering_engine->name();

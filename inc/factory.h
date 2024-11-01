@@ -1,23 +1,26 @@
 #ifndef _FACTORY_H_
 #define _FACTORY_H_
 
-// Templated Factory class with variadic template support
-template <typename BaseClass>
-class Factory {
+namespace cogui
+{
 
-    struct BuilderBase
+// Templated factory class with variadic template support
+template <typename BaseClass>
+class factory {
+
+    struct builder_base
     {
 
     };
 
     template<typename... Args>
-    struct Builder : BuilderBase
+    struct builder : builder_base
     {
         virtual void* build(Args...) = 0;
     };
 
     template<typename T, typename... Args>
-    struct ConcreteBuilder : public Builder<Args...>, public std::enable_shared_from_this <ConcreteBuilder<T, Args...> >
+    struct concrete_builder : public builder<Args...>, public std::enable_shared_from_this <concrete_builder<T, Args...> >
     {
         virtual void* build(Args... args)
         {
@@ -27,24 +30,25 @@ class Factory {
             ptr.reset(object);
             storage.emplace_back(ptr);
             return static_cast<void*>(object);
-        };
+        }
 
     };
 
 
 public:
-    static Factory& getInstance() {
-        static Factory instance;
+    static factory& instance()
+    {
+        static factory instance;
         return instance;
     }
 
     // Register a class with a specific name
     template <typename DerivedClass, typename ... Args>
-    void registerClass(const std::string& name) 
+    void register_class(const std::string& name)
     {
-        static std::vector< std::shared_ptr<ConcreteBuilder<DerivedClass, Args...>>> storage;
-        auto creator = new ConcreteBuilder<DerivedClass, Args...> ();
-        std::shared_ptr<ConcreteBuilder<DerivedClass, Args...>> ptr;
+        static std::vector< std::shared_ptr<concrete_builder<DerivedClass, Args...>>> storage;
+        auto creator = new concrete_builder<DerivedClass, Args...> ();
+        std::shared_ptr<concrete_builder<DerivedClass, Args...>> ptr;
         ptr.reset(creator);
         storage.emplace_back(ptr);
         creators.emplace(name, creator );
@@ -56,19 +60,21 @@ public:
     {
         auto it = creators.find(name);
         if (it != creators.end()) {
-            return  static_cast<BaseClass*> (( static_cast<Builder<Args...>* >(it->second) )->build(args...));
+            return  static_cast<BaseClass*> (( static_cast<builder<Args...>* >(it->second) )->build(args...));
         }
         return nullptr;
     }
 
 private:
     // Store each creator as an `std::any` to allow variadic lambdas
-    std::map<std::string, BuilderBase* > creators;
+    std::map<std::string, builder_base* > creators;
 
     // Private constructor for singleton pattern
-    Factory() = default;
-    Factory(const Factory&) = delete;
-    Factory& operator=(const Factory&) = delete;
+    factory() = default;
+    factory(const factory&) = delete;
+    factory& operator=(const factory&) = delete;
 };
+
+}
 
 #endif

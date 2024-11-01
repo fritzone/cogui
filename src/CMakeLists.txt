@@ -41,17 +41,17 @@ file(APPEND ${EXTENSION_MANAGER_CPP} "void cogui::extension::init(int argc, char
 
 # All the input providers
 foreach(inp ${ALL_INPUT_PROVIDERS})
-    file(APPEND ${EXTENSION_MANAGER_CPP} "    Factory<input_provider>::getInstance().template registerClass<cogui::input_providers::${inp}>(\"${inp}\");\n")
+    file(APPEND ${EXTENSION_MANAGER_CPP} "    factory<input_provider>::instance().template register_class<cogui::input_providers::${inp}>(\"${inp}\");\n")
 endforeach()
 
 # All the themes
 foreach(theme ${ALL_THEMES})
-    file(APPEND ${EXTENSION_MANAGER_CPP} "    Factory<theme>::getInstance().template registerClass<cogui::themes::${theme}>(\"${theme}\");\n")
+    file(APPEND ${EXTENSION_MANAGER_CPP} "    factory<theme>::instance().template register_class<cogui::themes::${theme}>(\"${theme}\");\n")
 endforeach()
 
 # All the rendering engines
 foreach(re ${ALL_RENDERING_ENGINES})
-    file(APPEND ${EXTENSION_MANAGER_CPP} "    Factory<rendering_engine>::getInstance().template registerClass<cogui::rendering_engines::${re}>(\"${re}\");\n")
+    file(APPEND ${EXTENSION_MANAGER_CPP} "    factory<rendering_engine>::instance().template register_class<cogui::rendering_engines::${re}>(\"${re}\");\n")
 endforeach()
 
 #
@@ -84,6 +84,7 @@ endforeach()
 #
 add_subdirectory(mouse)
 add_subdirectory(logger)
+add_subdirectory(keyboard)
 
 add_subdirectory(controls)
 
