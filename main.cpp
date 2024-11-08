@@ -61,7 +61,7 @@ int main( int argc, char* argv[] )
                                 menu {
                                         L"&File",
                                         {
-                                            {L"&New",  action::on_trigger = [](action*){log_info() << "New Clicked";}},
+                                            {"&New",  action::on_trigger = [](action*){log_info() << "New Clicked";}},
                                             {L"&Open", action::on_trigger = [](action*){log_info() << "Open Clicked";}},
                                             {L"&Save", action::checkable = true, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
                                             menu::separator_item,

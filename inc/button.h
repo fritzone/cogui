@@ -56,7 +56,7 @@ public:
 	 * @param height - the height of the button
 	 * @param title - the text that will be shown on the button - string
 	 */
-	template<typename S>
+    template<typename S>
 	button(int x, int y, int width, int height, const S& title) : themeable(x, y, width, height, title, this, builtin_button_draw, builtin_button_minimum_button_width, builtin_button_minimum_button_height) {}
 
 	/**

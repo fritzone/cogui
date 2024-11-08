@@ -53,8 +53,11 @@ function(EnumerateObjects type location target_var)
         message("-- ${theme} using as: ${var} = ${${var}}")
       endif()
 
-      # Theme platform mathces?
-      if("${var}" STREQUAL "${subdir}_json.${type}.platform" )
+      # Theme platform mathces? It might be an array, so we check 2 elements max
+      # since there is support fro 2 platforms right now: linux and windows
+      if("${var}" STREQUAL "${subdir}_json.${type}.platform"
+              OR "${var}" STREQUAL "${subdir}_json.${type}.platform_0"
+              OR "${var}" STREQUAL "${subdir}_json.${type}.platform_1")
         if(${${var}} STREQUAL ${TargetPlatform})
           message(STATUS "Platform match: ${subdir} (${type}) has the right platform: ${TargetPlatform}")
           math(EXPR "${subdir}_check" "${${subdir}_check} + 1")
@@ -62,7 +65,7 @@ function(EnumerateObjects type location target_var)
       endif()
 
       # Theme mode mathces?
-      if("${var}" STREQUAL "${subdir}_json.${type}.mode" )
+      if("${var}" STREQUAL "${subdir}_json.${type}.mode")
         if(${${var}} STREQUAL ${TargetRenderer})
           message(STATUS "Renderer match: ${subdir} (${type}) has the right mode: ${TargetRenderer}")
           math(EXPR "${subdir}_check" "${${subdir}_check} + 1")

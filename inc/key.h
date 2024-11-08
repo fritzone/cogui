@@ -74,6 +74,8 @@ class key
 {
 public:
 
+    static const key no_key;
+
     // used to create hotkeys
     key operator + (const key& other);
 

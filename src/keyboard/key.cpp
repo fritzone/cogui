@@ -3,6 +3,10 @@
 
 namespace cogui
 {
+// No key as hotkey
+const key key::no_key {};
+
+
 // Key A
 template<> cogui::key& cogui::on_impl<NoMod_a>::press = (NoMod_a::ptrNoMod_a)();
 template<> cogui::key& cogui::on_impl<Shift_a>::press = (Shift_a::ptrShift_a)();

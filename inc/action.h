@@ -5,11 +5,18 @@
 #include "tuple_iterator.h"
 #include "overload_impl.h"
 #include "miso.h"
+#include "string_type.h"
+#include "key.h"
 
 #include <string>
 
 namespace cogui {
 
+
+/**
+ * @brief The action class represents an action that can be attached to a menu item, in order for it to
+ * execute a user function or something similar
+ */
 class action
 {
 public:
@@ -23,23 +30,31 @@ public:
     action& operator=(const action& o);
     action& operator=(action&& o) = default;
 
-    action(const std::wstring& title) : m_title(title)
+
+    template<cogui::StringType S, typename ... Args>
+    void build(const S& title, cogui::key hotkey, Args... args)
     {
-		determine_hotchar();
+        m_title = convert_title(title);
+        resolve_named_parameters(std::forward<Args>(args)...);
+        determine_hotchar();
     }
 
-    template<typename ... Args>
-    action(const std::wstring& title, Args... args) : m_title(title)
+    template<StringType S>
+    action(const S& title)
     {
-        resolve_named_parameters(std::forward<Args>(args)...);
-		determine_hotchar();
+        m_title = convert_title(title);
     }
 
-    template<typename ... Args>
-    action(const std::wstring& title, cogui::key hotkey, Args... args) : m_title(title)
+    template<StringType S, typename ... Args>
+    action(const S& title, Args... args)
     {
-        resolve_named_parameters(std::forward<Args>(args)...);
-		determine_hotchar();
+        build(title, cogui::key::no_key, std::forward<Args>(args)...);
+    }
+
+    template<StringType S, typename ... Args>
+    action(const S& title, cogui::key hotkey, Args... args)
+    {
+        build(title, hotkey, std::forward<Args>(args)...);
     }
 
     void trigger();
@@ -82,6 +97,20 @@ public:
     }
 
 private:
+
+    template<StringType S>
+    std::wstring convert_title(const S& title)
+    {
+        if constexpr (std::same_as<S, const char*> || std::same_as<S, std::string> || (std::is_array_v<S> && std::same_as<typename std::remove_extent<S>::type, char>))
+        {
+            return cogui::utils::std2ws(title);
+        }
+        else
+        {
+            return title;
+        }
+    }
+
 	void determine_hotchar();
 
     std::wstring m_title;

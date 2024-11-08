@@ -2,6 +2,9 @@
 #define COGUI_H
 
 #include <memory>
+#include <concepts>
+#include <string>
+#include <type_traits>
 
 namespace cogui {
 

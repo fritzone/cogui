@@ -70,6 +70,7 @@ set(PROJECT_SOURCES
     ${CMAKE_SOURCE_DIR}/inc/tuple_iterator.h
     ${CMAKE_SOURCE_DIR}/inc/utils.h
     ${CMAKE_SOURCE_DIR}/inc/window.h
+    ${CMAKE_SOURCE_DIR}/inc/string_type.h
 
 )
 
