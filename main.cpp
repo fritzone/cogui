@@ -59,13 +59,13 @@ int main( int argc, char* argv[] )
                            window::mainmenu = menubar {
 
                                 menu {
-                                        L"&File",
+                                        "&File",
                                         {
                                             {"&New",  action::on_trigger = [](action*){log_info() << "New Clicked";}},
-                                            {L"&Open", action::on_trigger = [](action*){log_info() << "Open Clicked";}},
-                                            {L"&Save", action::checkable = true, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
+                                            {"&Open", action::on_trigger = [](action*){log_info() << "Open Clicked";}},
+                                            {"&Save", action::checkable = true, action::on_trigger = [](action*){log_info() << "Save Clicked";}},
                                             menu::separator_item,
-                                            {L"&Exit", action::on_trigger = [&](action*){app.exit(1);}}
+                                            {"&Exit", action::on_trigger = [&](action*){app.exit(1);}}
                                         }
                                 },
                                 menu {
@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
                            window::hotkeys = hotkey_associations {
                                on(Ctrl_b) = [&](window*){app.exit();}
                            },
-                           window::scrollbars = scrollbar::horizontal
+                           window::scrollbars = scrollbar::both
                            /*  */
     );
 
@@ -155,7 +155,7 @@ int main( int argc, char* argv[] )
 
 //	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
-	//a.setLayout<cogui::layout::grid>(3, 3);
+    //a.setLayout<cogui::layout::grid>(3, 3);
 
     app.run();
 

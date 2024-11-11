@@ -189,8 +189,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y,
 {
     std::wstring b;
     b += c;
-    rframe->set(x, y, b, m_currentFgColor,
-                m_currentBgColor, flags);
+    rframe->set(x, y, b, m_currentFgColor, m_currentBgColor, flags);
     //mvwaddch(stdscr, y, x, c | flags);
 }
 
@@ -376,6 +375,15 @@ void cogui::rendering_engines::frame::clear()
     memset(bg_colors, COLOR_BLACK, sizeof(uint8_t) * width * height);
     memset(attrs, 0, sizeof(int) * width * height);
 
+    for(int i = 0; i < width; i++)
+    {
+        for(int j = 0; j < height; j++)
+        {
+            int index = (width * j) + i;
+            data[index] = L" ";
+        }
+    }
+
 }
 
 void cogui::rendering_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
@@ -447,42 +455,41 @@ void cogui::rendering_engines::frame::print()
     {
         for(int j = 0; j < height; j++)
         {
+            bool mouse_on = false;
+
             int index = (width * j) + i;
             int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
 
-            if(mx == i && my == j)
+            /*if(mx == i && my == j)
             {
                 attron(COLOR_PAIR(3));
+                mouse_on = true;
             }
-            else
+            else*/
             {
                 attron(attrs[index] | COLOR_PAIR(a));
             }
+
             if(data[index].c_str())
             {
                 mvaddstr(j, i, unicode_to_utf8(*data[index].c_str()));
             }
-            else
+            else if(mx == i && my == j)
             {
-                if(mx == i && my == j)
-                {
-                    mvaddstr(j, i, " ");
-                }
+                mvaddstr(j, i, " ");
             }
-            if(mx == i && my == j)
+
+            /*if(mx == i && my == j || mouse_on)
             {
                 attroff(COLOR_PAIR(3));
             }
             else
+*/
             {
                 attroff(attrs[index] | COLOR_PAIR(a));
             }
         }
     }
-
-
-
-
 }
 
 

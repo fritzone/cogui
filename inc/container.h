@@ -88,6 +88,16 @@ public:
 
     std::vector<std::shared_ptr<control>>::iterator& focused();
 
+
+    /**
+     * @brief Determines the first row available for content.
+     *
+     * Adjusts for elements like a menu, leaving space as needed for consistent layout.
+     *
+     * @return The first row available for content.
+     */
+    virtual int first_available_row() const;
+
 protected:
 
     /*will just release a control that was pressed, helper function */

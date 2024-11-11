@@ -36,6 +36,11 @@ std::vector<std::shared_ptr<cogui::control>>::iterator& cogui::container::focuse
     return m_focused;
 }
 
+int cogui::container::first_available_row() const
+{
+    return 1;
+}
+
 void cogui::container::focus_next_element()
 {
     log_info() << "Focusing next element";

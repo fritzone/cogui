@@ -623,6 +623,7 @@ void cogui::themes::cursive_theme::draw_verticall_scrollbar(cogui::control *c, c
 {
     int x = c->get_x();
     int w = c->get_width();
+
     int y = c->get_y() + c->first_available_row(); // no need to put the scrollbar on menu
     int h = c->get_height() - c->first_available_row() - 1;
     cogui::graphics()->set_bg_color(color::white);

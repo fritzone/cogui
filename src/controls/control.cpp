@@ -9,25 +9,14 @@
 
 typedef std::unordered_map<std::type_index, std::function<int()> > mdw_map;
 
-cogui::control::control(int x, int y, int w, int h) : m_x(x), m_y(y), m_width(w), m_height(h)
+cogui::control::control(int x, int y, int w, int h) : positionable(x, y), m_width(w), m_height(h)
 {
     log_info() << "Created a control at:" << x << ", " << y;
 
     m_initial_x = m_x;
     m_initial_y = m_y;
     m_initial_width = m_width;
-    m_initial_height = m_height;}
-
-cogui::control::control(int x, int y, int width, int height, const std::wstring &title):
-    cogui::control::control(x, y, width, height)
-{
-    m_title = title;
-}
-
-cogui::control::control(int x, int y, int width, int height, const std::string &title) :
-    cogui::control::control(x, y, width, height)
-{
-    m_title = cogui::utils::std2ws(title);
+    m_initial_height = m_height;
 }
 
 int cogui::control::get_height() const
@@ -273,11 +262,11 @@ int cogui::control::get_y() const
     return m_parent ? m_parent->get_y() + m_y : m_y;
 }
 
-void cogui::control::set_y(int y)
+/*void cogui::control::set_y(int y)
 {
     log_debug() << "set y=" << y << " to" << (char*)m_title.c_str();
     m_y = y;
-}
+}*/
 
 void cogui::control::set_bounds(int x, int y, int w, int h)
 {
@@ -286,6 +275,8 @@ void cogui::control::set_bounds(int x, int y, int w, int h)
     set_width(w);
 	set_height(h);
 }
+
+int cogui::control::first_available_row() const { return 1; }
 
 cogui::rect cogui::control::get_rect() const
 {
@@ -297,10 +288,10 @@ int cogui::control::get_x() const
     return m_parent ? m_parent->get_x() + m_x : m_x;
 }
 
-void cogui::control::set_x(int x)
+/*void cogui::control::set_x(int x)
 {
     m_x = x;
-}
+}*/
 
 std::wstring cogui::control::get_title() const
 {

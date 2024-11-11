@@ -41,8 +41,6 @@ namespace cogui {
  * \endcode
  *
  */
-
-
 class button : public themeable<button>, public clickable<button>
 {
 public:
@@ -99,7 +97,6 @@ public:
 	{
 		clickable::click(this);
 	}
-
 
 };
 
