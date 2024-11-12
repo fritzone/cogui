@@ -81,12 +81,12 @@ private:
     bool m_colours = false;
     color m_currentFgColor = color::white;
     color m_currentBgColor = color::black;
-    frame* pframe = nullptr;
-    frame* rframe = nullptr;
+    frame* presentation_frame = nullptr;
+    frame* render_frame = nullptr;
     frame* buffers[2];
     int currentFrame = 0;
 
-	static void* thread_met(void* o);
+    static void* thread_met(void* o);
 
 };
 }

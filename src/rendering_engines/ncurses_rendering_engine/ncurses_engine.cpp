@@ -156,7 +156,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y,
         {
             std::wstring b;
             b+=s[sc];
-            rframe->set(sc+x, y, b, m_currentFgColor, m_currentBgColor, flags);
+            render_frame->set(sc+x, y, b, m_currentFgColor, m_currentBgColor, flags);
         }
 
         return;
@@ -172,7 +172,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y,
         {
             std::wstring b;
             b += s[i];
-            rframe->set(i, y, b, m_currentFgColor, m_currentBgColor, flags);
+            render_frame->set(i, y, b, m_currentFgColor, m_currentBgColor, flags);
         }
         return;
     }
@@ -181,7 +181,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y,
     {
         std::wstring b;
         b += ws[i];
-        rframe->set(x + i, y, b, m_currentFgColor, m_currentBgColor, flags);
+        render_frame->set(x + i, y, b, m_currentFgColor, m_currentBgColor, flags);
     }
 }
 
@@ -189,7 +189,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y,
 {
     std::wstring b;
     b += c;
-    rframe->set(x, y, b, m_currentFgColor, m_currentBgColor, flags);
+    render_frame->set(x, y, b, m_currentFgColor, m_currentBgColor, flags);
     //mvwaddch(stdscr, y, x, c | flags);
 }
 
@@ -232,29 +232,30 @@ bool cogui::rendering_engines::ncurses_rendering_engine::start_rendering()
 
 void cogui::rendering_engines::ncurses_rendering_engine::swap_buffers(){
     currentFrame ^= 1;
-    rframe = buffers[currentFrame ^ 1];
-    pframe = buffers[currentFrame];
+    render_frame = buffers[currentFrame ^ 1];
+    presentation_frame = buffers[currentFrame];
 }
 
 void* cogui::rendering_engines::ncurses_rendering_engine::thread_met(void* o)
 {
     ((cogui::rendering_engines::ncurses_rendering_engine*)o)->m_renderCallback();
-	return 0;
+    return 0;
 }
 
 void cogui::rendering_engines::ncurses_rendering_engine::present_scene()
 {
-	[[maybe_unused]] int iret;
-	pthread_t thread1;
+    [[maybe_unused]] int iret;
+    pthread_t thread1;
 
-	if(m_renderCallback != nullptr){
-		iret = ::pthread_create( &thread1, NULL, thread_met, (void*)this);
+    if(m_renderCallback != nullptr){
+        iret = ::pthread_create( &thread1, NULL, thread_met, (void*)this);
 
-		pframe->print();
-		pthread_join( thread1, NULL);
+        presentation_frame->print();
+        pthread_join( thread1, NULL);
 
     }
 }
+
 
 void cogui::rendering_engines::ncurses_rendering_engine::set_rendering_function(std::function<bool ()> rendercb)
 {
@@ -268,9 +269,9 @@ void cogui::rendering_engines::ncurses_rendering_engine::erase_screen()
 
 void cogui::rendering_engines::ncurses_rendering_engine::set_clip_area(const cogui::rect &r)
 {
-//	log_info() << "clip area:" << r;
-	rframe->set_clip_area(r);
-	pframe->set_clip_area(r);
+    log_info() << "clip area:" << r;
+    render_frame->set_clip_area(r);
+    presentation_frame->set_clip_area(r);
 }
 
 void cogui::rendering_engines::ncurses_rendering_engine::refresh_screen()
@@ -280,7 +281,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::refresh_screen()
 
 void cogui::rendering_engines::ncurses_rendering_engine::clear_screen()
 {
-    rframe->clear();
+    render_frame->clear();
 }
 
 void cogui::rendering_engines::ncurses_rendering_engine::shutdown()
@@ -353,7 +354,6 @@ cogui::rendering_engines::frame::frame(int w, int h)
     fg_colors = new uint8_t[width * height];
     bg_colors = new uint8_t[width * height];
     attrs = new int[width * height];
-
     data = new std::wstring[width * height];
 
     log_info() << "created data:" << width * height << " bytes";
@@ -374,28 +374,21 @@ void cogui::rendering_engines::frame::clear()
     memset(fg_colors, COLOR_WHITE, sizeof(uint8_t) * width * height);
     memset(bg_colors, COLOR_BLACK, sizeof(uint8_t) * width * height);
     memset(attrs, 0, sizeof(int) * width * height);
-
-    for(int i = 0; i < width; i++)
-    {
-        for(int j = 0; j < height; j++)
-        {
-            int index = (width * j) + i;
-            data[index] = L" ";
-        }
-    }
-
+    std::fill(data, data + width * height, L" ");
 }
 
 void cogui::rendering_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
 {
-	// are we inside the clip area?
-	if(clip_area.height > 0 && clip_area.width > 0)
+    // log_info() << "Set at:" << x << "," << y << " v=" << v << " fgc=" << (int)fgc << " bgc=" << (int)bgc << " flag=" << flag;
+
+    // are we inside the current clip area?
+    if(clip_area.height > 0 && clip_area.width > 0)
 	{
-		if(! (x >= clip_area.x && x <= clip_area.x + clip_area.width && y > clip_area.y && y < clip_area.y + clip_area.height)	)
+        if(! (x >= clip_area.x && x <= clip_area.x + clip_area.width && y > clip_area.y && y < clip_area.y + clip_area.height)	)
 		{
 			return;
 		}
-	}
+    }
 
 
     if(x < width && y < height && x >= 0 && y >= 0)
@@ -413,7 +406,7 @@ void cogui::rendering_engines::frame::set_clip_area(const cogui::rect &r)
 	clip_area = r;
 }
 
-extern "C" const char* unicode_to_utf8(wchar_t c)
+static const char* unicode_to_utf8(wchar_t c)
 {
     static unsigned char b_static[5];
     unsigned char* b = b_static;
@@ -447,49 +440,49 @@ extern "C" const char* unicode_to_utf8(wchar_t c)
 
 void cogui::rendering_engines::frame::print()
 {
-
-    int mx = mouse::get().x();
-    int my = mouse::get().y();
-
     for(int i = 0; i < width; i++)
     {
         for(int j = 0; j < height; j++)
         {
-            bool mouse_on = false;
-
             int index = (width * j) + i;
             int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
 
-            /*if(mx == i && my == j)
-            {
-                attron(COLOR_PAIR(3));
-                mouse_on = true;
-            }
-            else*/
-            {
-                attron(attrs[index] | COLOR_PAIR(a));
-            }
+            //attron(attrs[index] | COLOR_PAIR(a));
 
             if(data[index].c_str())
             {
                 mvaddstr(j, i, unicode_to_utf8(*data[index].c_str()));
             }
-            else if(mx == i && my == j)
+            else
             {
                 mvaddstr(j, i, " ");
             }
 
-            /*if(mx == i && my == j || mouse_on)
-            {
-                attroff(COLOR_PAIR(3));
-            }
-            else
-*/
-            {
-                attroff(attrs[index] | COLOR_PAIR(a));
-            }
+            //attroff(attrs[index] | COLOR_PAIR(a));
         }
     }
+
+    /*
+    int mx = mouse::get().x();
+    int my = mouse::get().y();
+
+    if(my > -1 && mx > -1)
+    {
+        log_debug() << "Mouse at:" << mx << "," << my;
+        int mouseIndex = (width * my) + mx;
+        attron(COLOR_PAIR(3));
+        if(data[mouseIndex].c_str())
+        {
+            mvaddstr(my, mx, unicode_to_utf8(*data[mouseIndex].c_str()));
+        }
+        else
+        {
+            mvaddstr(my, mx, " ");
+        }
+        attroff(COLOR_PAIR(3));
+    }
+    */
+
 }
 
 
