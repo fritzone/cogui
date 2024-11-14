@@ -116,6 +116,8 @@ template <typename T> struct on_impl
 struct name { \
         static auto constexpr ptr##name = []()->cogui::key& { \
             cogui::key* k = new cogui::key{ {cogui::events::key_class::key_##key_type, alt, shift, ctrl, L ## #key_type } }; \
+            static std::shared_ptr<cogui::key> container; \
+            container.reset(k); \
             return *k; \
     }; \
 };

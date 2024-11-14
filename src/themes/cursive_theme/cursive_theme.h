@@ -168,15 +168,18 @@ public:
 
     void draw_window(const window& w) override;
     void draw_button(const button& b) override;
+    void draw_label(const label& l) override;
     void draw_menu(const menu &m) override;
     void draw_checkbox(const checkbox& c) override;
     void draw_scrollbar(const scrollbar &s) override;
 	void draw_radiobutton(const radiobutton& rb) override;
 	void draw_radiobutton_group(const radiobutton_group& rbg) override;
 
-
     int minimum_checkbox_width(const checkbox& c) override;
     int minimum_checkbox_height(const checkbox& c) override;
+
+    int minimum_label_width(const label& l) override;
+    int minimum_label_height(const label& l) override;
 
     int minimum_button_width(const button& b) override;
     int minimum_button_height(const button& b) override;

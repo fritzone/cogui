@@ -59,7 +59,8 @@ namespace cogui {
             v_normal = 0,
             v_bold = 1 << 9,
             v_underline = 1 << 13,
-            v_title = 1 << 22
+            v_title = 1 << 22,
+            v_italic = 1 << 23
         };
 
 
@@ -89,6 +90,12 @@ namespace cogui {
         {
             static textflags l_underline(textflags::v_underline);
             return l_underline;
+        }
+
+        static textflags italic()
+        {
+            static textflags l_italic(textflags::v_italic);
+            return l_italic;
         }
 
         static textflags title()
@@ -126,5 +133,6 @@ namespace cogui {
 #include "key.h"
 #include "scrollbar.h"
 #include "color.h"
+#include "label.h"
 
 #endif // COGUI_H

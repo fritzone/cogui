@@ -44,6 +44,8 @@ std::map<TermKeySym, cogui::events::key_class> cogui::input_providers::termkey_i
 cogui::input_providers::termkey_input_provider::~termkey_input_provider()
 {
     log_info() << "Termkey shutting down";
+    termkey_destroy(tk);
+    tk = nullptr;
 }
 
 bool cogui::input_providers::termkey_input_provider::init()
@@ -231,7 +233,6 @@ bool cogui::input_providers::termkey_input_provider::shutdown()
 {
     printf("\033[?1003l\n");
     printf("\033[?9l\n");
-    termkey_destroy(tk);
     curs_set(prev_curs);
 
     return true;

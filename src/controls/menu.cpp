@@ -79,16 +79,7 @@ void cogui::menu::open(int x, int y)
 void cogui::menu::close()
 {
     m_opened = false;
-}
-
-int cogui::menu::getX() const
-{
-    return m_x;
-}
-
-int cogui::menu::getY() const
-{
-    return m_y;
+    m_lastSelectedIndex = -1;
 }
 
 int cogui::menu::getHeight() const
@@ -98,16 +89,16 @@ int cogui::menu::getHeight() const
 
 bool cogui::menu::inside(int x, int y) const
 {
-    bool b = x > this->getX() && x < this->getX() + m_width && y > this->getY() && y < this->getY() + m_height;
+    bool b = x > this->get_x() && x < this->get_x() + m_width && y > this->get_y() && y < this->get_y() + m_height;
     //debug() << "x=" << x <<" y=" << y << " this.x=" << this->getX() << " this.y=" << this->getY() << " this.w=" << this->getWidth() << " this.h=" << this->getHeight() << " in:" << b;
     return b;
 }
 
 bool cogui::menu::mouse_move(int, int y)
 {
-    if(m_lastSelectedIndex != y - getY() - 1)
+    if(m_lastSelectedIndex != y - get_y() - 1)
     {
-        m_lastSelectedIndex = y - getY() - 1;
+        m_lastSelectedIndex = y - get_y() - 1;
         return true;
     }
     return false;

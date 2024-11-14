@@ -1,5 +1,6 @@
 #include "cogui.h"
 #include "application.h"
+#include "key.h"
 
 #include <iostream>
 
@@ -47,7 +48,7 @@ int main( int argc, char* argv[] )
 
 	std::shared_ptr<button> b;
 
-	auto a = cogui::window(5, 5, 70, 15, L"A not so special window",
+    auto a = cogui::window(2, 2, 20, 10, L"Gindow",
                            window::on_resize = [](window*, int w, int h){log_info() << "(lambda slot) new size:" << w << "x" << h;},
                            window::on_close  = [&](window*){log_info() << "Closing this window"; app.exit(1);},
                            window::on_mouse_down = [](window* w, cogui::mouse::button b, int x, int y){log_info() << "Mouse (" << mouse::get().buttonName(b) << ") down:" << x << ", " << y; },
@@ -100,7 +101,7 @@ int main( int argc, char* argv[] )
                                on(Ctrl_b) = [&](window*){app.exit();}
                            },
                            window::scrollbars = scrollbar::both
-                           /*  */
+
     );
 
 	b = a.add_button(5,5, 10, 2, L"&Vertical layout",
@@ -147,6 +148,8 @@ int main( int argc, char* argv[] )
                                        }
 	);
 
+    auto l = a.add_label(3, 3, 10, 10, "Label me");
+
 
 	miso::connect(&a, a.sig_on_resize, [](window* win, int w, int h){log_info() << "(slot) new size:" << w << "x" << h;});
 	miso::connect(&c, c->sig_on_click, [](button*){ log_info() << "You clicked me...:" ;});
@@ -156,6 +159,8 @@ int main( int argc, char* argv[] )
 //	auto h = a.add_button(35,5, 5, 2, L"E", button::on_click = [&](button*) {w2.close();});
 
     //a.setLayout<cogui::layout::grid>(3, 3);
+
+
 
     app.run();
 

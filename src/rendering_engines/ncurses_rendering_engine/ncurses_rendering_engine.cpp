@@ -8,10 +8,10 @@
 #include "mouse.h"
 #include "cogui.h"
 #include "desktop.h"
+#include "frame.h"
 
 #include <wchar.h>
 #include <ncursesw/ncurses.h>
-
 #include <sstream>
 #include <thread>
 #include <pthread.h>
@@ -22,6 +22,7 @@ namespace {
 // code, index, foreground, background
 static const std::map<int, std::tuple<int, int, int>> colorpairs =
 {
+    {-1, {-1, COLOR_BLACK, COLOR_BLACK}},
     {0, {0, COLOR_BLACK, COLOR_BLACK}},
     {1, {1, COLOR_BLACK, COLOR_RED}},
     {2, {2, COLOR_BLACK, COLOR_GREEN}},
@@ -113,6 +114,7 @@ bool cogui::rendering_engines::ncurses_rendering_engine::initialize()
     if(has_colors())
     {
         start_color();
+        use_default_colors();
         m_colours = true;
     }
 
@@ -190,7 +192,6 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_text(int x, int y,
     std::wstring b;
     b += c;
     render_frame->set(x, y, b, m_currentFgColor, m_currentBgColor, flags);
-    //mvwaddch(stdscr, y, x, c | flags);
 }
 
 void cogui::rendering_engines::ncurses_rendering_engine::set_fg_color(const color &c)
@@ -216,6 +217,8 @@ std::string cogui::rendering_engines::ncurses_rendering_engine::name() const
 
 void cogui::rendering_engines::ncurses_rendering_engine::clear_area(int x, int y, int width, int height)
 {
+    set_fg_color(color::white);
+    set_bg_color(color::black);
     for(int rc = y; rc <= y + height; rc++)
     {
         draw_text(x, rc, cogui::utils::repeated(width, L" "));
@@ -236,26 +239,23 @@ void cogui::rendering_engines::ncurses_rendering_engine::swap_buffers(){
     presentation_frame = buffers[currentFrame];
 }
 
-void* cogui::rendering_engines::ncurses_rendering_engine::thread_met(void* o)
-{
-    ((cogui::rendering_engines::ncurses_rendering_engine*)o)->m_renderCallback();
-    return 0;
-}
-
 void cogui::rendering_engines::ncurses_rendering_engine::present_scene()
 {
-    [[maybe_unused]] int iret;
-    pthread_t thread1;
+    if (m_renderCallback != nullptr)
+    {
+        // Start the thread using a lambda to call the thread_met function
+        std::thread thread1([this]() {
+            std::lock_guard<std::mutex> lock(renderMutex); // Lock the mutex for the duration of this scope
 
-    if(m_renderCallback != nullptr){
-        iret = ::pthread_create( &thread1, NULL, thread_met, (void*)this);
+            m_renderCallback();
+        });
 
         presentation_frame->print();
-        pthread_join( thread1, NULL);
+        thread1.join();
 
+        // Wait for the thread to finish
     }
 }
-
 
 void cogui::rendering_engines::ncurses_rendering_engine::set_rendering_function(std::function<bool ()> rendercb)
 {
@@ -269,7 +269,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::erase_screen()
 
 void cogui::rendering_engines::ncurses_rendering_engine::set_clip_area(const cogui::rect &r)
 {
-    log_info() << "clip area:" << r;
+//    log_info() << "clip area:" << r;
     render_frame->set_clip_area(r);
     presentation_frame->set_clip_area(r);
 }
@@ -346,142 +346,58 @@ int cogui::rendering_engines::ncurses_rendering_engine::get_screen_width() const
 
 int cogui::rendering_engines::ncurses_rendering_engine::get_screen_height() const {return m_height;}
 
-cogui::rendering_engines::frame::frame(int w, int h)
-{
-    this->width = w;
-    this->height = h;
 
-    fg_colors = new uint8_t[width * height];
-    bg_colors = new uint8_t[width * height];
-    attrs = new int[width * height];
-    data = new std::wstring[width * height];
-
-    log_info() << "created data:" << width * height << " bytes";
-
-    clear();
-}
-
-cogui::rendering_engines::frame::~frame()
-{
-    delete [] bg_colors;
-    delete [] fg_colors;
-    delete [] attrs;
-    delete [] data;
-}
-
-void cogui::rendering_engines::frame::clear()
-{
-    memset(fg_colors, COLOR_WHITE, sizeof(uint8_t) * width * height);
-    memset(bg_colors, COLOR_BLACK, sizeof(uint8_t) * width * height);
-    memset(attrs, 0, sizeof(int) * width * height);
-    std::fill(data, data + width * height, L" ");
-}
-
-void cogui::rendering_engines::frame::set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag)
-{
-    // log_info() << "Set at:" << x << "," << y << " v=" << v << " fgc=" << (int)fgc << " bgc=" << (int)bgc << " flag=" << flag;
-
-    // are we inside the current clip area?
-    if(clip_area.height > 0 && clip_area.width > 0)
-	{
-        if(! (x >= clip_area.x && x <= clip_area.x + clip_area.width && y > clip_area.y && y < clip_area.y + clip_area.height)	)
-		{
-			return;
-		}
-    }
-
-
-    if(x < width && y < height && x >= 0 && y >= 0)
-    {
-        int index = (y * width) + x;
-        fg_colors[index] = fgc;
-        bg_colors[index] = bgc;
-        attrs[index] = flag;
-        data[index] = v;
-	}
-}
-
-void cogui::rendering_engines::frame::set_clip_area(const cogui::rect &r)
-{
-	clip_area = r;
-}
-
-static const char* unicode_to_utf8(wchar_t c)
-{
-    static unsigned char b_static[5];
-    unsigned char* b = b_static;
-
-    if (c<(1<<7))// 7 bit Unicode encoded as plain ascii
-    {
-        *b++ = (unsigned char)(c);
-    }
-    else if (c<(1<<11))// 11 bit Unicode encoded in 2 UTF-8 bytes
-    {
-        *b++ = (unsigned char)((c>>6)|0xC0);
-        *b++ = (unsigned char)((c&0x3F)|0x80);
-    }
-    else if (c<(1<<16))// 16 bit Unicode encoded in 3 UTF-8 bytes
-    {
-        *b++ = (unsigned char)(((c>>12))|0xE0);
-        *b++ =  (unsigned char)(((c>>6)&0x3F)|0x80);
-        *b++ =  (unsigned char)((c&0x3F)|0x80);
-    }
-
-    else if (c<(1<<21))// 21 bit Unicode encoded in 4 UTF-8 bytes
-    {
-        *b++ = (unsigned char)(((c>>18))|0xF0);
-        *b++ = (unsigned char)(((c>>12)&0x3F)|0x80);
-        *b++ = (unsigned char)(((c>>6)&0x3F)|0x80);
-        *b++ = (unsigned char)((c&0x3F)|0x80);
-    }
-    *b = '\0';
-    return (const char*)b_static;
-}
 
 void cogui::rendering_engines::frame::print()
 {
-    for(int i = 0; i < width; i++)
+    log_debug() << "Printing Frame:" << (void*)this;
+
+    for(int i = 0; i < height; i++)
     {
-        for(int j = 0; j < height; j++)
+        for(int j = 0; j < width; j++)
         {
-            int index = (width * j) + i;
+            int index = (width * i) + j;
             int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
 
-            //attron(attrs[index] | COLOR_PAIR(a));
-
-            if(data[index].c_str())
-            {
-                mvaddstr(j, i, unicode_to_utf8(*data[index].c_str()));
-            }
-            else
-            {
-                mvaddstr(j, i, " ");
-            }
-
-            //attroff(attrs[index] | COLOR_PAIR(a));
+            attron(attrs[index] | COLOR_PAIR(a));
+            mvaddstr(i, j, utils::unicode_to_utf8(data[index]));
+            attroff(attrs[index] | COLOR_PAIR(a));
         }
     }
 
-    /*
+#define SOFTMOUSE 1
+#if SOFTMOUSE
     int mx = mouse::get().x();
     int my = mouse::get().y();
 
-    if(my > -1 && mx > -1)
+    if(my > -1 && mx > -1 && mx < width && my < width)
     {
-        log_debug() << "Mouse at:" << mx << "," << my;
+        log_debug() << "Mouse at:" << mx << "," << my << " - rect:" << width << "x" << height;
         int mouseIndex = (width * my) + mx;
-        attron(COLOR_PAIR(3));
-        if(data[mouseIndex].c_str())
+        int a =  (fg_colors[mouseIndex] - 1) << 8 | (bg_colors[mouseIndex] - 1);
+
+        attron(A_REVERSE | COLOR_PAIR(a));
+        mvaddstr(my, mx, utils::unicode_to_utf8(data[mouseIndex]));
+        attroff(A_REVERSE | COLOR_PAIR(a));
+
+        // debug
+        /*
+        std::stringstream ss;
+        ss << "attrs:";
+        for(int i = mx; i < width; i++)
         {
-            mvaddstr(my, mx, unicode_to_utf8(*data[mouseIndex].c_str()));
+            int index = (width * my) + i;
+
+            ss << "x:" << i << " attr:" << attrs[index] << " F:" << (int)fg_colors[index] << " B:" << (int)bg_colors[index];
+            ss << std::endl;
+
         }
-        else
-        {
-            mvaddstr(my, mx, " ");
-        }
-        attroff(COLOR_PAIR(3));
+
+        log_debug() << ss.str();
+        */
+
     }
-    */
+#endif
 
 }
 

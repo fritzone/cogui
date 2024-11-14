@@ -7,6 +7,7 @@
 #include "miso.h"
 #include "events.h"
 #include "action.h"
+#include "positionable.h"
 
 #include <initializer_list>
 #include <string>
@@ -20,7 +21,7 @@ namespace cogui
  * @brief The menu class is responsible for representing one menu either in the form of a sysmenu,
  * or in the form of a popup menu, or as part of a menubar
  */
-class menu
+class menu : public positionable<int>
 {
 public:
 
@@ -44,8 +45,6 @@ public:
 
     void close();
 
-    int getX() const;
-    int getY() const;
     int getWidth() const;
     int getHeight() const;
 
@@ -78,8 +77,6 @@ public:
 
 private:
     std::vector<action> m_actions;
-    int m_x = 0;
-    int m_y = 0;
     int m_width = 0;
     int m_height = 0;
     int m_lastSelectedIndex = -1;
@@ -91,7 +88,6 @@ private:
 private:
 
     void register_action_activators();
-
 
 };
 

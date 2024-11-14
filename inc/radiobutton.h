@@ -13,6 +13,7 @@
 #include "state_changer.h"
 #include "checkable.h"
 #include "control_creator.h"
+#include "string_type.h"
 
 namespace cogui {
 
@@ -20,7 +21,7 @@ class radiobutton : public themeable<radiobutton>, public checkable<radiobutton>
 {
 public:
 
-    template<typename S, typename ... Args>
+    template<StringType S, typename ... Args>
     radiobutton(int x, int y, int width, int height, const S& title, Args... args) :
         themeable(x, y, width, height, title, this, builtin_radiobutton_draw, builtin_radiobutton_minimum_radiobutton_width, builtin_radiobutton_minimum_radiobutton_height),
         checkable<radiobutton>(this)
@@ -36,7 +37,7 @@ public:
 
     void click(int x, int y) override;
 
-    template<typename S, typename ... Args>
+    template<StringType S, typename ... Args>
     radiobutton(const S& title, Args... args) :
         radiobutton(-1, -1, 0, 0, title, std::forward<Args>(args)...)
     {}

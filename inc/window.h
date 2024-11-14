@@ -292,7 +292,7 @@ private:
 		if(desktop::get().get_theme()->current_menu_position_stored(*m_current_menu))
         {
 			auto p = desktop::get().get_theme()->current_menu_position(*m_current_menu);
-            m_current_menu->open(p.x, p.y + p.height + 1);
+            m_current_menu->open(p.get_x(), p.get_y() + p.get_height() + 1);
             m_current_menu->activate_action(0);
             redraw();
         }

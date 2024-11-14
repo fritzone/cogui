@@ -1,5 +1,5 @@
 #include "desktop.h"
-
+#include "application.h"
 #include "extension_manager.h"
 
 #include "input_provider.h"
@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <factory.h>
 #include "log.h"
+
+#include <mutex>
 
 namespace cogui
 {
@@ -44,8 +46,12 @@ bool desktop::initialize()
     return b;
 }
 
+
+
 bool desktop::renderer()
 {
+    std::lock_guard<std::mutex> lock(renderMutex); // Lock the mutex for the duration of this scope
+
     get().redraw();
     return true;
 }
@@ -202,6 +208,12 @@ void desktop::handle_tab()
 
 bool desktop::handle_key(std::shared_ptr<cogui::events::keypress> k)
 {
+    if(k->get_chardata() == Ctrl_Alt_q::ptrCtrl_Alt_q().generator().get_chardata())
+    {
+        cogui::application::instance().stop();
+        return true;
+    }
+
     if(m_captured_window)
     {
 		if(k->get_chardata() == L"Tab")
@@ -209,6 +221,7 @@ bool desktop::handle_key(std::shared_ptr<cogui::events::keypress> k)
 			m_captured_window->focus_next_element();
 			return true;
 		}
+
         return m_captured_window->keypress(k);
     }
     return false;
@@ -264,8 +277,11 @@ void desktop::clear()
 
 void desktop::shutdown()
 {
-    m_rendering_engine->shutdown();
-    m_input->shutdown();
+    if(m_rendering_engine) m_rendering_engine->shutdown();
+    m_rendering_engine = nullptr;
+
+    if(m_input) m_input->shutdown();
+    m_input = nullptr;
 }
 
 void desktop::resize()
@@ -291,9 +307,13 @@ void desktop::redraw()
 			graphics()->set_clip_area(rect());
         }
     }
-	graphics()->set_clip_area(m_captured_window->get_rect());
-	m_captured_window->draw();
-	graphics()->set_clip_area(rect());
+    if(m_captured_window)
+    {
+        graphics()->set_clip_area(m_captured_window->get_rect());
+        m_captured_window->draw();
+        graphics()->set_clip_area(rect());
+    }
+
 
 }
 

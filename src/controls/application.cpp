@@ -7,6 +7,8 @@
 
 #include "log.h"
 
+cogui::application* cogui::application::m_instance = nullptr;
+
 cogui::application::~application()
 {
     desktop::get().shutdown();
@@ -69,6 +71,11 @@ void cogui::application::exit(int c)
 {
     stop();
     ::exit(c);
+}
+
+cogui::application &cogui::application::instance()
+{
+    return *m_instance;
 }
 
 /*

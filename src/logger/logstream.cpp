@@ -61,7 +61,7 @@ logstream &logstream::operator<<(bool t)
 
 logstream &logstream::operator<<(const cogui::rect& r)
 {
-	mOutputStream << "{ (" << r.x <<", " << r.y <<") x (" << r.width << ", " << r.height << ")}";
+    mOutputStream << "{ (" << r.get_x() <<", " << r.get_y() <<") x (" << r.get_width() << ", " << r.get_height() << ")}";
 	return appendSpace();
 }
 

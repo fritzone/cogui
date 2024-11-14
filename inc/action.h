@@ -223,8 +223,6 @@ public:
     }
 
 private:
-
-
     template<cogui::StringType S, typename ... Args>
     void build(const S& title, cogui::key hotkey, Args... args)
     {

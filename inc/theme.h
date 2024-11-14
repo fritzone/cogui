@@ -20,6 +20,7 @@ class scrollbar;
 class checkbox;
 class radiobutton;
 class radiobutton_group;
+class label;
 
 class theme : public extension
 {
@@ -39,6 +40,7 @@ public:
 
     virtual void draw_window(const window& w) = 0;
     virtual void draw_button(const button& b) = 0;
+    virtual void draw_label(const label& b) = 0;
     virtual void draw_menu(const menu &m) = 0;
     virtual void draw_checkbox(const checkbox& c) = 0;
 	virtual void draw_radiobutton(const radiobutton& c) = 0;
@@ -49,8 +51,10 @@ public:
     virtual int minimum_checkbox_height(const checkbox& c) = 0;
 	virtual int minimum_radiobutton_width(const radiobutton& c) = 0;
 	virtual int minimum_radiobutton_height(const radiobutton& c) = 0;
-	virtual int minimum_button_width(const button& b) = 0;
+    virtual int minimum_button_width(const button& b) = 0;
     virtual int minimum_button_height(const button& b) = 0;
+    virtual int minimum_label_width(const label& b) = 0;
+    virtual int minimum_label_height(const label& b) = 0;
     virtual int minimum_window_width(const window& w) = 0;
     virtual int minimum_window_height(const window& w) = 0;
 	virtual int minimum_radiobutton_group_width(const radiobutton_group& c) = 0;
@@ -94,6 +98,9 @@ private:
 	std::map<menu*, rect> m_menu_positions;
 };
 
+static constexpr auto builtin_label_minimum_label_width = [](label* o) -> int { return desktop::get().get_theme()->minimum_label_width(*o); };
+static constexpr auto builtin_label_minimum_label_height = [](label* o) -> int { return desktop::get().get_theme()->minimum_label_height(*o); };
+static constexpr auto builtin_label_draw = [](label* o) -> int { cogui::desktop::get().get_theme()->draw_label(*o); return 0; };
 
 static constexpr auto builtin_button_minimum_button_width = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_width(*o); };
 static constexpr auto builtin_button_minimum_button_height = [](button* o) -> int { return desktop::get().get_theme()->minimum_button_height(*o); };

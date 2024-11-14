@@ -51,6 +51,8 @@ struct themeable : public control
         m_draw->run();
     }
 
+private:
+
     std::shared_ptr<executor_base> m_draw;
     std::shared_ptr<executor_base> m_minimum_object_width;
     std::shared_ptr<executor_base> m_minimum_object_height;

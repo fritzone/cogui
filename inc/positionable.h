@@ -1,6 +1,8 @@
 #ifndef POSITIONABLE_H
 #define POSITIONABLE_H
 
+#include <utility>
+
 namespace cogui
 {
 template<typename T>
@@ -78,6 +80,18 @@ struct positionable
     std::pair<T, T> get_position() const
     {
         return {m_x, m_y};
+    }
+
+    /**
+     * @brief Moves the rectangle by a specified offset.
+     *
+     * @param dx The offset to move in the x-direction.
+     * @param dy The offset to move in the y-direction.
+     */
+    void move(T dx, T dy)
+    {
+        m_x += dx;
+        m_y += dy;
     }
 
 protected:

@@ -2,6 +2,7 @@
 #define CONTROL_GROUPER_H
 
 #include <initializer_list>
+#include <memory>
 
 namespace cogui
 {
@@ -15,18 +16,13 @@ public:
     {
         for(const auto& rbc : controls)
         {
-            m_controls.push_back(rbc.get_control());
+            std::shared_ptr<C> ptr_c;
+            ptr_c.reset(rbc.get_control());
+            m_controls.push_back(ptr_c);
         }
     }
 
-    virtual ~control_grouper()
-    {
-        for(auto& b : m_controls)
-        {
-            delete b;
-        }
-
-    }
+    virtual ~control_grouper() = default;
 
     int calculate_width() const
     {
@@ -38,27 +34,27 @@ public:
         return calculate_height(m_controls);
     }
 
-    const std::vector<C *> &controls() const
+    const std::vector<std::shared_ptr<C>> &controls() const
     {
         return m_controls;
     }
 
 private:
 
-    int calculate_height(const std::vector<radiobutton*>& buttons) const
+    int calculate_height(const std::vector<std::shared_ptr<radiobutton>>& buttons) const
     {
         int calc_height = 0;
 
         for(const auto& r : buttons)
         {
-            calc_height +=desktop::get().get_theme()->minimum_radiobutton_height(*r);
+            calc_height += desktop::get().get_theme()->minimum_radiobutton_height(*r);
         }
 
         return calc_height + 2; // frame around top/bottm
 
     }
 
-    int calculate_width(const std::vector<radiobutton*>& buttons) const
+    int calculate_width(const std::vector<std::shared_ptr<radiobutton>>& buttons) const
     {
         int max_width = -1;
 
@@ -76,7 +72,7 @@ private:
 
 
 protected:
-    std::vector<C*> m_controls;
+    std::vector<std::shared_ptr<C>> m_controls;
 
 };
 

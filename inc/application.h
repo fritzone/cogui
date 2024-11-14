@@ -81,6 +81,8 @@ public:
             print_help(std::forward<Args>(args)...);
             exit(1);
         }
+
+        m_instance = this;
     }
 
 
@@ -124,6 +126,12 @@ public:
      */
     void exit(int c = 0);
 
+    /**
+     * @brief instance Returns the single instance of the application
+     *
+     * @return the application instance
+     */
+    static application& instance();
 
 private:
     application() = delete;
@@ -150,6 +158,7 @@ private:
 
 private:
     bool m_running = false;
+    static application* m_instance;
 };
 
 }

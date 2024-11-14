@@ -20,7 +20,7 @@ namespace cogui
  * @tparam C The type of the control to which checkable functionality is added.
  */
 template <typename C>
-class checkable : public clickable<C>, public state_changer<C, bool>
+class checkable : virtual public clickable<C>, public state_changer<C, bool>
 {
 public:
 

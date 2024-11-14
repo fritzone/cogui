@@ -11,26 +11,7 @@ namespace cogui {
 
 namespace rendering_engines {
 
-struct frame final
-{
-    frame(int w, int h);
-    ~frame();
-
-    void clear();
-
-    void set(int x, int y, std::wstring v, uint8_t fgc, uint8_t bgc, int flag);
-	void set_clip_area(const rect& r);
-    void print();
-
-    int width;
-    int height;
-    std::wstring* data;
-    uint8_t* fg_colors;
-    uint8_t* bg_colors;
-    int* attrs;
-	rect clip_area;
-
-};
+struct frame;
 
 class ncurses_rendering_engine : public rendering_engine
 {
@@ -85,8 +66,6 @@ private:
     frame* render_frame = nullptr;
     frame* buffers[2];
     int currentFrame = 0;
-
-    static void* thread_met(void* o);
 
 };
 }

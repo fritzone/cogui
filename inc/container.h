@@ -7,6 +7,7 @@
 #include "checkbox.h"
 #include "radiobutton.h"
 #include "radiobutton_group.h"
+#include "string_type.h"
 
 #include <vector>
 #include <iterator>
@@ -26,28 +27,35 @@ public:
     }
 
     /* to add a button to the container */
-	template<typename S, typename ... Args>
+    template<StringType S, typename ... Args>
 	std::shared_ptr<button> add_button(int x, int y, int width, int height, const S& title, Args... args)
     {
 		return add_control<button>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
 
     /* to add a checkbox to the container */
-	template<typename S, typename ... Args>
+    template<StringType S, typename ... Args>
 	std::shared_ptr<checkbox> add_checkbox(int x, int y, int width, int height, const S& title, Args... args)
     {
 		return add_control<checkbox>(x, y, width, height, this, title, std::forward<Args>(args)...);
     }
 
+    /* to add a label to the container */
+    template<StringType S>
+    std::shared_ptr<label> add_label(int x, int y, int width, int height, const S& title)
+    {
+        return add_control<label>(x, y, width, height, this, title);
+    }
+
 	/* to add a radiobutton to the container */
-	template<typename S, typename ... Args>
+    template<StringType S, typename ... Args>
 	std::shared_ptr<radiobutton> add_radiobutton(int x, int y, int width, int height, const S& title, Args... args)
 	{
 		return add_control<radiobutton>(x, y, width, height, this, title, std::forward<Args>(args)...);
 	}
 
 	/* to add a radiobutton group to the container */
-	template<typename S, typename ... Args>
+    template<StringType S, typename ... Args>
     std::shared_ptr<radiobutton_group> add_radiobutton_group(int x, int y, const S& title, const std::initializer_list<radiobutton::CREATOR>& buttons, Args... args)
 	{
         return add_control<radiobutton_group>(x, y, this, title, buttons, std::forward<Args>(args)...);
@@ -160,7 +168,7 @@ private:
     /**
      * Adds a control to the container
      */
-	template<typename C, typename S>
+    template<typename C, StringType S>
 	std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc, const S& title = S())
     {
         static store<C> cc(pc);
@@ -177,7 +185,7 @@ private:
         return shp;
     }
 
-    template<typename C = radiobutton_group, typename S, typename ... Args>
+    template<typename C = radiobutton_group, StringType S, typename ... Args>
     std::shared_ptr<radiobutton_group> add_control(int x, int y, container* pc, const S& title = S(), std::initializer_list<radiobutton::CREATOR> buttons = {}, Args... args)
 	{
 		static store<radiobutton_group> cc(pc);
@@ -198,7 +206,7 @@ private:
     /**
      * Add a control with a set of forwarded arguments as slots for specific signals
      */
-    template<typename C, typename S, typename ... Args>
+    template<typename C, StringType S, typename ... Args>
 	std::shared_ptr<C> add_control(int x, int y, int width, int height, container* pc, const S& title = S(), Args... args)
     {
         static store<C> cc(pc);

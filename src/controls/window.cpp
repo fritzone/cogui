@@ -100,7 +100,7 @@ void cogui::window::click(int x, int y)
 		if(m)
 		{
 			m_current_menu = m;
-			m_current_menu->open(p.x, p.y + p.height + 1);
+            m_current_menu->open(p.get_x(), p.get_y() + p.get_height() + 1);
 			return redraw();
 		}
 	}
@@ -201,7 +201,7 @@ bool cogui::window::mouse_move(int x, int y)
 				{
 					m_current_menu->close();
 					m_current_menu = m;
-					m_current_menu->open(p.x, p.y + p.height + 1);
+                    m_current_menu->open(p.get_x(), p.get_y() + p.get_height() + 1);
 					redraw();
 					return true;
 				}
@@ -522,7 +522,7 @@ bool cogui::window::keypress(std::shared_ptr<cogui::events::keypress> k)
 
 				auto p = desktop::get().get_theme()->current_menu_position(*m);
                 m_current_menu = m;
-                m_current_menu->open(p.x, p.y + p.height + 1);
+                m_current_menu->open(p.get_x(), p.get_y() + p.get_height() + 1);
                 m_current_menu->activate_action(0);
                 redraw();
                 return true;

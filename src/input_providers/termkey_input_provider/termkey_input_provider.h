@@ -20,7 +20,7 @@ public:
 	std::string name() const override;
 
 	std::vector<std::shared_ptr<events::event>> get_next_event() override;
-    TermKey *tk;
+    TermKey *tk = nullptr;
     int prev_curs = 1;
 	static std::map<TermKeySym, events::key_class> m_keymap;
 

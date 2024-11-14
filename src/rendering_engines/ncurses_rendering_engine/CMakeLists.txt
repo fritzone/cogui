@@ -11,5 +11,7 @@ else()
     message(FATAL_ERROR STATUS "ncurses not found!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ncurses_engine.cpp)
+add_library(${PROJECT_NAME} STATIC ncurses_rendering_engine.cpp
+    frame.cpp
+    frame.h)
 target_link_libraries(${PROJECT_NAME} ${CURSES_NCURSESW_LIBRARY} pthread dl cogui cogui_mouse cogui_logger)

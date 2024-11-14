@@ -57,14 +57,14 @@ std::tuple<cogui::menu *, cogui::rect> cogui::theme::menu_at(int x, int y)
 {
 	for(auto& [m, p] : m_menu_positions)
 	{
-		log_info() << "Trying menu:" << m->caption() << "at (" <<p.x<<","<<p.y << ") - (" <<p.x + p.width<<","<<p.y + p.height<< ") has (" << x << "," << y << ")";
-		if(p.x <=x && p.x + p.width>= x && p.y <= y && p.y + p.height >= y)
+        //log_info() << "Trying menu:" << m->caption() << "at (" <<p.x<<","<<p.y << ") - (" <<p.x + p.width<<","<<p.y + p.height<< ") has (" << x << "," << y << ")";
+        if(p.get_x() <=x && p.get_x() + p.get_width() >= x && p.get_y() <= y && p.get_y() + p.get_height() >= y)
 		{
 			log_info() << "Found click:" << m->caption();
 			return {m, p};
 		}
 	}
-	return {nullptr, {}}	;
+    return {nullptr, {}};
 }
 
 

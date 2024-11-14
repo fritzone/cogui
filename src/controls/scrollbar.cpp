@@ -45,13 +45,13 @@ void cogui::scrollbar::recalculate_step()
         m_dec_pos_set = m_inc_pos_set = false;
         if(m_orientation == orientation::so_horizontal)
         {
-            m_dist = (m_inc_arrow_screen_position.x - m_dec_arrow_screen_position.x - m_inc_arrow_screen_position.width - m_dec_arrow_screen_position.width);
+            m_dist = (m_inc_arrow_screen_position.get_x() - m_dec_arrow_screen_position.get_x() - m_inc_arrow_screen_position.get_width() - m_dec_arrow_screen_position.get_width());
             m_step = static_cast<float>(m_max_value - m_min_value) / static_cast<float>(m_dist);
         }
         else
         if(m_orientation == orientation::so_vertical)
         {
-            m_dist = (m_inc_arrow_screen_position.y - m_dec_arrow_screen_position.y - m_inc_arrow_screen_position.height - m_dec_arrow_screen_position.height);
+            m_dist = (m_inc_arrow_screen_position.get_y() - m_dec_arrow_screen_position.get_y() - m_inc_arrow_screen_position.get_height() - m_dec_arrow_screen_position.get_height());
             m_step = static_cast<float>(m_max_value - m_min_value) / static_cast<float>(m_dist);
         }
     }
@@ -100,8 +100,8 @@ void cogui::scrollbar::step_to_location(int locationx, int locationy)
     if(m_orientation == orientation::so_horizontal)
     {
         // use locationx
-        m_current_value = m_max_value - static_cast<int>((static_cast<float>( (m_inc_arrow_screen_position.x - m_inc_arrow_screen_position.width - locationx)  * (m_max_value - m_min_value) ) /
-                static_cast<float>( m_inc_arrow_screen_position.x - m_inc_arrow_screen_position.width - m_dec_arrow_screen_position.x - m_dec_arrow_screen_position.width)));
+        m_current_value = m_max_value - static_cast<int>((static_cast<float>( (m_inc_arrow_screen_position.get_x() - m_inc_arrow_screen_position.get_width() - locationx)  * (m_max_value - m_min_value) ) /
+                                                          static_cast<float>( m_inc_arrow_screen_position.get_x() - m_inc_arrow_screen_position.get_width() - m_dec_arrow_screen_position.get_x() - m_dec_arrow_screen_position.get_width())));
 
         if(m_current_value > m_max_value) m_current_value = m_max_value;
         if(m_current_value < m_min_value) m_current_value = m_min_value;
@@ -113,8 +113,8 @@ void cogui::scrollbar::step_to_location(int locationx, int locationy)
     if(m_orientation == orientation::so_vertical)
     {
         // use locationy
-        m_current_value = m_max_value - static_cast<int>((static_cast<float>( (m_inc_arrow_screen_position.y - m_inc_arrow_screen_position.height - locationy)  * (m_max_value - m_min_value) ) /
-                static_cast<float>( m_inc_arrow_screen_position.y - m_inc_arrow_screen_position.height - m_dec_arrow_screen_position.y - m_dec_arrow_screen_position.height)));
+        m_current_value = m_max_value - static_cast<int>((static_cast<float>( (m_inc_arrow_screen_position.get_y() - m_inc_arrow_screen_position.get_height() - locationy)  * (m_max_value - m_min_value) ) /
+                                                          static_cast<float>( m_inc_arrow_screen_position.get_y() - m_inc_arrow_screen_position.get_height() - m_dec_arrow_screen_position.get_y() - m_dec_arrow_screen_position.get_height())));
 
         if(m_current_value > m_max_value) m_current_value = m_max_value;
         if(m_current_value < m_min_value) m_current_value = m_min_value;

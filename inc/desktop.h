@@ -74,6 +74,9 @@ private:
 
 };
 
+
+static std::mutex renderMutex;
+
 }
 
 #endif // DESKTOP_H

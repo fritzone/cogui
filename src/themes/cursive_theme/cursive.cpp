@@ -291,6 +291,48 @@ void cogui::themes::cursive_theme::draw_button(const cogui::button &b)
     }
 }
 
+void cogui::themes::cursive_theme::draw_label(const label &l)
+{
+    if(!l.is_visible())
+    {
+        return;
+    }
+    int drawWidth = l.get_width();
+    int drawHeight = l.get_height();
+
+    if(drawWidth <= 0 || drawHeight <=0)
+    {
+        return;
+    }
+    int drawX = l.get_x();
+    int drawY = l.get_y();
+    int title_x = (int)(drawX + drawWidth / 2 - l.get_title().length() / 2);
+    std::wstring title_to_draw = l.get_title();
+    if(title_x <= drawX)
+    {
+        title_x = drawX + 1;
+    }
+
+    if(static_cast<int>(title_to_draw.length()) >= drawWidth)
+    {
+        if(drawWidth <= 5)
+        {
+            title_to_draw = title_to_draw[0];
+            while(static_cast<int>(title_to_draw.length()) < drawWidth - 2 && title_to_draw.length() < cogui::MAX_CAPTION_WIDTH)
+            {
+                title_to_draw += L".";
+            }
+        }
+        else
+        {
+            title_to_draw = title_to_draw.substr(0, drawWidth - 4) + L"...";
+        }
+    }
+
+    cogui::graphics()->draw_text(title_x, drawY, title_to_draw.c_str(), cogui::textflags::italic());
+
+}
+
 void cogui::themes::cursive_theme::draw_menu(const cogui::menu &m)
 {
     int drawHeight = m.getHeight();
@@ -301,8 +343,8 @@ void cogui::themes::cursive_theme::draw_menu(const cogui::menu &m)
 		return;
 	}
 
-	int drawX = m.getX();
-	int drawY = m.getY();
+    int drawX = m.get_x();
+    int drawY = m.get_y();
     bool one_is_selectable = false;
     // see if there is a menu action which is selectable or not
     for(int i=0; i<m.get_action_count(); i++)
@@ -491,7 +533,7 @@ void cogui::themes::cursive_theme::draw_radiobutton_group(const cogui::radiobutt
 	int drawX = rbg.get_x();
 	int y_ctr = 0;
 
-    for(const auto& rb : rbg.controls())
+    for(auto rb : rbg.controls())
 	{
 		int drawY = rbg.get_y() + y_ctr++;
 
@@ -533,6 +575,16 @@ int cogui::themes::cursive_theme::minimum_checkbox_height(const cogui::checkbox 
     return 1;
 }
 
+int cogui::themes::cursive_theme::minimum_label_width(const label &l)
+{
+    return l.get_title().length();
+}
+
+int cogui::themes::cursive_theme::minimum_label_height(const label &l)
+{
+    return 1;
+}
+
 int cogui::themes::cursive_theme::minimum_button_width(const cogui::button &b)
 {
     return b.get_title().length() + 2; // +2 for the beginning and ending lines
@@ -569,7 +621,7 @@ int cogui::themes::cursive_theme::minimum_radiobutton_height(const cogui::radiob
 
 int cogui::themes::cursive_theme::minimum_radiobutton_group_width(const cogui::radiobutton_group &c)
 {
-	return c.calculate_width();
+    return c.calculate_width();
 }
 
 int cogui::themes::cursive_theme::minimum_radiobutton_group_height(const cogui::radiobutton_group &c)
