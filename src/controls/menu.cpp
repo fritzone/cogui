@@ -206,7 +206,7 @@ void cogui::menu::trigger_current_action()
 
 }
 
-bool cogui::menu::isOpened() const
+bool cogui::menu::is_opened() const
 {
     return m_opened;
 }
@@ -221,12 +221,12 @@ const cogui::action &cogui::menu::operator[](int i) const
     throw "Index out of size";
 }
 
-int cogui::menu::getLastSelectedIndex() const
+int cogui::menu::get_last_selected_index() const
 {
     return m_lastSelectedIndex;
 }
 
-bool cogui::menu::isSysmenu() const
+bool cogui::menu::is_sysmenu() const
 {
     return m_is_sysmenu;
 }

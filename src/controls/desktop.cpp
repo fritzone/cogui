@@ -92,7 +92,7 @@ bool desktop::handle_mouse_left_click(int x, int y)
     {
         return true;
     }
-    if(m_captured_window && m_captured_window->has_sysmenu_button() && m_captured_window->get_system_menu().isOpened())
+    if(m_captured_window && m_captured_window->has_sysmenu_button() && m_captured_window->get_system_menu().is_opened())
     {
         m_captured_window->close_current_menu();
         handled = true;

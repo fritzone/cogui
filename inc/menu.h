@@ -61,12 +61,12 @@ public:
     void trigger_action(size_t index);
     void trigger_current_action();
 
-    bool isOpened() const;
+    bool is_opened() const;
 
     const action& operator[](int i) const;
 
-    int getLastSelectedIndex() const;
-    bool isSysmenu() const;
+    int get_last_selected_index() const;
+    bool is_sysmenu() const;
     std::wstring caption() const;
 
     static cogui::action separator_item;

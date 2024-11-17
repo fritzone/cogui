@@ -106,7 +106,7 @@ void cogui::themes::cursive_theme::draw_window(const cogui::window &w)
         available_width -= sysmenu_char.length();
 //        log_debug() << "adjusting width due to sysmenu button:" <<drawWidth << " avail:" << available_width;
 
-        cogui::graphics()->draw_text(drawX + 1, drawY, (w.get_system_menu().isOpened() ? WND_SYSMENU_DOWN : sysmenu_char).c_str());
+        cogui::graphics()->draw_text(drawX + 1, drawY, (w.get_system_menu().is_opened() ? WND_SYSMENU_DOWN : sysmenu_char).c_str());
         sysmenu_pos = drawX + 1 + 1 ;
     }
 
@@ -366,7 +366,7 @@ void cogui::themes::cursive_theme::draw_menu(const cogui::menu &m)
     cogui::graphics()->draw_text(drawX + drawWidth, drawY + drawHeight, MNU_LR_CORNER.c_str());
     cogui::graphics()->draw_text(drawX + 1, drawY + drawHeight, cogui::utils::repeated(drawWidth - 1, MNU_HORIZONTAL).c_str());
 
-    if(m.isSysmenu())
+    if(m.is_sysmenu())
     {
         cogui::graphics()->draw_text(drawX + 1, drawY, cogui::utils::repeated(drawWidth - 1, MNU_HORIZONTAL).c_str());
     }
@@ -375,7 +375,7 @@ void cogui::themes::cursive_theme::draw_menu(const cogui::menu &m)
         cogui::graphics()->draw_text(drawX , drawY, (MNU_UR_CORNER + cogui::utils::repeated(drawWidth - 1, L" ") + MNU_UL_CORNER + MNU_HORIZONTAL).c_str());
     }
 
-    if(m.isSysmenu())
+    if(m.is_sysmenu())
     {
         cogui::graphics()->draw_text(drawX, drawY, MNU_SYSMENU_TOP.c_str());
     }
@@ -406,7 +406,7 @@ void cogui::themes::cursive_theme::draw_menu(const cogui::menu &m)
         {
             while(static_cast<int>(titleToDraw.length()) < drawWidth - 1 && titleToDraw.length() < cogui::MAX_CAPTION_WIDTH) titleToDraw += L" ";
 
-            if(mc == m.getLastSelectedIndex())
+            if(mc == m.get_last_selected_index())
             {
                 cogui::graphics()->set_colors(color::black, color::white);
                 cogui::graphics()->draw_text(drawX + 1, y, titleToDraw.c_str(), cogui::textflags::title());
