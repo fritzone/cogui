@@ -1,0 +1,8 @@
+{
+	"theme": {
+		"name": "blitmap_theme",
+		"mode": "graphics",
+		"library": "blitmap_theme",
+                "platform": ["linux"]
+	}
+}

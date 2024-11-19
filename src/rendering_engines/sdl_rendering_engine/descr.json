@@ -1,0 +1,8 @@
+{
+	"rendering_engine": {
+		"name": "sdl_rendering_engine",
+		"mode": "graphics",
+		"library": "sdl_rendering_engine",
+		"platform": ["linux"]
+	}
+}

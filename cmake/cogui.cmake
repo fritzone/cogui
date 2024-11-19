@@ -1,5 +1,29 @@
 cmake_minimum_required(VERSION 3.25.0)
 
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(ColourBold  "${Esc}[1m")
+  set(Red         "${Esc}[31m")
+  set(Green       "${Esc}[32m")
+  set(Yellow      "${Esc}[33m")
+  set(Blue        "${Esc}[34m")
+  set(Magenta     "${Esc}[35m")
+  set(Cyan        "${Esc}[36m")
+  set(White       "${Esc}[37m")
+  set(BoldRed     "${Esc}[1;31m")
+  set(BoldGreen   "${Esc}[1;32m")
+  set(BoldYellow  "${Esc}[1;33m")
+  set(BoldBlue    "${Esc}[1;34m")
+  set(BoldMagenta "${Esc}[1;35m")
+  set(BoldCyan    "${Esc}[1;36m")
+  set(BoldWhite   "${Esc}[1;37m")
+endif()
+
+if(CMAKE_USE_EXTRA_DEBUG)
+    set(CMAKE_EXTRA_DEBUG 1)
+endif()
+
 #
 # Macro to traverse all the subdirectories of a specific directory
 #
@@ -53,8 +77,8 @@ function(EnumerateObjects type location target_var)
         message("-- ${theme} using as: ${var} = ${${var}}")
       endif()
 
-      # Theme platform mathces? It might be an array, so we check 2 elements max
-      # since there is support fro 2 platforms right now: linux and windows
+      # Theme platform matches? It might be an array, so we check 2 elements max
+      # since there is support for 2 platforms right now: linux and windows
       if("${var}" STREQUAL "${subdir}_json.${type}.platform"
               OR "${var}" STREQUAL "${subdir}_json.${type}.platform_0"
               OR "${var}" STREQUAL "${subdir}_json.${type}.platform_1")

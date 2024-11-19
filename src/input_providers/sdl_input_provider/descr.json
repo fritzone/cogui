@@ -1,0 +1,8 @@
+{
+	"input_provider": {
+		"name": "sdl_input_provider",
+		"mode": "graphics",
+		"platform": "linux",
+		"library": "sdl_input_provider"
+	}
+}

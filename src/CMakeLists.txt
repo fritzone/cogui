@@ -14,6 +14,27 @@ EnumerateObjects(rendering_engine "${CMAKE_CURRENT_SOURCE_DIR}/rendering_engines
 EnumerateObjects(input_provider "${CMAKE_CURRENT_SOURCE_DIR}/input_providers" ALL_INPUT_PROVIDERS)
 
 #
+# Check if we have found at least one
+#
+
+list(LENGTH ALL_THEMES ALL_THEMES_SIZE)
+list(LENGTH ALL_RENDERING_ENGINES ALL_RENDERING_ENGINES_SIZE)
+list(LENGTH ALL_INPUT_PROVIDERS ALL_INPUT_PROVIDERS_SIZE)
+
+if(NOT ALL_THEMES)
+  message(FATAL_ERROR "There was no ${White}theme${Red} that satisifes the current renderer/platform requirement")
+endif()
+
+if(NOT ALL_RENDERING_ENGINES)
+  message(FATAL_ERROR "There was no ${White}rendering engine${Red} that satisifes the current renderer/platform requirement")
+endif()
+
+if(NOT ALL_INPUT_PROVIDERS)
+  message(FATAL_ERROR "There was no ${White}input provider${Red} that satisifes the current renderer/platform requirement")
+endif()
+
+
+#
 # Now create the factory bindings for the identified objects and render the extension_manager.cpp to cover all the
 # identified extensions
 #
