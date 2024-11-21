@@ -71,9 +71,9 @@ set(PROJECT_SOURCES
     ${CMAKE_SOURCE_DIR}/inc/utils.h
     ${CMAKE_SOURCE_DIR}/inc/window.h
     ${CMAKE_SOURCE_DIR}/inc/string_type.h
-
+    ${CMAKE_SOURCE_DIR}/inc/positionable.h
+    ${CMAKE_SOURCE_DIR}/inc/label.h
 )
-
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)

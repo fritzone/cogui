@@ -1,5 +1,5 @@
-#ifndef THEME_CURSIVE_H
-#define THEME_CURSIVE_H
+#ifndef TURBO_THEME_H
+#define TURBO_THEME_H
 
 #include "theme.h"
 
@@ -20,7 +20,7 @@ namespace themes {
 /**
  * @brief The cursive class is the example class for a console based theme
  */
-class cursive_theme final : public ::cogui::console_theme
+class turbo_theme final : public ::cogui::console_theme
 {
     /******************************************************************************************************************/
     /*                                                      WINDOW                                                    */
@@ -161,8 +161,8 @@ class cursive_theme final : public ::cogui::console_theme
 
 public:
 
-    cursive_theme() = default;
-    ~cursive_theme() override = default;
+    turbo_theme() = default;
+    ~turbo_theme() override = default;
 
     void clear(const control& c) override;
 
@@ -195,12 +195,12 @@ public:
 
     int first_available_row(const window& w) override;
 
+    std::string name() override;
+
     wchar_t get_desktop_background() const override
     {
-        return L' ';
+        return L'▒';
     }
-
-    std::string name() override;
 private:
 
     void draw_horizontal_scrollbar(control* c, scrollbar& s);

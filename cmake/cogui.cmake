@@ -41,10 +41,19 @@ endmacro()
 #
 # Joins the given list with the given glue
 #
-function(JoinList VALUES GLUE OUTPUT)
-  string (REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
-  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
-  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+function(JoinStrings output_var delimiter strings)
+  # Initialize an empty result variable
+  set(result "")
+  # Loop through each string in the list
+  foreach(string IN LISTS ${strings})
+    if(result STREQUAL "") # If the result is empty, just set it
+      set(result "${string}")
+    else() # Otherwise, append the delimiter and the string
+      set(result "${result}${delimiter}${string}")
+    endif()
+  endforeach()
+  # Set the result to the output variable
+  set(${output_var} "${result}" PARENT_SCOPE)
 endfunction()
 
 #
@@ -150,7 +159,18 @@ function(EnumerateObjects type location target_var)
   message("object count: ${obj_cnt}")
   if(obj_cnt GREATER_EQUAL 1)
     set(${target_var} ${all_objects} PARENT_SCOPE)
-    JoinList(${all_objects} "\";\"" str_all_objects)
+
+    set(str_all_objects "")
+    # Loop through each string in the list
+    foreach(string IN LISTS all_objects)
+      if(str_all_objects STREQUAL "") # If the result is empty, just set it
+        set(str_all_objects "${string}")
+      else() # Otherwise, append the delimiter and the string
+        set(str_all_objects "${str_all_objects}\", \"${string}")
+      endif()
+    endforeach()
+
+    # JoinStrings(str_all_objects "\", \""  ${all_objects})
     file(APPEND ${CMAKE_BINARY_DIR}/${type}s.cpp "std::vector<std::string> g_s_all_${type}s={\"${str_all_objects}\"};\n")
 
     list(GET all_objects 0 main_theme)

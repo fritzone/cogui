@@ -219,9 +219,14 @@ void cogui::rendering_engines::ncurses_rendering_engine::clear_area(int x, int y
 {
     set_fg_color(color::white);
     set_bg_color(color::black);
+
+    console_theme* ct = dynamic_cast<console_theme*>(const_cast<theme*>(get_theme()));
+    wchar_t g[2];
+    g[0] = ct->get_desktop_background();
+    g[1] = L'\0';
     for(int rc = y; rc <= y + height; rc++)
     {
-        draw_text(x, rc, cogui::utils::repeated(width, L" "));
+        draw_text(x, rc, cogui::utils::repeated(width, g));
     }
 }
 
@@ -350,6 +355,8 @@ int cogui::rendering_engines::ncurses_rendering_engine::get_screen_height() cons
 
 void cogui::rendering_engines::frame::print()
 {
+    std::lock_guard<std::mutex> lock(renderMutex); // Lock the mutex to wait for the renderer to finish before printing the next phase
+
     log_debug() << "Printing Frame:" << (void*)this;
 
     for(int i = 0; i < height; i++)

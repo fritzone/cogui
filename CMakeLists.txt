@@ -53,8 +53,6 @@ add_subdirectory(src)
 #
 # Test app
 #
-add_executable(cogui_ex main.cpp
-    inc/positionable.h
-    inc/label.h)
+add_executable(cogui_ex main.cpp)
 
 target_link_libraries(cogui_ex cogui_controls)

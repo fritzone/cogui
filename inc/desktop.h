@@ -35,6 +35,7 @@ public:
 
     theme *get_theme() const;
     rendering_engine *get_graphics() const;
+    void set_theme(const std::string& name);
     input_provider *get_input() const;
 	const std::vector<window *>& get_windows() const;
 	int get_width() const;

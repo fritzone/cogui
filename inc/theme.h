@@ -29,8 +29,8 @@ public:
     static const char* type;
     static const char* path;
 
-    theme() {}
-    virtual ~theme() {}
+    theme() = default;
+    virtual ~theme() = default;
 
     /**
      * @brief clear
@@ -61,6 +61,7 @@ public:
 	virtual int minimum_radiobutton_group_height(const radiobutton_group& c) = 0;
 
 	virtual int first_available_row(const window& w) = 0;
+
 
     virtual std::string name() = 0;
 
@@ -96,6 +97,13 @@ private:
 	// this will hold the positions where the menu was drawn
 	// key is the menu, followed by two coordinates on the screen, upper left, lower right corner
 	std::map<menu*, rect> m_menu_positions;
+};
+
+class console_theme : public theme
+{
+
+public:
+    virtual wchar_t get_desktop_background() const = 0;
 };
 
 static constexpr auto builtin_label_minimum_label_width = [](label* o) -> int { return desktop::get().get_theme()->minimum_label_width(*o); };

@@ -140,6 +140,7 @@ std::map<std::string, std::shared_ptr<cogui::arguments::argument_base> > cogui::
             if(i + 1 < argc)
             {
                 std::string theme = argv[i + 1];
+                g_s_theme_name = theme;
                 i++;
                 continue;
             }

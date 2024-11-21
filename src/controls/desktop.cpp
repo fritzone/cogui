@@ -19,6 +19,8 @@ desktop::desktop() : m_theme( factory<theme>::instance().create(g_s_theme_name) 
                      m_rendering_engine( factory<rendering_engine>::instance().create(g_s_rendering_engine_name)),
                      m_input( factory<input_provider>::instance().create(g_s_input_provider_name) )
 {
+    m_rendering_engine->set_theme(m_theme);
+
     log_info() << "Picking theme:" << m_theme->name();
     log_info() << "Picking graphics engine:" << m_rendering_engine->name();
 	log_info() << "Picking input provider engine:" << m_input->name();
@@ -236,6 +238,11 @@ theme* desktop::get_theme() const
 rendering_engine* desktop::get_graphics() const
 {
     return m_rendering_engine;
+}
+
+void desktop::set_theme(const std::string &name)
+{
+    m_theme = factory<theme>::instance().create(name);
 }
 
 input_provider* desktop::get_input() const

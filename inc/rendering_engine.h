@@ -11,6 +11,8 @@
 namespace cogui
 {
 
+class theme;
+
 /**
  * @brief The graphics_engine class represents a mechanism that is used to draw the visual components of
  * the gui library onto the screen, after being rendered by the engine's renderer.
@@ -71,7 +73,24 @@ public:
 	 */
 	virtual void set_clip_area(const rect& r) = 0;
 
+
+
+    const theme *get_theme() const;
+    void set_theme(theme *newTheme);
+
+private:
+    theme* m_theme;
 };
+
+inline const theme *rendering_engine::get_theme() const
+{
+    return m_theme;
+}
+
+inline void rendering_engine::set_theme(theme *newTheme)
+{
+    m_theme = newTheme;
+}
 
 }
 
