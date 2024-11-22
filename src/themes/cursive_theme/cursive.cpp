@@ -643,7 +643,6 @@ void cogui::themes::cursive_theme::draw_horizontal_scrollbar(cogui::control *c, 
     int h = c->get_height();
     int w = c->get_width();
     int y = c->get_y();
-    cogui::graphics()->set_bg_color(color::white);
 
     cogui::graphics()->draw_text(x + 1, y + h, SCROLL_LEFT_ARROW.c_str(), cogui::textflags::normal());
     s.set_dec_arrow_screen_position({x + 1, y + h, 1, 1});
@@ -653,17 +652,22 @@ void cogui::themes::cursive_theme::draw_horizontal_scrollbar(cogui::control *c, 
 
     int handle_counter = 0;
 
+    cogui::graphics()->set_bg_color(color::white);
     for(int i =x + 2; i<= x + w - 1; i++)
     {
         cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_BODY.c_str(), cogui::textflags::normal());
         if(handle_counter == s.get_handle_position())
         {
+            cogui::graphics()->set_bg_color(color::black);
             cogui::graphics()->draw_text(i, y+h, SCROLL_HORIZONTAL_HANDLE.c_str(), cogui::textflags::normal());
             s.set_handle_screen_position({i, y+h, 1, 1});
+            cogui::graphics()->set_bg_color(color::white);
+
         }
         handle_counter ++;
     }
     cogui::graphics()->set_bg_color(color::black);
+
 }
 
 void cogui::themes::cursive_theme::draw_verticall_scrollbar(cogui::control *c, cogui::scrollbar &s)
@@ -673,7 +677,6 @@ void cogui::themes::cursive_theme::draw_verticall_scrollbar(cogui::control *c, c
 
     int y = c->get_y() + c->first_available_row(); // no need to put the scrollbar on menu
     int h = c->get_height() - c->first_available_row() - 1;
-    cogui::graphics()->set_bg_color(color::white);
 
     cogui::graphics()->draw_text(x + w + 1, y, SCROLL_UP_ARROW.c_str(), cogui::textflags::normal());
     s.set_dec_arrow_screen_position({x + w + 1, y, 1 ,1});
@@ -681,14 +684,17 @@ void cogui::themes::cursive_theme::draw_verticall_scrollbar(cogui::control *c, c
     cogui::graphics()->draw_text(x + w + 1, y + h, SCROLL_DOWN_ARROW.c_str(), cogui::textflags::normal());
     s.set_inc_arrow_screen_position({x + w + 1, y + h, 1, 1});
 
+    cogui::graphics()->set_bg_color(color::white);
     int handle_counter = 0;
     for(int i=y + 1; i<y+h; i++)
     {
         cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_BODY.c_str(), cogui::textflags::normal());
         if(handle_counter == s.get_handle_position())
         {
+            cogui::graphics()->set_bg_color(color::black);
             cogui::graphics()->draw_text(x + w + 1, i, SCROLL_VERTICAL_HANDLE.c_str(), cogui::textflags::normal());
             s.set_handle_screen_position({x + w + 1, i, 1, 1});
+            cogui::graphics()->set_bg_color(color::white);
         }
         handle_counter ++;
     }

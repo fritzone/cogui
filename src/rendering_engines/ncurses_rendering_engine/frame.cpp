@@ -51,7 +51,7 @@ void cogui::rendering_engines::frame::set(int x, int y, std::wstring v, uint8_t 
         }
     }
 
-    if(x < width && y < height && x >= 0 && y >= 0)
+    if(x < width && y < height && x >= 0 && y >= 0 && !v.empty())
     {
         int index = (y * width) + x;
         fg_colors[index] = fgc;

@@ -39,24 +39,6 @@ macro(Subdirlist result curdir)
 endmacro()
 
 #
-# Joins the given list with the given glue
-#
-function(JoinStrings output_var delimiter strings)
-  # Initialize an empty result variable
-  set(result "")
-  # Loop through each string in the list
-  foreach(string IN LISTS ${strings})
-    if(result STREQUAL "") # If the result is empty, just set it
-      set(result "${string}")
-    else() # Otherwise, append the delimiter and the string
-      set(result "${result}${delimiter}${string}")
-    endif()
-  endforeach()
-  # Set the result to the output variable
-  set(${output_var} "${result}" PARENT_SCOPE)
-endfunction()
-
-#
 # Enumerates the objects at a given location, and builds up the required structures
 #
 function(EnumerateObjects type location target_var)

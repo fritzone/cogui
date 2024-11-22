@@ -51,17 +51,20 @@ void cogui::themes::turbo_theme::draw_window(const cogui::window &w)
     auto maximize_char = normal_state ? active_state ? WND_MAXIMIZE : WND_MAXIMIZE_RESIZE : WND_MAXIMIZE_RESIZE;
 
     // top line
-    cogui::graphics()->draw_text(drawX, drawY, std::wstring(ul_corner_char + cogui::utils::repeated(drawWidth, line_char) + ur_corner_char).c_str() );
+    cogui::graphics()->set_bg_color(color::blue);
+    cogui::graphics()->set_fg_color(color::white);
+
+    cogui::graphics()->draw_text(drawX, drawY + 1, std::wstring(ul_corner_char + cogui::utils::repeated(drawWidth, line_char) + ur_corner_char).c_str() );
 
     // bottom line
     cogui::graphics()->draw_text(drawX, drawY + drawHeight, std::wstring(ll_corner_char + cogui::utils::repeated(drawWidth, line_char) +
         (w.is_resizeable() ? WND_LR_RESIZE : lr_corner_char)).c_str() );
 
     // side lines
-    for(int i=1; i< drawHeight; i++)
+    for(int i=1; i< drawHeight - 1; i++)
     {
-        cogui::graphics()->draw_text(drawX, drawY + i, vert_line_char.c_str());
-        cogui::graphics()->draw_text(drawX + drawWidth + 1, drawY + i, vert_line_char.c_str());
+        cogui::graphics()->draw_text(drawX, drawY + i + 1, vert_line_char.c_str());
+        cogui::graphics()->draw_text(drawX + drawWidth + 1, drawY + i + 1, vert_line_char.c_str());
     }
 
     int available_width = drawWidth; // -3 because of the begin and end chars for title separator
@@ -75,7 +78,7 @@ void cogui::themes::turbo_theme::draw_window(const cogui::window &w)
     {
         available_width -= close_char.length();
 //        log_debug() << "adjusting width due to close button:" << drawWidth << " avail:" << available_width;
-        cogui::graphics()->draw_text(drawX + available_width, drawY, close_char.c_str());
+        cogui::graphics()->draw_text(drawX + available_width, drawY + 1, close_char.c_str());
         close_pos = drawX + available_width + 1;
 
     }
@@ -95,15 +98,6 @@ void cogui::themes::turbo_theme::draw_window(const cogui::window &w)
         }
     }
 
-    // if there is a system menu
-    if(w.has_sysmenu_button())
-    {
-        available_width -= sysmenu_char.length();
-//        log_debug() << "adjusting width due to sysmenu button:" <<drawWidth << " avail:" << available_width;
-
-        cogui::graphics()->draw_text(drawX + 1, drawY, (w.get_system_menu().is_opened() ? WND_SYSMENU_DOWN : sysmenu_char).c_str());
-        sysmenu_pos = drawX + 1 + 1 ;
-    }
 
     // title
     if(!w.get_title().empty())
@@ -114,21 +108,20 @@ void cogui::themes::turbo_theme::draw_window(const cogui::window &w)
 
         std::wstring t = title_delim_left_char + wtitle + title_delim_right_char;
 
-        cogui::graphics()->draw_text(lefts, drawY, t.c_str());
+        cogui::graphics()->draw_text(lefts, drawY - 1, t.c_str());
     }
 
-    // tell the window the position of the three topbar buttons
-	set_window_close_button_position(w, rect {close_pos, drawY, 1, 1});
-	set_window_sysmenu_button_position(w, rect {sysmenu_pos, drawY, 1, 1});
-	set_window_maximize_button_position(w, rect {maximize_pos, drawY, 1, 1});
+
 
     // do we have a menubar
     if(w.has_menubar())
     {
-        cogui::graphics()->draw_text(drawX, drawY + 2, ((normal_state ? active_state ? WND_VERT_MENULINE_START_RESIZE : WND_VERT_MENULINE_START:WND_VERT_MENULINE_START )
-                                              + cogui::utils::repeated(drawWidth, WND_HORZ_MENULINE)
-                                              + (normal_state ? active_state ?WND_VERT_MENULINE_END_RESIZE : WND_VERT_MENULINE_END: WND_VERT_MENULINE_END)).c_str()
-                    );
+
+        cogui::graphics()->set_bg_color(color::white);
+        cogui::graphics()->set_fg_color(color::black);
+        // clear top line
+        cogui::graphics()->draw_text(drawX, drawY, empty_line.c_str());
+
         auto& m = const_cast<cogui::menubar&>(const_cast<cogui::window&>(w).get_main_menu());
         auto& items = m.items();
         int mdix = drawX + 2;
@@ -147,13 +140,22 @@ void cogui::themes::turbo_theme::draw_window(const cogui::window &w)
             }
             else
             {
-                cogui::graphics()->draw_text(mdix, drawY + 1, itm.caption().c_str(), cogui::textflags::title() & cogui::textflags::bold());
-				update_menubar_positions(&itm, {mdix, drawY + 1}, {mdix + itm.caption().length(), drawY + 1});
+                cogui::graphics()->draw_text(mdix, drawY, itm.caption().c_str(), cogui::textflags::title() & cogui::textflags::bold());
+                update_menubar_positions(&itm, {mdix, drawY}, {mdix + itm.caption().length(), drawY});
                 mdix += (itm.caption().length());
             }
         }
     }
 
+
+    // if there is a system menu
+    if(w.has_sysmenu_button())
+    {
+        cogui::graphics()->set_fg_color(color::red);
+        cogui::graphics()->draw_text(drawX, drawY, (w.get_system_menu().is_opened() ? WND_SYSMENU_DOWN : sysmenu_char).c_str());
+        cogui::graphics()->set_fg_color(color::black);
+        sysmenu_pos = drawX;
+    }
 
     // and the scrollbar, finally
     switch(w.get_scrollbar().get_orientation())
@@ -174,6 +176,11 @@ void cogui::themes::turbo_theme::draw_window(const cogui::window &w)
         draw_scrollbar(w.get_vertical_scrollbar());
         break;
     }
+
+    // tell the window the position of the three topbar buttons
+    set_window_close_button_position(w, rect {close_pos, drawY, 1, 1});
+    set_window_sysmenu_button_position(w, rect {sysmenu_pos, drawY, 1, 1});
+    set_window_maximize_button_position(w, rect {maximize_pos, drawY, 1, 1});
 
 }
 

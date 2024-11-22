@@ -27,12 +27,12 @@ class turbo_theme final : public ::cogui::console_theme
     /******************************************************************************************************************/
 
     // the line characters of the window
-    std::wstring WND_UL_CORNER = L"\x250F"; // L"\x2554";
-    std::wstring WND_UR_CORNER = L"\x2513"; // L"\x2557";
-    std::wstring WND_LL_CORNER = L"\x2517"; // L"\x255A";
-    std::wstring WND_LR_CORNER = L"\x251B"; // L"\x255D";
-    std::wstring WND_HORZ_LINE = L"\x2501"; // L"\x2550";
-    std::wstring WND_VERT_LINE = L"\x2503"; // L"\x2551";
+    std::wstring WND_UL_CORNER = L"╔"; // L"\x2554";
+    std::wstring WND_UR_CORNER = L"╗"; // L"\x2557";
+    std::wstring WND_LL_CORNER = L"╚"; // L"\x255A";
+    std::wstring WND_LR_CORNER = L"╝"; // L"\x255D";
+    std::wstring WND_HORZ_LINE = L"═"; // L"\x2550";
+    std::wstring WND_VERT_LINE = L"║"; // L"\x2551";
 
     // if there is a main menu attached to this window
     std::wstring WND_VERT_MENULINE_START =          L"\x2523"; // L"\x2520";
@@ -49,8 +49,8 @@ class turbo_theme final : public ::cogui::console_theme
     std::wstring WND_MAXIMIZE = L"\x252B\x25ab\x2523";
 
     // the system menu
-    std::wstring WND_SYSMENU =  L"\x252B\x25bf\x2523";
-    std::wstring WND_SYSMENU_DOWN =  L"\x252B\x25b5\x2523";
+    std::wstring WND_SYSMENU =  L"☰";
+    std::wstring WND_SYSMENU_DOWN =  L"☰";
 
     // the delimiters of the title
     std::wstring WND_TITLE_DELIM_LEFT = L"\x252B ";
@@ -67,7 +67,7 @@ class turbo_theme final : public ::cogui::console_theme
     std::wstring VERT_LINE_RESIZE = L"\x2503";
 
     // the system menu, resize mode
-    std::wstring WND_SYSMENU_RESIZE =  L"\x252B\x25bf\x2523";
+    std::wstring WND_SYSMENU_RESIZE = L"☰";
 
     // the delimiters of the title
     std::wstring WND_TITLE_DELIM_LEFT_RESIZE = L"\x252B ";

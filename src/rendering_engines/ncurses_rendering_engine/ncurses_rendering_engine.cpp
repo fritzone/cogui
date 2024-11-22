@@ -121,6 +121,8 @@ bool cogui::rendering_engines::ncurses_rendering_engine::initialize()
     // initialize the colorpairs
     for(const auto& cp : colorpairs)
     {
+        log_info() << "Init:" << std::get<0>(cp.second) << std::get<1>(cp.second) << std::get<2>(cp.second);
+
         init_pair(std::get<0>(cp.second), std::get<1>(cp.second), std::get<2>(cp.second));
     }
 
@@ -330,10 +332,7 @@ void cogui::rendering_engines::ncurses_rendering_engine::draw_title(int x, int y
         // ad an extra space at the end, because we took away an & sign
 		draw_text(x + final_title.length(), y, L' ', cogui::textflags::normal());
 
-		draw_text(x + highlight_pos, y, highlight_char,
-                                           cogui::textflags::underline() & cogui::textflags::bold());
-
-
+        draw_text(x + highlight_pos, y, highlight_char, cogui::textflags::underline() & cogui::textflags::bold());
     }
 }
 
@@ -365,10 +364,13 @@ void cogui::rendering_engines::frame::print()
         {
             int index = (width * i) + j;
             int a =  (fg_colors[index] - 1) << 8 | (bg_colors[index] - 1);
+            //log_info() << "fg_colors:" << fg_colors[index] << " bg_colors:" << bg_colors[index] << " a=" << a << " CP:" << COLOR_PAIR(a);
 
-            attron(attrs[index] | COLOR_PAIR(a));
+            const auto cp = colorpairs.at(a);
+
+            attron(attrs[index] | COLOR_PAIR(std::get<0>(cp)));
             mvaddstr(i, j, utils::unicode_to_utf8(data[index]));
-            attroff(attrs[index] | COLOR_PAIR(a));
+            attroff(attrs[index] | COLOR_PAIR(std::get<0>(cp)));
         }
     }
 
@@ -383,9 +385,10 @@ void cogui::rendering_engines::frame::print()
         int mouseIndex = (width * my) + mx;
         int a =  (fg_colors[mouseIndex] - 1) << 8 | (bg_colors[mouseIndex] - 1);
 
-        attron(A_REVERSE | COLOR_PAIR(a));
+        const auto cp = colorpairs.at(a);
+        attron(A_REVERSE | COLOR_PAIR(std::get<0>(cp)));
         mvaddstr(my, mx, utils::unicode_to_utf8(data[mouseIndex]));
-        attroff(A_REVERSE | COLOR_PAIR(a));
+        attroff(A_REVERSE | COLOR_PAIR(std::get<0>(cp)));
 
         // debug
         /*
